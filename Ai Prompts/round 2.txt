@@ -1,0 +1,30 @@
+I want to make a prompt for claude code to help finish up some details with my website. 
+
+For the Admin...
+
+1. Fix the transaction tab
+
+- add whitespace in the table heading between the # and the text.
+
+- The table is appearing on the right side of the screen and is partially off the screen. The table should be centered and occupy all available screen.
+
+- I should be able to download transaction information as a .csv file.
+
+2. Fix delievery date tab
+
+- Same problem as the transaction tab. I need the table centered and occupying all available screen
+
+- Upgrade the 'add delivery date' functionality so that I can multi-select dates from a calendar interface.
+
+- Automatically delete 'past' delivery dates from the list of availably delivery dates.
+
+3. Fix global inventory tab and functionality.
+
+- I want the ability to add a part to the global inventory via the global inventory tab. 
+
+- add a part with the required fields : (part #, make, model, price, quantity) leave space for optional fields (image, description, year) limit make and model and year librarys to all tesla and rivian production to date. 
+
+- If the part number is a match to existing inventory... increment  the existing inventory by the quantity.
+
+- when a user successfully purchases a part, decrement the inventory. 
+

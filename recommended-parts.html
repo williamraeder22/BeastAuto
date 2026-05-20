@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PartFind — My Parts</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:       #0d0d0f;
+            --surface:  #16161a;
+            --surface2: #1e1e24;
+            --surface3: #26262e;
+            --border:   rgba(255,255,255,0.07);
+            --border2:  rgba(255,255,255,0.13);
+            --accent:   #e8ff47;
+            --accent2:  #c8dc30;
+            --text:     #f0ede8;
+            --muted:    rgba(240,237,232,0.45);
+            --danger:   #ff5c5c;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { height: 100%; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+
+        .noise { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 180px; }
+
+        /* -- Sidebar -- */
+        .sidebar { width: 220px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 28px 20px; gap: 28px; position: sticky; top: 0; height: 100vh; z-index: 10; }
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo-mark { width: 32px; height: 32px; background: var(--accent); color: #0d0d0f; font-family: 'Bebas Neue', sans-serif; font-size: 20px; display: flex; align-items: center; justify-content: center; border-radius: 7px; flex-shrink: 0; }
+        .logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: .05em; }
+        .nav { display: flex; flex-direction: column; gap: 2px; }
+        .nav-label { font-size: 9px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding: 0 10px; margin-bottom: 4px; margin-top: 8px; }
+        .nav-item { font-size: 13px; color: var(--muted); text-decoration: none; padding: 9px 12px; border-radius: 8px; transition: background .15s, color .15s; display: flex; align-items: center; gap: 9px; cursor: pointer; border: none; background: none; width: 100%; text-align: left; }
+        .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; }
+        .nav-item:hover { background: var(--surface2); color: var(--text); }
+        .nav-item.active { background: var(--surface2); color: var(--text); font-weight: 500; }
+
+        /* Global cart badge — total across all folders */
+        .global-cart-badge { margin-left: auto; background: var(--accent); color: #0d0d0f; font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 99px; display: flex; align-items: center; justify-content: center; padding: 0 4px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+        .global-cart-badge.visible { opacity: 1; }
+
+        .sidebar-footer { border-top: 1px solid var(--border); padding-top: 18px; margin-top: auto; }
+        .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; color: var(--accent); flex-shrink: 0; }
+        .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .user-info-block { min-width: 0; }
+        .user-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-role-label { font-size: 11px; color: var(--muted); }
+        .logout-btn { font-size: 12px; color: var(--muted); background: none; border: none; cursor: pointer; padding: 0; transition: color .15s; }
+        .logout-btn:hover { color: var(--danger); }
+
+        /* -- Main -- */
+        .main { flex: 1; display: flex; flex-direction: column; position: relative; z-index: 1; min-width: 0; }
+        #view-folders { display: flex; flex-direction: column; }
+        #view-parts   { display: none; flex-direction: column; }
+
+        /* -- Folder hero -- */
+        .folder-hero { padding: 52px 56px 36px; border-bottom: 1px solid var(--border); }
+        .page-eyebrow { font-size: 10px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+        .page-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(44px, 5.5vw, 72px); line-height: .93; margin-bottom: 10px; }
+        .page-title em { font-style: italic; font-family: 'DM Sans', sans-serif; font-weight: 300; font-size: .6em; color: var(--accent); vertical-align: middle; }
+        .page-sub { font-size: 14px; font-weight: 300; color: var(--muted); max-width: 460px; line-height: 1.7; }
+        .folder-section { padding: 36px 56px 60px; }
+        .section-label { font-size: 11px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+
+        /* -- Folder cards -- */
+        .folder-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+        .folder-card { background: var(--surface); border: 1px solid var(--border2); border-radius: 18px; padding: 0; cursor: pointer; overflow: hidden; transition: border-color .2s, transform .2s; animation: fadeUp .4s ease both; position: relative; }
+        .folder-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+        .folder-card:hover .folder-arrow { opacity: 1; transform: translate(0,0); }
+        .folder-card-accent { height: 5px; background: var(--accent); width: 100%; }
+        .folder-card-body { padding: 22px 22px 20px; }
+        .folder-icon { width: 42px; height: 42px; background: rgba(232,255,71,.08); border: 1px solid rgba(232,255,71,.18); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+        .folder-icon svg { width: 20px; height: 20px; color: var(--accent); }
+        .folder-card-name { font-size: 22px; font-weight: 500; letter-spacing: -.01em; margin-bottom: 4px; line-height: 1; }
+        .folder-card-num { font-size: 11px; color: var(--muted); letter-spacing: .06em; font-weight: 400; margin-bottom: 16px; }
+        .folder-card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--border); gap: 8px; flex-wrap: wrap; }
+        .folder-parts-count { font-size: 12px; color: var(--muted); }
+        .folder-parts-count strong { color: var(--text); font-weight: 500; }
+
+        /* Per-folder cart pill — only shown when cart has items */
+        .folder-cart-pill { display: flex; align-items: center; gap: 5px; background: rgba(232,255,71,.1); border: 1px solid rgba(232,255,71,.25); border-radius: 99px; padding: 3px 10px 3px 6px; font-size: 11px; font-weight: 500; color: var(--accent); opacity: 0; transition: opacity .2s; pointer-events: none; }
+        .folder-cart-pill.visible { opacity: 1; pointer-events: auto; cursor: pointer; }
+        .folder-cart-pill svg { width: 11px; height: 11px; }
+
+        .folder-arrow { width: 28px; height: 28px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transform: translate(-4px,4px); transition: opacity .2s, transform .2s; flex-shrink: 0; }
+        .folder-arrow svg { width: 12px; height: 12px; color: #0d0d0f; }
+
+        /* -- Empty state -- */
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 40px; gap: 14px; color: var(--muted); text-align: center; }
+        .empty-state svg { width: 52px; height: 52px; opacity: .25; }
+        .empty-state p { font-size: 14px; font-weight: 300; max-width: 280px; line-height: 1.6; }
+
+        /* -- Parts topbar -- */
+        .parts-topbar { height: 56px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0; flex-shrink: 0; }
+        .back-btn { height: 100%; padding: 0 20px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); cursor: pointer; background: none; border: none; border-right: 1px solid var(--border); transition: color .15s, background .15s; }
+        .back-btn:hover { color: var(--text); background: var(--surface2); }
+        .back-btn svg { width: 14px; height: 14px; }
+        .parts-topbar-info { padding: 0 22px; flex: 1; }
+        .parts-topbar-name { font-size: 15px; font-weight: 500; }
+        .parts-topbar-num { font-size: 11px; color: var(--muted); letter-spacing: .05em; }
+        .parts-topbar-right { padding: 0 20px; display: flex; align-items: center; gap: 10px; }
+        .parts-count-pill { font-size: 12px; color: var(--muted); background: var(--surface2); border: 1px solid var(--border2); padding: 4px 12px; border-radius: 99px; }
+
+        /* Folder-specific cart button — hidden until this folder has items */
+        .folder-cart-btn { display: flex; align-items: center; gap: 7px; padding: 8px 14px; background: rgba(232,255,71,.08); border: 1px solid rgba(232,255,71,.25); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--accent); cursor: pointer; transition: background .15s; visibility: hidden; }
+        .folder-cart-btn.has-items { visibility: visible; }
+        .folder-cart-btn:hover { background: rgba(232,255,71,.15); }
+        .folder-cart-btn svg { width: 14px; height: 14px; }
+        .folder-cart-btn-count { font-family: 'Bebas Neue', sans-serif; font-size: 16px; line-height: 1; }
+
+        /* -- Parts grid -- */
+        .parts-body { flex: 1; padding: 36px 56px 60px; overflow-y: auto; }
+        .parts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .part-card { background: var(--surface); border: 1px solid var(--border2); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; animation: fadeUp .35s ease both; transition: border-color .2s, transform .2s; }
+        .part-card:hover { border-color: rgba(255,255,255,.2); transform: translateY(-2px); }
+        .part-card.in-cart { border-color: rgba(232,255,71,.35); }
+        .part-img-wrap { position: relative; height: 180px; background: var(--surface2); overflow: hidden; }
+        .part-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s ease; }
+        .part-card:hover .part-img { transform: scale(1.03); }
+        .part-img-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .part-img-placeholder svg { width: 36px; height: 36px; color: var(--muted); opacity: .4; }
+        .in-cart-ribbon { position: absolute; top: 12px; right: 12px; background: var(--accent); color: #0d0d0f; font-size: 10px; font-weight: 700; letter-spacing: .06em; padding: 3px 9px; border-radius: 99px; opacity: 0; transform: translateY(-4px); transition: opacity .2s, transform .2s; pointer-events: none; }
+        .part-card.in-cart .in-cart-ribbon { opacity: 1; transform: translateY(0); }
+        .part-card-body { padding: 18px 20px 20px; display: flex; flex-direction: column; flex: 1; }
+        .part-number { font-size: 10px; letter-spacing: .12em; font-weight: 500; color: var(--accent); margin-bottom: 6px; text-transform: uppercase; }
+        .part-name { font-size: 16px; font-weight: 500; margin-bottom: 4px; line-height: 1.3; }
+        .part-desc { font-size: 13px; font-weight: 300; color: var(--muted); line-height: 1.5; flex: 1; margin-bottom: 16px; }
+        .part-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .part-price { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: .02em; line-height: 1; }
+        .add-btn { padding: 9px 16px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--text); cursor: pointer; transition: background .15s, border-color .15s, color .15s, transform .1s; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+        .add-btn svg { width: 13px; height: 13px; transition: transform .2s; }
+        .add-btn:hover { background: var(--accent); border-color: var(--accent); color: #0d0d0f; }
+        .add-btn:hover svg { transform: scale(1.15); }
+        .add-btn:active { transform: scale(.97); }
+        .add-btn.added { background: rgba(232,255,71,.12); border-color: rgba(232,255,71,.35); color: var(--accent); cursor: default; }
+
+        /* -- Cart drawer -- */
+        .cart-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 90; opacity: 0; pointer-events: none; transition: opacity .25s; }
+        .cart-backdrop.open { opacity: 1; pointer-events: all; }
+        .cart-drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 380px; max-width: 100vw; background: var(--surface); border-left: 1px solid var(--border2); z-index: 100; display: flex; flex-direction: column; transform: translateX(100%); transition: transform .3s cubic-bezier(.4,0,.2,1); }
+        .cart-drawer.open { transform: translateX(0); }
+        .cart-drawer-head { padding: 18px 24px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .cart-drawer-title { font-size: 15px; font-weight: 500; margin-bottom: 2px; }
+        .cart-drawer-folder { font-size: 11px; color: var(--accent); letter-spacing: .04em; }
+        .cart-head-row { display: flex; align-items: flex-start; justify-content: space-between; }
+        .cart-close { background: none; border: none; cursor: pointer; color: var(--muted); padding: 4px; border-radius: 6px; transition: color .15s, background .15s; }
+        .cart-close:hover { color: var(--text); background: var(--surface2); }
+        .cart-close svg { width: 18px; height: 18px; display: block; }
+        .cart-items { flex: 1; overflow-y: auto; padding: 16px 24px; display: flex; flex-direction: column; gap: 12px; }
+        .cart-items::-webkit-scrollbar { width: 4px; }
+        .cart-items::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+        .cart-item { display: flex; gap: 12px; align-items: flex-start; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+        .cart-item-thumb { width: 48px; height: 48px; border-radius: 6px; object-fit: cover; background: var(--surface3); flex-shrink: 0; }
+        .cart-item-thumb-placeholder { width: 48px; height: 48px; border-radius: 6px; background: var(--surface3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .cart-item-info { flex: 1; min-width: 0; }
+        .cart-item-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cart-item-num { font-size: 10px; color: var(--accent); letter-spacing: .08em; margin-bottom: 6px; }
+        .cart-item-bottom { display: flex; align-items: center; gap: 10px; }
+        .cart-item-price { font-family: 'Bebas Neue', sans-serif; font-size: 17px; }
+        .qty-control { display: flex; align-items: center; border: 1px solid var(--border2); border-radius: 6px; overflow: hidden; }
+        .qty-btn { width: 26px; height: 24px; background: none; border: none; cursor: pointer; color: var(--muted); font-size: 14px; transition: background .12s, color .12s; display: flex; align-items: center; justify-content: center; }
+        .qty-btn:hover { background: var(--surface3); color: var(--text); }
+        .qty-val { min-width: 24px; text-align: center; font-size: 12px; font-weight: 500; color: var(--text); padding: 0 4px; border-left: 1px solid var(--border); border-right: 1px solid var(--border); line-height: 24px; }
+        .cart-item-remove { margin-left: auto; background: none; border: none; cursor: pointer; color: var(--muted); padding: 2px; border-radius: 4px; transition: color .15s; }
+        .cart-item-remove:hover { color: var(--danger); }
+        .cart-item-remove svg { width: 14px; height: 14px; display: block; }
+        .cart-empty-msg { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 12px; color: var(--muted); }
+        .cart-empty-msg svg { width: 40px; height: 40px; opacity: .25; }
+        .cart-empty-msg p { font-size: 13px; font-weight: 300; }
+        .cart-footer { padding: 18px 24px; border-top: 1px solid var(--border); flex-shrink: 0; }
+        .cart-totals { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
+        .cart-total-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+        .cart-total-price { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: .02em; }
+        .checkout-btn { width: 100%; padding: 14px; background: var(--accent); color: #0d0d0f; border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: background .15s, transform .1s; }
+        .checkout-btn:hover { background: var(--accent2); }
+        .checkout-btn:active { transform: scale(.99); }
+
+        /* -- Return button & status -- */
+        .return-btn { display:inline-flex; align-items:center; gap:5px; padding:5px 10px; border-radius:6px; font-family:'DM Sans',sans-serif; font-size:11px; font-weight:500; cursor:pointer; border:1px solid var(--border2); background:transparent; color:var(--muted); transition:all .15s; white-space:nowrap; }
+        .return-btn:hover { border-color:var(--danger); color:var(--danger); background:rgba(255,92,92,.07); }
+        .return-btn svg { width:11px; height:11px; }
+        .return-status { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:99px; font-size:10px; font-weight:500; }
+        .return-status.pending  { background:rgba(255,184,0,.1);  color:#F5A623; border:1px solid rgba(255,184,0,.3); }
+        .return-status.approved { background:rgba(71,255,178,.1); color:#47ffb2; border:1px solid rgba(71,255,178,.3); }
+        .return-status.rejected { background:rgba(255,92,92,.1);  color:var(--danger); border:1px solid rgba(255,92,92,.3); }
+
+        /* -- Return modal -- */
+        .ret-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:300; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
+        .ret-backdrop.open { opacity:1; pointer-events:all; }
+        .ret-modal { background:var(--surface); border:1px solid var(--border2); border-radius:16px; padding:28px; width:100%; max-width:420px; animation:fadeUp .2s ease both; }
+        .ret-modal h3 { font-size:16px; font-weight:500; margin-bottom:4px; }
+        .ret-modal p  { font-size:13px; color:var(--muted); margin-bottom:20px; }
+        .ret-part-preview { display:flex; align-items:center; gap:12px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:20px; }
+        .ret-part-preview img { width:40px; height:40px; border-radius:6px; object-fit:cover; flex-shrink:0; }
+        .ret-part-thumb { width:40px; height:40px; border-radius:6px; background:var(--surface3); flex-shrink:0; }
+        .ret-part-name { font-size:13px; font-weight:500; }
+        .ret-part-num  { font-size:10px; color:var(--accent); letter-spacing:.06em; margin-top:2px; }
+        .ret-reason-group { display:flex; flex-direction:column; gap:8px; margin-bottom:20px; }
+        .ret-reason-opt { display:flex; align-items:center; gap:10px; padding:10px 14px; border:1px solid var(--border2); border-radius:8px; cursor:pointer; transition:all .15s; }
+        .ret-reason-opt:hover { border-color:rgba(255,255,255,.2); background:var(--surface2); }
+        .ret-reason-opt input[type=radio] { accent-color:var(--accent); width:14px; height:14px; flex-shrink:0; }
+        .ret-reason-opt label { font-size:13px; cursor:pointer; }
+        .ret-actions { display:flex; gap:8px; justify-content:flex-end; }
+        .ret-cancel { padding:9px 16px; background:transparent; border:1px solid var(--border2); border-radius:8px; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; transition:all .15s; }
+        .ret-cancel:hover { border-color:rgba(255,255,255,.25); color:var(--text); }
+        .ret-submit { padding:9px 18px; background:var(--danger); border:none; border-radius:8px; color:#fff; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; cursor:pointer; transition:background .15s; }
+        .ret-submit:hover { background:#e04444; }
+
+        /* -- Toast -- */
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(10px); background: var(--surface2); color: var(--text); font-size: 13px; font-weight: 500; padding: 11px 20px; border-radius: 99px; border: 1px solid var(--border2); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 200; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; flex-shrink: 0; }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* -- Order History view -- */
+        #view-history { display: none; flex-direction: column; flex: 1; }
+        .history-hero { padding: 52px 56px 36px; border-bottom: 1px solid var(--border); }
+        .history-body { padding: 36px 56px 60px; overflow-y: auto; flex: 1; }
+        .order-card { background: var(--surface); border: 1px solid var(--border2); border-radius: 16px; margin-bottom: 16px; overflow: hidden; animation: fadeUp .3s ease both; }
+        .order-card-head { padding: 18px 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--border); }
+        .order-id { font-size: 10px; font-weight: 500; letter-spacing: .1em; color: var(--accent); }
+        .order-date { font-size: 11px; color: var(--muted); margin-top: 3px; }
+        .order-status { font-size: 10px; font-weight: 500; padding: 3px 10px; border-radius: 99px; background: rgba(71,255,178,.1); color: #47ffb2; border: 1px solid rgba(71,255,178,.25); }
+        .order-status.test { background: rgba(232,255,71,.08); color: var(--accent); border-color: rgba(232,255,71,.25); }
+        .order-card-body { padding: 16px 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .order-meta-item { display: flex; flex-direction: column; gap: 3px; }
+        .order-meta-label { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+        .order-meta-val { font-size: 14px; font-weight: 500; }
+        .order-meta-val.price { font-family: 'Bebas Neue', sans-serif; font-size: 20px; }
+        .order-items-list { padding: 0 22px 16px; display: flex; flex-direction: column; gap: 6px; }
+        .order-item-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--surface2); border-radius: 8px; font-size: 12px; }
+        .order-item-row img { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; flex-shrink: 0; }
+        .order-item-thumb-sm { width: 32px; height: 32px; border-radius: 4px; background: var(--surface3); flex-shrink: 0; }
+        .order-item-name-sm { flex: 1; font-weight: 500; }
+        .order-item-num-sm { font-size: 10px; color: var(--accent); letter-spacing: .06em; }
+        .order-item-price-sm { font-family: 'Bebas Neue', sans-serif; font-size: 15px; flex-shrink: 0; }
+        .order-card-footer { padding: 14px 22px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+        .email-confirm { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+        .email-confirm svg { width: 13px; height: 13px; color: #47ffb2; flex-shrink: 0; }
+        .invoice-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--text); cursor: pointer; transition: all .15s; }
+        .invoice-btn svg { width: 13px; height: 13px; }
+        .invoice-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .history-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 40px; gap: 14px; color: var(--muted); text-align: center; }
+        .history-empty svg { width: 48px; height: 48px; opacity: .2; }
+
+        /* -- Print invoice styles -- */
+        @media print {
+            body > *:not(#print-invoice) { display: none !important; }
+            #print-invoice { display: block !important; font-family: sans-serif; color: #000; padding: 40px; max-width: 680px; margin: 0 auto; }
+            #print-invoice h1 { font-size: 28px; margin-bottom: 4px; }
+            #print-invoice .inv-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 20px 0; font-size: 13px; }
+            #print-invoice .inv-label { color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+            #print-invoice table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
+            #print-invoice th { text-align: left; padding: 8px; border-bottom: 2px solid #000; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+            #print-invoice td { padding: 8px; border-bottom: 1px solid #ddd; }
+            #print-invoice .inv-total { text-align: right; font-size: 18px; font-weight: 700; margin-top: 16px; }
+            #print-invoice .inv-footer { margin-top: 40px; font-size: 11px; color: #999; border-top: 1px solid #ddd; padding-top: 12px; }
+        }
+
+        @media (max-width: 860px) {
+            .sidebar { display: none; }
+            .folder-hero, .folder-section, .parts-body { padding-left: 24px; padding-right: 24px; }
+            .cart-drawer { width: 100vw; }
+        }
+    </style>
+</head>
+<body>
+<div class="noise"></div>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <div class="logo">
+        <span class="logo-mark">P</span>
+        <span class="logo-text">PartFind</span>
+    </div>
+    <nav class="nav">
+        <span class="nav-label">Menu</span>
+        <a href="recommended-parts.html" class="nav-item active">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M2 4a2 2 0 012-2h2l2 2h4a2 2 0 012 2v5a2 2 0 01-2 2H4a2 2 0 01-2-2V4z"/></svg>
+            My Folders
+        </a>
+        <!-- Cart nav item — shows global total across all folders -->
+        <button class="nav-item" id="nav-cart-btn" onclick="openCart()">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M2 2h2l.8 3M5 8h8l1.5-5H4.8M5 8l-.8 3h9"/><circle cx="7" cy="13.5" r="1"/><circle cx="13" cy="13.5" r="1"/></svg>
+            My Cart
+            <span class="global-cart-badge" id="global-cart-badge">0</span>
+        </button>
+        <button class="nav-item" id="nav-history-btn" onclick="showOrderHistory()">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 4h10M3 8h10M3 12h6"/></svg>
+            Order History
+        </button>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="user-row">
+            <div class="user-avatar" id="user-avatar">?</div>
+            <div class="user-info-block">
+                <div class="user-name" id="user-name">—</div>
+                <div class="user-role-label">Customer</div>
+            </div>
+        </div>
+        <button class="logout-btn" id="logout-btn">Sign out →</button>
+    </div>
+</aside>
+
+<!-- Folder view -->
+<div id="view-folders" style="flex:1;display:flex;flex-direction:column;">
+    <div class="folder-hero">
+        <div class="page-eyebrow">Service records</div>
+        <h1 class="page-title" id="hero-title">Your <em>folders</em></h1>
+        <p class="page-sub">Select a service folder to view recommended parts and manage your cart for that vehicle.</p>
+    </div>
+    <div class="folder-section">
+        <div class="section-label" id="folders-section-label">Your folders</div>
+        <div class="folder-grid" id="folder-grid"></div>
+    </div>
+</div>
+
+<!-- Parts view -->
+<div id="view-parts" style="flex:1;display:none;flex-direction:column;">
+    <div class="parts-topbar">
+        <button class="back-btn" onclick="showFolders()">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 2L4 7l5 5"/></svg>
+            All folders
+        </button>
+        <div class="parts-topbar-info">
+            <div class="parts-topbar-name" id="topbar-folder-name">—</div>
+            <div class="parts-topbar-num" id="topbar-folder-num"></div>
+        </div>
+        <div class="parts-topbar-right">
+            <span class="parts-count-pill" id="topbar-parts-count"></span>
+            <!-- Only visible when THIS folder's cart has items -->
+            <button class="folder-cart-btn" id="folder-cart-btn" onclick="openCart()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M2 2h2l.8 3M5 8h8l1.5-5H4.8M5 8l-.8 3h9"/><circle cx="7" cy="13.5" r="1"/><circle cx="13" cy="13.5" r="1"/></svg>
+                Cart
+                <span class="folder-cart-btn-count" id="folder-cart-btn-count"></span>
+            </button>
+        </div>
+    </div>
+    <div class="parts-body">
+        <div class="parts-grid" id="parts-grid"></div>
+    </div>
+</div>
+
+<!-- Order History view -->
+<div id="view-history" style="flex:1;display:none;flex-direction:column;">
+    <div class="history-hero">
+        <div class="page-eyebrow">Account</div>
+        <h1 class="page-title">Order <em>history</em></h1>
+        <p class="page-sub" id="history-sub">Your past orders and delivery schedule.</p>
+    </div>
+    <div class="history-body" id="history-body"></div>
+</div>
+
+<!-- Hidden print invoice container (populated by printInvoice()) -->
+<div id="print-invoice" style="display:none;"></div>
+
+<!-- Cart drawer -->
+<div class="cart-backdrop" id="cart-backdrop" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cart-drawer">
+    <div class="cart-drawer-head">
+        <div class="cart-head-row">
+            <div>
+                <div class="cart-drawer-title">Cart</div>
+                <div class="cart-drawer-folder" id="cart-drawer-folder"></div>
+            </div>
+            <button class="cart-close" onclick="closeCart()">
+                <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="2" x2="16" y2="16"/><line x1="16" y1="2" x2="2" y2="16"/></svg>
+            </button>
+        </div>
+    </div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="cart-footer" id="cart-footer" style="display:none;">
+        <div class="cart-totals">
+            <span class="cart-total-label">Total</span>
+            <span class="cart-total-price" id="cart-total">$0.00</span>
+        </div>
+        <button class="checkout-btn" id="checkout-btn">Proceed to checkout →</button>
+    </div>
+</div>
+
+<div class="toast" id="toast"><span class="toast-dot"></span><span id="toast-msg"></span></div>
+
+<!-- Return Request Modal -->
+<div class="ret-backdrop" id="ret-backdrop">
+    <div class="ret-modal">
+        <h3>Request a Return</h3>
+        <p>Select the reason for returning this part.</p>
+        <div class="ret-part-preview" id="ret-part-preview"></div>
+        <div class="ret-reason-group">
+            <div class="ret-reason-opt">
+                <input type="radio" name="ret-reason" id="r1" value="Ordered wrong part">
+                <label for="r1">Ordered wrong part</label>
+            </div>
+            <div class="ret-reason-opt">
+                <input type="radio" name="ret-reason" id="r2" value="Defective or damaged">
+                <label for="r2">Defective or damaged</label>
+            </div>
+            <div class="ret-reason-opt">
+                <input type="radio" name="ret-reason" id="r3" value="Part not as described">
+                <label for="r3">Part not as described</label>
+            </div>
+            <div class="ret-reason-opt">
+                <input type="radio" name="ret-reason" id="r4" value="No longer needed">
+                <label for="r4">No longer needed</label>
+            </div>
+        </div>
+        <div style="font-size:11px;color:var(--danger);margin-bottom:14px;display:none;" id="ret-err">Please select a reason.</div>
+        <div class="ret-actions">
+            <button class="ret-cancel" onclick="closeReturnModal()">Cancel</button>
+            <button class="ret-submit" onclick="submitReturn()">Submit request</button>
+        </div>
+    </div>
+</div>
+
+<script src="db.js"></script>
+<script>
+// -- Auth guard -----------------------------------------------------------------
+const session = Auth.requireAuth();
+if (session && session.role === 'admin') Auth.redirectByRole('admin');
+
+if (session) {
+    const firstName = session.displayName.split(' ')[0];
+    const initials  = session.displayName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+    document.getElementById('user-name').textContent   = session.displayName;
+    document.getElementById('user-avatar').textContent = initials;
+    document.getElementById('hero-title').innerHTML    = `${firstName}'s <em>folders</em>`;
+    document.getElementById('logout-btn').addEventListener('click', () => Auth.logout());
+
+    // -- State -----------------------------------------------------------------
+    // activeFolder holds the full folder object currently open in the parts view.
+    // Cart is stored on the folder itself (folder.cart) and persisted via Admin.setCart.
+    let activeFolder = null;
+
+    function getDbUser() { return Admin.getUserById(session.id); }
+    function getFolders() { const u = getDbUser(); return u ? u.serviceFolders : []; }
+
+    // Convenience: get the live cart for a named folder
+    function folderCart(folderName) {
+        return Admin.getCart(session.id, folderName);
+    }
+
+    // -- Toast ------------------------------------------------------------------
+    let toastTimer;
+    function showToast(msg) {
+        document.getElementById('toast-msg').textContent = msg;
+        const el = document.getElementById('toast');
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+    }
+
+    // -- Global badge (sidebar) -------------------------------------------------
+    // Reflects total items across ALL folders so the user always knows their
+    // combined cart activity without opening any specific folder.
+    function updateGlobalBadge() {
+        const total = Admin.getTotalCartCount(session.id);
+        const badge = document.getElementById('global-cart-badge');
+        badge.textContent = total;
+        badge.classList.toggle('visible', total > 0);
+    }
+
+    // -- Folder view ------------------------------------------------------------
+    function showFolders() {
+        document.getElementById('view-folders').style.display = 'flex';
+        document.getElementById('view-parts').style.display   = 'none';
+        document.getElementById('view-history').style.display = 'none';
+        activeFolder = null;
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.querySelector('a[href="recommended-parts.html"]').classList.add('active');
+        renderFolderGrid();
+    }
+
+    function renderFolderGrid() {
+        const folders = getFolders();
+        const grid    = document.getElementById('folder-grid');
+        const label   = document.getElementById('folders-section-label');
+        grid.innerHTML = '';
+        label.textContent = folders.length + ' folder' + (folders.length !== 1 ? 's' : '');
+
+        if (folders.length === 0) {
+            grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M8 14a4 4 0 014-4h7l4 4h13a4 4 0 014 4v14a4 4 0 01-4 4H12a4 4 0 01-4-4V14z"/></svg>
+                <p>No service folders have been assigned to your account yet.</p>
+            </div>`;
+            updateGlobalBadge();
+            return;
+        }
+
+        folders.forEach((folder, i) => {
+            const cart       = folderCart(folder.folderName);
+            const cartCount  = cart.reduce((n, item) => n + item.qty, 0);
+            const hasCart    = cartCount > 0;
+
+            const card = document.createElement('div');
+            card.className = 'folder-card';
+            card.style.animationDelay = `${i * 70}ms`;
+            card.innerHTML = `
+                <div class="folder-card-accent"></div>
+                <div class="folder-card-body">
+                    <div class="folder-icon">
+                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+                            <path d="M3 6a2 2 0 012-2h3l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V6z"/>
+                        </svg>
+                    </div>
+                    <div class="folder-card-name">${folder.folderName}</div>
+                    <div class="folder-card-num">Customer #${folder.customerNumber}</div>
+                    <div class="folder-card-footer">
+                        <div class="folder-parts-count">
+                            <strong>${folder.parts.length}</strong> part${folder.parts.length !== 1 ? 's' : ''}
+                        </div>
+                        <div class="folder-cart-pill ${hasCart ? 'visible' : ''}"
+                             onclick="event.stopPropagation(); openFolderCart(${JSON.stringify(folder.folderName)})">
+                            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+                                <path d="M1 1h2l.7 2.5M4 7h8l1.3-4.5H3.7M4 7l-.7 2.5h8"/><circle cx="5.5" cy="12" r="1"/><circle cx="11" cy="12" r="1"/>
+                            </svg>
+                            ${cartCount} item${cartCount !== 1 ? 's' : ''}
+                        </div>
+                        <div class="folder-arrow">
+                            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 6h8M6 2l4 4-4 4"/></svg>
+                        </div>
+                    </div>
+                </div>`;
+            card.addEventListener('click', () => showParts(folder.folderName));
+            grid.appendChild(card);
+        });
+
+        updateGlobalBadge();
+    }
+
+    // Open cart drawer pre-scoped to a specific folder from the folder grid
+    function openFolderCart(folderName) {
+        const folders = getFolders();
+        const folder  = folders.find(f => f.folderName === folderName);
+        if (!folder) return;
+        activeFolder = folder;
+        openCart();
+    }
+
+    // -- Parts view -------------------------------------------------------------
+    function showParts(folderName) {
+        const folders = getFolders();
+        const folder  = folders.find(f => f.folderName === folderName);
+        if (!folder) return;
+        activeFolder = folder;
+
+        document.getElementById('view-folders').style.display = 'none';
+        document.getElementById('view-parts').style.display   = 'flex';
+        document.getElementById('topbar-folder-name').textContent = folder.folderName;
+        document.getElementById('topbar-folder-num').textContent  = 'Customer #' + folder.customerNumber;
+        document.getElementById('topbar-parts-count').textContent =
+            folder.parts.length + ' part' + (folder.parts.length !== 1 ? 's' : '');
+
+        renderPartsGrid();
+        updateFolderCartUI();
+    }
+
+    function renderPartsGrid() {
+        if (!activeFolder) return;
+        const grid   = document.getElementById('parts-grid');
+        const folder = activeFolder;
+        const cart   = folderCart(folder.folderName);
+        grid.innerHTML = '';
+
+        if (folder.parts.length === 0) {
+            grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><rect x="8" y="8" width="32" height="32" rx="4"/><line x1="24" y1="18" x2="24" y2="30"/><line x1="18" y1="24" x2="30" y2="24"/></svg>
+                <p>No parts in this folder yet.</p>
+            </div>`;
+            return;
+        }
+
+        folder.parts.forEach((part, i) => {
+            const inCart = cart.some(c => c.partNumber === part.partNumber);
+            const card   = document.createElement('div');
+            card.className = 'part-card' + (inCart ? ' in-cart' : '');
+            card.id        = 'part-card-' + part.partNumber;
+            card.style.animationDelay = `${i * 55}ms`;
+            card.innerHTML = `
+                <div class="part-img-wrap">
+                    ${part.imageUrl
+                        ? `<img class="part-img" src="${part.imageUrl}" alt="${part.partName || ''}" loading="lazy">`
+                        : `<div class="part-img-placeholder"><svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="4" y="4" width="28" height="28" rx="3"/><circle cx="13" cy="13" r="3"/><path d="M32 24l-9-7-6 6-3-3L4 28"/></svg></div>`}
+                    <div class="in-cart-ribbon">In cart</div>
+                </div>
+                <div class="part-card-body">
+                    <div class="part-number">${part.partNumber}</div>
+                    <div class="part-name">${part.partName || 'Part'}</div>
+                    <div class="part-desc">${part.description}</div>
+                    <div class="part-card-footer">
+                        <div class="part-price">$${Number(part.price).toFixed(2)}</div>
+                        <button class="add-btn ${inCart ? 'added' : ''}" id="btn-${part.partNumber}"
+                                onclick="handleAddToCart(${JSON.stringify(part).replace(/"/g,'&quot;')}, this)">
+                            ${inCart
+                                ? `<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="2,7 5,10 11,3"/></svg> Added`
+                                : `<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="6.5" y1="1" x2="6.5" y2="12"/><line x1="1" y1="6.5" x2="12" y2="6.5"/></svg> Add to cart`}
+                        </button>
+                    </div>
+                </div>`;
+            grid.appendChild(card);
+        });
+    }
+
+    // -- Folder-scoped cart logic -----------------------------------------------
+
+    function handleAddToCart(part, btn) {
+        if (!activeFolder || btn.classList.contains('added')) return;
+
+        const folderName = activeFolder.folderName;
+        const cart       = folderCart(folderName);
+        const existing   = cart.find(c => c.partNumber === part.partNumber);
+
+        if (existing) {
+            existing.qty++;
+        } else {
+            cart.push({ ...part, qty: 1 });
+        }
+
+        // Persist — this folder's cart only
+        Admin.setCart(session.id, folderName, cart);
+
+        // Update card state
+        const card = document.getElementById('part-card-' + part.partNumber);
+        if (card) card.classList.add('in-cart');
+        btn.classList.add('added');
+        btn.innerHTML = `<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="2,7 5,10 11,3"/></svg> Added`;
+
+        updateFolderCartUI();
+        updateGlobalBadge();
+        showToast(`"${part.partName || part.partNumber}" added to ${folderName} cart`);
+    }
+
+    // Updates the topbar cart button visibility and count for the active folder
+    function updateFolderCartUI() {
+        if (!activeFolder) return;
+        const cart      = folderCart(activeFolder.folderName);
+        const count     = cart.reduce((n, i) => n + i.qty, 0);
+        const btn       = document.getElementById('folder-cart-btn');
+        const countEl   = document.getElementById('folder-cart-btn-count');
+
+        btn.classList.toggle('has-items', count > 0);
+        countEl.textContent = count > 0 ? count : '';
+
+        // Update drawer label and total if open
+        document.getElementById('cart-drawer-folder').textContent =
+            activeFolder.folderName + ' — Customer #' + activeFolder.customerNumber;
+
+        const total = cart.reduce((n, i) => n + i.price * i.qty, 0);
+        document.getElementById('cart-total').textContent = '$' + total.toFixed(2);
+        document.getElementById('cart-footer').style.display = cart.length > 0 ? 'block' : 'none';
+    }
+
+    function renderCartItems() {
+        const el   = document.getElementById('cart-items');
+        el.innerHTML = '';
+        if (!activeFolder) {
+            el.innerHTML = `<div class="cart-empty-msg"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M5 5h4l1 3M10 11h20l-2.5 11H11L10 11z"/><circle cx="14" cy="28" r="2"/><circle cx="26" cy="28" r="2"/></svg><p>Open a folder to view its cart</p></div>`;
+            return;
+        }
+
+        const cart = folderCart(activeFolder.folderName);
+        if (cart.length === 0) {
+            el.innerHTML = `<div class="cart-empty-msg"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M5 5h4l1 3M10 11h20l-2.5 11H11L10 11z"/><circle cx="14" cy="28" r="2"/><circle cx="26" cy="28" r="2"/></svg><p>No items in this folder's cart</p></div>`;
+            return;
+        }
+
+        cart.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'cart-item';
+            row.innerHTML = `
+                ${item.imageUrl
+                    ? `<img class="cart-item-thumb" src="${item.imageUrl}" alt="${item.partName || ''}">`
+                    : `<div class="cart-item-thumb-placeholder"></div>`}
+                <div class="cart-item-info">
+                    <div class="cart-item-name">${item.partName || item.description}</div>
+                    <div class="cart-item-num">${item.partNumber}</div>
+                    <div class="cart-item-bottom">
+                        <div class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+                        <div class="qty-control">
+                            <button class="qty-btn" onclick="changeQty('${item.partNumber}', -1)">-</button>
+                            <span class="qty-val">${item.qty}</span>
+                            <button class="qty-btn" onclick="changeQty('${item.partNumber}', 1)">+</button>
+                        </div>
+                        <button class="cart-item-remove" onclick="removeFromCart('${item.partNumber}')">
+                            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="2" x2="12" y2="12"/><line x1="12" y1="2" x2="2" y2="12"/></svg>
+                        </button>
+                    </div>
+                </div>`;
+            el.appendChild(row);
+        });
+    }
+
+    function changeQty(partNumber, delta) {
+        if (!activeFolder) return;
+        const folderName = activeFolder.folderName;
+        const cart       = folderCart(folderName);
+        const item       = cart.find(c => c.partNumber === partNumber);
+        if (!item) return;
+        item.qty = Math.max(1, item.qty + delta);
+        Admin.setCart(session.id, folderName, cart);
+        updateFolderCartUI();
+        updateGlobalBadge();
+        renderCartItems();
+    }
+
+    function removeFromCart(partNumber) {
+        if (!activeFolder) return;
+        const folderName = activeFolder.folderName;
+        const cart       = folderCart(folderName).filter(c => c.partNumber !== partNumber);
+        Admin.setCart(session.id, folderName, cart);
+
+        // Unmark part card if visible
+        const card = document.getElementById('part-card-' + partNumber);
+        if (card) {
+            card.classList.remove('in-cart');
+            const btn = document.getElementById('btn-' + partNumber);
+            if (btn) {
+                btn.classList.remove('added');
+                btn.innerHTML = `<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="6.5" y1="1" x2="6.5" y2="12"/><line x1="1" y1="6.5" x2="12" y2="6.5"/></svg> Add to cart`;
+            }
+        }
+
+        updateFolderCartUI();
+        updateGlobalBadge();
+        renderCartItems();
+        renderFolderGrid(); // refresh folder card pill count
+    }
+
+    // -- Order History ---------------------------------------------------------
+    function showOrderHistory() {
+        document.getElementById('view-folders').style.display  = 'none';
+        document.getElementById('view-parts').style.display    = 'none';
+        document.getElementById('view-history').style.display  = 'flex';
+        // Update nav active state
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('nav-history-btn').classList.add('active');
+        renderOrderHistory();
+    }
+
+    function showFoldersFromHistory() {
+        document.getElementById('view-history').style.display = 'none';
+        showFolders();
+    }
+
+    function renderOrderHistory() {
+        const dbUser = Admin.getUserById(session.id);
+        const orders = dbUser?.orderHistory || [];
+        const email  = dbUser?.email || '';
+        const body   = document.getElementById('history-body');
+        const sub    = document.getElementById('history-sub');
+
+        sub.textContent = orders.length
+            ? `${orders.length} order${orders.length !== 1 ? 's' : ''} · confirmations sent to ${email}`
+            : 'Your past orders will appear here.';
+
+        if (orders.length === 0) {
+            body.innerHTML = `<div class="history-empty">
+                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+                    <path d="M8 12h32M8 20h20M8 28h12"/><path d="M30 26l8 8m0-8l-8 8"/>
+                </svg>
+                <p>No orders yet. When you complete a purchase, it will appear here.</p>
+            </div>`;
+            return;
+        }
+
+        body.innerHTML = '';
+        orders.forEach((order, i) => {
+            const orderDate    = new Date(order.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const delivDate    = order.deliveryDate
+                ? new Date(order.deliveryDate + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+                : '—';
+
+            const card = document.createElement('div');
+            card.className = 'order-card';
+            card.style.animationDelay = `${i * 50}ms`;
+
+            const statusClass = order.testMode ? 'order-status test' : 'order-status';
+            const statusLabel = order.testMode ? 'Test order' : 'Confirmed';
+
+            const itemsHtml = (order.items || []).map(item => {
+                const rs = item.returnStatus;
+                const returnBtnHtml = rs === 'pending'
+                    ? `<span class="return-status pending">Return pending</span>`
+                    : rs === 'approved'
+                    ? `<span class="return-status approved">Return approved</span>`
+                    : rs === 'rejected'
+                    ? `<span class="return-status rejected">Return rejected</span>`
+                    : `<button class="return-btn" onclick="openReturnModal(${JSON.stringify(order).replace(/"/g,'&quot;')}, ${JSON.stringify(item).replace(/"/g,'&quot;')})">
+                           <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 4h7a3 3 0 010 6H4"/><polyline points="4,1 1,4 4,7"/></svg>
+                           Request return
+                       </button>`;
+                return `<div class="order-item-row" style="flex-wrap:wrap;gap:6px;">
+                    ${item.imageUrl
+                        ? `<img src="${item.imageUrl}" alt="">`
+                        : `<div class="order-item-thumb-sm"></div>`}
+                    <div style="flex:1;min-width:0;">
+                        <div class="order-item-name-sm">${item.partName || item.description}</div>
+                        <div class="order-item-num-sm">${item.partNumber}</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                        <div style="font-size:11px;color:var(--muted);">qty ${item.qty}</div>
+                        <div class="order-item-price-sm">$${(item.price * item.qty).toFixed(2)}</div>
+                        ${returnBtnHtml}
+                    </div>
+                </div>`;
+            }).join('');
+
+            card.innerHTML = `
+                <div class="order-card-head">
+                    <div>
+                        <div class="order-id">${order.orderId}</div>
+                        <div class="order-date">Placed ${orderDate} · ${order.folderName} #${order.customerNumber}</div>
+                    </div>
+                    <span class="${statusClass}">${statusLabel}</span>
+                </div>
+                <div class="order-card-body">
+                    <div class="order-meta-item">
+                        <span class="order-meta-label">Total charged</span>
+                        <span class="order-meta-val price">$${order.total.toFixed(2)}</span>
+                    </div>
+                    <div class="order-meta-item">
+                        <span class="order-meta-label">Delivery date</span>
+                        <span class="order-meta-val">${delivDate}</span>
+                    </div>
+                    <div class="order-meta-item">
+                        <span class="order-meta-label">Payment method</span>
+                        <span class="order-meta-val" style="text-transform:capitalize;">${order.paymentMethod}</span>
+                    </div>
+                    <div class="order-meta-item">
+                        <span class="order-meta-label">Items</span>
+                        <span class="order-meta-val">${(order.items || []).reduce((n, i) => n + i.qty, 0)} part(s)</span>
+                    </div>
+                </div>
+                <div class="order-items-list">${itemsHtml}</div>
+                <div class="order-card-footer">
+                    <div class="email-confirm">
+                        <svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="1,6 5,10 12,2"/></svg>
+                        Confirmation sent to ${email || 'your email'}
+                    </div>
+                    <button class="invoice-btn" onclick="printInvoice(${JSON.stringify(order).replace(/"/g,'&quot;')}, '${email}')">
+                        <svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                            <path d="M2 9v2a1 1 0 001 1h7a1 1 0 001-1V9M6.5 1v7M4 6l2.5 2.5L9 6"/>
+                        </svg>
+                        Download Invoice
+                    </button>
+                </div>`;
+
+            body.appendChild(card);
+        });
+    }
+
+    function printInvoice(order, email) {
+        const delivDate = order.deliveryDate
+            ? new Date(order.deliveryDate + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+            : '—';
+        const orderDate = new Date(order.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        const itemRows  = (order.items || []).map(item => `
+            <tr>
+                <td>${item.partNumber}</td>
+                <td>${item.partName || item.description}</td>
+                <td style="text-align:center">${item.qty}</td>
+                <td style="text-align:right">$${item.price.toFixed(2)}</td>
+                <td style="text-align:right">$${(item.price * item.qty).toFixed(2)}</td>
+            </tr>`).join('');
+
+        document.getElementById('print-invoice').innerHTML = `
+            <h1>PartFind Invoice</h1>
+            <p style="color:#666;font-size:13px;margin-bottom:4px;">Tax invoice / receipt</p>
+            ${order.testMode ? '<p style="color:#c8a800;font-size:12px;font-weight:700;margin-bottom:4px;">TEST ORDER — Not a real transaction</p>' : ''}
+            <div class="inv-meta">
+                <div><div class="inv-label">Order ID</div><div>${order.orderId}</div></div>
+                <div><div class="inv-label">Order date</div><div>${orderDate}</div></div>
+                <div><div class="inv-label">Service folder</div><div>${order.folderName} #${order.customerNumber}</div></div>
+                <div><div class="inv-label">Delivery date</div><div>${delivDate}</div></div>
+                <div><div class="inv-label">Payment method</div><div style="text-transform:capitalize">${order.paymentMethod}</div></div>
+                <div><div class="inv-label">Confirmation sent to</div><div>${email || '—'}</div></div>
+            </div>
+            <table>
+                <thead><tr><th>Part #</th><th>Description</th><th style="text-align:center">Qty</th><th style="text-align:right">Unit</th><th style="text-align:right">Total</th></tr></thead>
+                <tbody>${itemRows}</tbody>
+            </table>
+            <div class="inv-total">Order total: $${order.total.toFixed(2)}</div>
+            <div class="inv-footer">PartFind · ${email} · Order ${order.orderId} · Generated ${new Date().toLocaleDateString()}</div>`;
+
+        window.print();
+    }
+
+    // -- Cart drawer ------------------------------------------------------------
+    function openCart() {
+        // Refresh label and items before opening
+        if (activeFolder) {
+            document.getElementById('cart-drawer-folder').textContent =
+                activeFolder.folderName + ' — Customer #' + activeFolder.customerNumber;
+            // Wire checkout button to pass folder name
+            const chkBtn = document.getElementById('checkout-btn');
+            if (chkBtn) {
+                chkBtn.onclick = () => {
+                    window.location.href = 'checkout.html?folder=' + encodeURIComponent(activeFolder.folderName);
+                };
+            }
+        }
+        renderCartItems();
+        updateFolderCartUI();
+        document.getElementById('cart-drawer').classList.add('open');
+        document.getElementById('cart-backdrop').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeCart() {
+        document.getElementById('cart-drawer').classList.remove('open');
+        document.getElementById('cart-backdrop').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    // -- Return Modal Logic -----------------------------------------------------
+    let _returnOrder = null;
+    let _returnItem  = null;
+
+    function openReturnModal(order, item) {
+        _returnOrder = order;
+        _returnItem  = item;
+        // Clear previous selection
+        document.querySelectorAll('input[name="ret-reason"]').forEach(r => r.checked = false);
+        document.getElementById('ret-err').style.display = 'none';
+        // Populate part preview
+        const preview = document.getElementById('ret-part-preview');
+        preview.innerHTML = `
+            ${item.imageUrl ? `<img src="${item.imageUrl}" alt="">` : '<div class="ret-part-thumb"></div>'}
+            <div>
+                <div class="ret-part-name">${item.partName || item.description}</div>
+                <div class="ret-part-num">${item.partNumber} &nbsp;·&nbsp; $${item.price.toFixed(2)} each</div>
+            </div>`;
+        document.getElementById('ret-backdrop').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeReturnModal() {
+        document.getElementById('ret-backdrop').classList.remove('open');
+        document.body.style.overflow = '';
+        _returnOrder = null;
+        _returnItem  = null;
+    }
+
+    function submitReturn() {
+        const selected = document.querySelector('input[name="ret-reason"]:checked');
+        if (!selected) {
+            document.getElementById('ret-err').style.display = 'block';
+            return;
+        }
+        const result = Returns.create({
+            userId:         session.id,
+            displayName:    session.displayName,
+            orderId:        _returnOrder.orderId,
+            folderName:     _returnOrder.folderName,
+            customerNumber: _returnOrder.customerNumber,
+            part:           _returnItem,
+            reason:         selected.value
+        });
+        closeReturnModal();
+        if (result.ok) {
+            showToast('Return request submitted.');
+            renderOrderHistory(); // refresh to show "Return Pending" status
+        } else {
+            showToast(result.error);
+        }
+    }
+
+    // Close modal on backdrop click
+    document.getElementById('ret-backdrop').addEventListener('click', function(e) {
+        if (e.target === this) closeReturnModal();
+    });
+
+    // -- Init --
+    renderFolderGrid();
+
+    // Show a toast and optionally navigate to Order History if redirected from checkout
+    const _toastParam = new URLSearchParams(location.search).get('toast');
+    if (_toastParam) {
+        setTimeout(() => showToast(_toastParam), 300);
+        history.replaceState({}, '', 'recommended-parts.html');
+        // Auto-open Order History so the user can immediately see their new order
+        setTimeout(() => showOrderHistory(), 600);
+    }
+}
+</script>
+</body>
+</html>

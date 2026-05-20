@@ -1,0 +1,31 @@
+Please help me make a prompt for Claude Code. I am working with Claude on a website and need to make some adjustments. (please prompt claude to make the adjustments listed below also include any recommended additions to my 'user functionality, Admin interface, shopping cart functionality. Should we brreak this up into multiple prompt? 
+
+1. I want to add Account functionality
+
+- People on the website can make an account using a username and password.
+
+2. I need administrator functionality
+
+- I can sign in to my administrator account and have a user friendly interface to perform the functions listed below.
+
+- Accesing user's recommended parts
+
+- adding / deleing 'folders' (naming folders, adding customer number)
+
+- Populating the folder with parts
+
+- Adding images to the parts section, adding description to the parts section, part number ect.)
+
+- Viewing the user's cart. 
+
+3. When someone signs into their account it will default direct them to their 'recommended parts' page.
+
+- On the 'recommended parts' page will be listed 'folders' that are added, deleted and populated with parts by an administrator. (each folder is for a customer car that the user is servicing)
+
+- The folders will be named according to a last name (Ex. Hames) with an opaque subscript detailing the customer number (Ex. #853934)
+
+- within each folder should be a list of parts that the Administrator recommends the User purchase
+
+- the list of parts will be attractive to look at including an image of the part , the part #, the part description and the price of the part. (updated by the administrator)
+
+-from the list the User can select parts to add to cart.

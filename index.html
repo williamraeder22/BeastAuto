@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PartFind</title>
+    <style>
+        body { margin: 0; background: #0d0d0f; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        p { color: rgba(240,237,232,0.35); font-family: sans-serif; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <p>Loading…</p>
+    <script src="db.js"></script>
+    <script>
+        // Route based on session: logged-in users go to their dashboard, everyone else to login
+        const session = Auth.getSession();
+        if (session) {
+            Auth.redirectByRole(session.role);
+        } else {
+            window.location.replace('login.html');
+        }
+    </script>
+</body>
+</html>
