@@ -50,14 +50,17 @@
         .subtitle { font-size:14px; font-weight:300; color:var(--muted); margin-bottom:32px; }
         .field { margin-bottom:18px; display:flex; flex-direction:column; gap:6px; }
         label { font-size:10px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
-        input {
+        input, select {
             padding:12px 14px; font-size:14px; font-family:'DM Sans',sans-serif;
             color:var(--text); background:var(--surface2);
             border:1px solid var(--border2); border-radius:10px; outline:none;
             transition:border-color .15s;
+            appearance: none; -webkit-appearance: none;
         }
-        input:focus { border-color:var(--accent); }
+        select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none' stroke='rgba(240,237,232,0.45)' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+        input:focus, select:focus { border-color:var(--accent); }
         input::placeholder { color:var(--muted); }
+        select option { background: var(--surface2); color: var(--text); }
         .btn {
             width:100%; padding:14px; margin-top:8px;
             background:var(--accent); color:#0d0d0f;
@@ -73,18 +76,15 @@
             border-radius:8px; padding:10px 14px;
             margin-bottom:16px; display:none;
         }
-        .demo-hint {
-            margin-top:24px; padding-top:20px; border-top:1px solid var(--border);
-            font-size:12px; color:var(--muted); line-height:1.8;
+        /* Fixed bottom-left admin toggle link */
+        .admin-portal-link {
+            position: fixed; bottom: 24px; left: 24px;
+            font-size: 12px; color: var(--muted);
+            background: none; border: none; cursor: pointer;
+            font-family: 'DM Sans', sans-serif; z-index: 10;
+            transition: color .15s; padding: 4px 0;
         }
-        .demo-hint strong { color:var(--text); font-weight:500; }
-        .badge {
-            display:inline-block; font-size:10px; font-weight:500;
-            padding:2px 7px; border-radius:99px; margin-left:4px;
-            vertical-align:middle;
-        }
-        .badge-user  { background:rgba(56,138,221,.15); color:#85B7EB; }
-        .badge-admin { background:rgba(232,255,71,.12); color:var(--accent); }
+        .admin-portal-link:hover { color: var(--text); }
     </style>
 </head>
 <body>
@@ -96,28 +96,45 @@
     </div>
 
     <h1>Welcome back.</h1>
-    <p class="subtitle">Sign in to access your parts dashboard.</p>
+    <p class="subtitle" id="card-subtitle">Sign in to access your parts dashboard.</p>
 
-    <div class="error-msg" id="error-msg">Incorrect username or password. Please try again.</div>
+    <div class="error-msg" id="error-msg">Incorrect credentials. Please try again.</div>
 
-    <div class="field">
-        <label for="username">Username</label>
-        <input type="text" id="username" placeholder="your username" autocomplete="username">
+    <!-- User (location) form -->
+    <div id="user-form">
+        <div class="field">
+            <label for="profile-select">Location</label>
+            <select id="profile-select">
+                <option value="">— Select your location —</option>
+                <option value="ACBW Wasson">ACBW Wasson</option>
+                <option value="ACBW North">ACBW North</option>
+                <option value="ACBW San Marcos">ACBW San Marcos</option>
+                <option value="ACBW Spicewood">ACBW Spicewood</option>
+            </select>
+        </div>
+        <div class="field">
+            <label for="user-password">Password</label>
+            <input type="password" id="user-password" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button class="btn" id="user-login-btn">Sign in</button>
     </div>
-    <div class="field">
-        <label for="password">Password</label>
-        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
-    </div>
 
-    <button class="btn" id="login-btn">Sign in</button>
-
-    <div class="demo-hint">
-        <div>Demo accounts:</div>
-        <div><strong>jsmith</strong> / pass1234 <span class="badge badge-user">user</span></div>
-        <div><strong>mchen</strong> / secure99 <span class="badge badge-user">user</span></div>
-        <div><strong>admin</strong> / admin2025 <span class="badge badge-admin">admin</span></div>
+    <!-- Admin form (hidden by default) -->
+    <div id="admin-form" style="display:none;">
+        <div class="field">
+            <label for="admin-username">Username</label>
+            <input type="text" id="admin-username" placeholder="admin username" autocomplete="username">
+        </div>
+        <div class="field">
+            <label for="admin-password">Password</label>
+            <input type="password" id="admin-password" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button class="btn" id="admin-login-btn">Sign in as Admin</button>
     </div>
 </div>
+
+<!-- Admin toggle link — fixed bottom-left, low contrast -->
+<button class="admin-portal-link" id="admin-portal-toggle">Admin Sign In</button>
 
 <script src="db.js"></script>
 <script>
@@ -125,10 +142,37 @@
     const existing = Auth.getSession();
     if (existing) Auth.redirectByRole(existing.role);
 
+    let adminMode = false;
+
+    function setMode(isAdmin) {
+        adminMode = isAdmin;
+        document.getElementById('user-form').style.display  = isAdmin ? 'none'  : 'block';
+        document.getElementById('admin-form').style.display = isAdmin ? 'block' : 'none';
+        document.getElementById('admin-portal-toggle').textContent = isAdmin ? '← Location Sign In' : 'Admin Sign In';
+        document.getElementById('card-subtitle').textContent = isAdmin
+            ? 'Administrator access only.'
+            : 'Sign in to access your parts dashboard.';
+        document.getElementById('error-msg').style.display = 'none';
+    }
+
+    document.getElementById('admin-portal-toggle').addEventListener('click', () => setMode(!adminMode));
+
     function attemptLogin() {
-        const username = document.getElementById('username').value.trim();
-        const password = document.getElementById('password').value;
         const errorMsg = document.getElementById('error-msg');
+        let username, password;
+
+        if (adminMode) {
+            username = document.getElementById('admin-username').value.trim();
+            password = document.getElementById('admin-password').value;
+        } else {
+            username = document.getElementById('profile-select').value;
+            password = document.getElementById('user-password').value;
+            if (!username) {
+                errorMsg.textContent = 'Please select your location.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+        }
 
         const session = Auth.login(username, password);
 
@@ -136,18 +180,27 @@
             errorMsg.style.display = 'none';
             Auth.redirectByRole(session.role);
         } else {
+            errorMsg.textContent = 'Incorrect credentials. Please try again.';
             errorMsg.style.display = 'block';
-            document.getElementById('password').value = '';
+            if (adminMode) {
+                document.getElementById('admin-password').value = '';
+            } else {
+                document.getElementById('user-password').value = '';
+            }
         }
     }
 
-    document.getElementById('login-btn').addEventListener('click', attemptLogin);
+    document.getElementById('user-login-btn').addEventListener('click', attemptLogin);
+    document.getElementById('admin-login-btn').addEventListener('click', attemptLogin);
 
-    // Allow Enter key to submit
-    ['username', 'password'].forEach(id => {
+    // Allow Enter key to submit from any field
+    ['user-password', 'admin-username', 'admin-password'].forEach(id => {
         document.getElementById(id).addEventListener('keydown', e => {
             if (e.key === 'Enter') attemptLogin();
         });
+    });
+    document.getElementById('profile-select').addEventListener('keydown', e => {
+        if (e.key === 'Enter') attemptLogin();
     });
 </script>
 </body>

@@ -1,8 +1,6 @@
 // ─── PartFind Database (db.js) ────────────────────────────────────────────────
 //
 // Flat-file "database" using plain JS objects + localStorage for persistence.
-// In production replace with a real backend (Node/Express + PostgreSQL, Firebase, etc.)
-// and NEVER store passwords in plaintext — use bcrypt or similar.
 //
 // Module order matters:
 //   1. DB_DEFAULTS + persistence helpers (_loadDB, saveDB, resetDB, DB)
@@ -10,169 +8,146 @@
 //   3. Admin
 //   4. Auth
 //   5. Checkout
+//   6. Returns
 // ─────────────────────────────────────────────────────────────────────────────
 
 const DB_DEFAULTS = {
     users: [
         {
             id: "u001",
-            username: "jsmith",
-            password: "pass1234",
+            username: "ACBW Wasson",
+            password: "Calcutta",
             role: "user",
-            displayName: "John Smith",
-            email: "j.smith@example.com",
-            availableDeliveryDates: ["2026-05-12","2026-05-15","2026-05-19","2026-05-22","2026-05-26"],
+            displayName: "ACBW Wasson",
+            email: "",
             orderHistory: [],
-            serviceFolders: [
-                {
-                    folderName: "Hames",
-                    customerNumber: "853934",
-                    cart: [
-                        { partNumber: "TY-8821-BRK", partName: "Brake Pad Set",  description: "Front Brake Pad Set — Ceramic", price: 49.99, qty: 2, imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop" },
-                        { partNumber: "TY-0192-SPK", partName: "Spark Plugs",    description: "Iridium Spark Plug (qty 4)",    price: 34.50, qty: 1, imageUrl: "https://images.unsplash.com/photo-1599669454699-248893623440?w=400&auto=format&fit=crop" }
-                    ],
-                    parts: [
-                        { partNumber: "TY-8821-BRK", partName: "Brake Pad Set",   description: "Front Brake Pad Set — Ceramic",    imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop", price: 49.99, stock: 12, make: "Toyota", model: "Camry", year: "2022" },
-                        { partNumber: "TY-3301-FLT", partName: "Oil Filter",      description: "Engine Oil Filter — Extended Life", imageUrl: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&auto=format&fit=crop", price: 12.99, stock: 8, make: "Toyota", model: "Camry", year: "2022" },
-                        { partNumber: "TY-0192-SPK", partName: "Spark Plugs",     description: "Iridium Spark Plug (qty 4)",        imageUrl: "https://images.unsplash.com/photo-1599669454699-248893623440?w=400&auto=format&fit=crop", price: 34.50, stock: 20, make: "Toyota", model: "Camry", year: "2022" }
-                    ]
-                },
-                {
-                    folderName: "Rivera",
-                    customerNumber: "291047",
-                    cart: [],
-                    parts: [
-                        { partNumber: "HN-4410-ALT", partName: "Alternator",      description: "Alternator — Remanufactured OEM",   imageUrl: "https://images.unsplash.com/photo-1562577309-4932fdd64cd1?w=400&auto=format&fit=crop", price: 189.00, stock: 4, make: "Honda", model: "Accord", year: "2021" },
-                        { partNumber: "HN-0055-BLT", partName: "Serpentine Belt", description: "Serpentine Drive Belt",             imageUrl: "https://images.unsplash.com/photo-1599669454699-248893623440?w=400&auto=format&fit=crop", price: 22.75,  stock: 15, make: "Honda", model: "Accord", year: "2021" }
-                    ]
-                }
-            ]
+            serviceFolders: []
         },
         {
             id: "u002",
-            username: "mchen",
-            password: "secure99",
+            username: "ACBW North",
+            password: "Guadalupe",
             role: "user",
-            displayName: "Maya Chen",
-            email: "m.chen@example.com",
-            availableDeliveryDates: ["2026-05-14","2026-05-20","2026-05-28"],
+            displayName: "ACBW North",
+            email: "",
             orderHistory: [],
-            serviceFolders: [
-                {
-                    folderName: "Chen",
-                    customerNumber: "774512",
-                    cart: [],
-                    parts: [
-                        { partNumber: "BM-7755-SUS", partName: "Strut Assembly",  description: "Front Strut Assembly — Left",       imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop", price: 210.00, stock: 2, make: "BMW", model: "3 Series", year: "2020" }
-                    ]
-                }
-            ]
+            serviceFolders: []
+        },
+        {
+            id: "u003",
+            username: "ACBW San Marcos",
+            password: "Lourdes",
+            role: "user",
+            displayName: "ACBW San Marcos",
+            email: "",
+            orderHistory: [],
+            serviceFolders: []
+        },
+        {
+            id: "u004",
+            username: "ACBW Spicewood",
+            password: "Paris",
+            role: "user",
+            displayName: "ACBW Spicewood",
+            email: "",
+            orderHistory: [],
+            serviceFolders: []
         },
         {
             id: "a001",
             username: "admin",
             password: "admin2025",
             role: "admin",
-            displayName: "Site Administrator",
-            email: "admin@partfind.com",
-            availableDeliveryDates: [],
+            displayName: "Administrator",
+            email: "admin@acbw.com",
             orderHistory: [],
             serviceFolders: []
         }
     ],
 
     vehicles: {
-        "Lexus":      { models: ["IS","ES","GS","LS","UX","NX","RX","GX","LX","LC","RC"],                   image: "https://images.unsplash.com/photo-1619767886558-efdc259b6e09?w=800&auto=format&fit=crop" },
-        "Tesla":      { models: ["Model 3","Model S","Model X","Model Y","Cybertruck","Roadster"],            image: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800&auto=format&fit=crop" },
-        "Porsche":    { models: ["911","718 Cayman","718 Boxster","Taycan","Panamera","Macan","Cayenne"],    image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&auto=format&fit=crop" },
-        "Toyota":     { models: ["Camry","Corolla","RAV4","Tacoma","Tundra","Highlander","4Runner","Prius","Supra"], image: "https://images.unsplash.com/photo-1559416523-140ddc3d238c?w=800&auto=format&fit=crop" },
-        "Honda":      { models: ["Civic","Accord","CR-V","Pilot","Odyssey","Ridgeline","HR-V","Passport"],   image: "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=800&auto=format&fit=crop" },
-        "BMW":        { models: ["3 Series","5 Series","7 Series","X1","X3","X5","X7","M3","M5","i3","i8"], image: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&auto=format&fit=crop" },
-        "Mercedes":   { models: ["C-Class","E-Class","S-Class","GLA","GLC","GLE","GLS","AMG GT"],            image: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&auto=format&fit=crop" },
-        "Audi":       { models: ["A3","A4","A6","A8","Q3","Q5","Q7","Q8","e-tron","R8"],                     image: "https://images.unsplash.com/photo-1502161254066-6c74afbf07aa?w=800&auto=format&fit=crop" },
-        "Nissan":     { models: ["Altima","Sentra","Maxima","Rogue","Pathfinder","Frontier","Titan","370Z","GT-R"], image: "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800&auto=format&fit=crop" },
-        "Hyundai":    { models: ["Elantra","Sonata","Tucson","Santa Fe","Palisade","Kona","Ioniq 5"],         image: "https://images.unsplash.com/photo-1629897048514-3dd7414fe72a?w=800&auto=format&fit=crop" },
-        "Kia":        { models: ["Forte","K5","Stinger","Sportage","Sorento","Telluride","Soul","EV6"],       image: "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=800&auto=format&fit=crop" },
-        "Land Rover": { models: ["Range Rover","Range Rover Sport","Evoque","Velar","Discovery","Defender"],  image: "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=800&auto=format&fit=crop" },
-        "Jaguar":     { models: ["XE","XF","XJ","E-Pace","F-Pace","I-Pace","F-Type"],                        image: "https://images.unsplash.com/photo-1547744152-14d985cb937f?w=800&auto=format&fit=crop" }
+        "Tesla":  {
+            models: ["Model 3", "Model S", "Model X", "Model Y", "Cybertruck", "Roadster"],
+            image:  "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800&auto=format&fit=crop"
+        },
+        "Rivian": {
+            models: ["R1T", "R1S", "R2", "R3", "R3X"],
+            image:  "https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800&auto=format&fit=crop"
+        }
     },
 
     // Global Inventory: indexed as { [make]: { [model]: { [year]: Part[] } } }
-    // Pre-seeded with 20 test parts across multiple makes/models for development.
     globalInventory: {
-        "Toyota": {
-            "Camry": {
-                "2022": [
-                    { partNumber: "TY-8821-BRK", partName: "Brake Pad Set",         description: "Front Brake Pad Set — Ceramic",                imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop", price: 49.99, stock: 12, make: "Toyota", model: "Camry", year: "2022" },
-                    { partNumber: "TY-3301-FLT", partName: "Oil Filter",             description: "Engine Oil Filter — Extended Life",             imageUrl: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&auto=format&fit=crop", price: 12.99, stock: 30, make: "Toyota", model: "Camry", year: "2022" },
-                    { partNumber: "TY-0192-SPK", partName: "Spark Plugs",            description: "Iridium Spark Plug Set (qty 4)",                imageUrl: "https://images.unsplash.com/photo-1599669454699-248893623440?w=400&auto=format&fit=crop", price: 34.50, stock: 20, make: "Toyota", model: "Camry", year: "2022" },
-                    { partNumber: "TY-2201-WPR", partName: "Wiper Blades",           description: "OEM Front Wiper Blade Set",                     imageUrl: "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=400&auto=format&fit=crop", price: 28.00, stock: 15, make: "Toyota", model: "Camry", year: "2022" }
-                ]
-            },
-            "Corolla": {
-                "2021": [
-                    { partNumber: "TY-5501-THR", partName: "Throttle Body",          description: "Electronic Throttle Body Assembly",             imageUrl: "https://images.unsplash.com/photo-1562577309-4932fdd64cd1?w=400&auto=format&fit=crop", price: 145.00, stock: 5, make: "Toyota", model: "Corolla", year: "2021" },
-                    { partNumber: "TY-4410-CAB", partName: "Cabin Air Filter",       description: "HEPA Cabin Air Filter",                         imageUrl: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&auto=format&fit=crop", price: 18.50, stock: 25, make: "Toyota", model: "Corolla", year: "2021" }
-                ]
-            }
-        },
-        "Honda": {
-            "Accord": {
-                "2021": [
-                    { partNumber: "HN-4410-ALT", partName: "Alternator",             description: "Alternator — Remanufactured OEM",               imageUrl: "https://images.unsplash.com/photo-1562577309-4932fdd64cd1?w=400&auto=format&fit=crop", price: 189.00, stock: 4, make: "Honda", model: "Accord", year: "2021" },
-                    { partNumber: "HN-0055-BLT", partName: "Serpentine Belt",        description: "Serpentine Drive Belt",                         imageUrl: "https://images.unsplash.com/photo-1599669454699-248893623440?w=400&auto=format&fit=crop", price: 22.75,  stock: 18, make: "Honda", model: "Accord", year: "2021" },
-                    { partNumber: "HN-3302-RAD", partName: "Radiator",               description: "Aluminum Radiator Assembly",                    imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop", price: 220.00, stock: 3, make: "Honda", model: "Accord", year: "2021" }
-                ]
-            },
-            "Civic": {
+        "Tesla": {
+            "Model 3": {
                 "2023": [
-                    { partNumber: "HN-1100-STR", partName: "Starter Motor",          description: "Starter Motor — Remanufactured",                imageUrl: "https://images.unsplash.com/photo-1562577309-4932fdd64cd1?w=400&auto=format&fit=crop", price: 135.00, stock: 6, make: "Honda", model: "Civic", year: "2023" },
-                    { partNumber: "HN-7700-CVJ", partName: "CV Joint Boot Kit",      description: "Inner and Outer CV Boot Kit",                   imageUrl: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&auto=format&fit=crop", price: 44.99, stock: 9, make: "Honda", model: "Civic", year: "2023" }
-                ]
-            }
-        },
-        "BMW": {
-            "3 Series": {
-                "2020": [
-                    { partNumber: "BM-7755-SUS", partName: "Front Strut Assembly",   description: "Front Strut Assembly — Left",                   imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop", price: 210.00, stock: 2, make: "BMW", model: "3 Series", year: "2020" },
-                    { partNumber: "BM-2200-COL", partName: "Ignition Coil",          description: "Ignition Coil Pack — Set of 6",                 imageUrl: "https://images.unsplash.com/photo-1599669454699-248893623440?w=400&auto=format&fit=crop", price: 88.00, stock: 7, make: "BMW", model: "3 Series", year: "2020" }
+                    { partNumber: "TS-M3-BRK-F",  partName: "Front Brake Pad Set",   description: "OEM Front Brake Pad Set — Ceramic",               imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop", price: 89.99,  stock: 12, make: "Tesla", model: "Model 3", year: "2023" },
+                    { partNumber: "TS-M3-BRK-R",  partName: "Rear Brake Pad Set",    description: "OEM Rear Brake Pad Set — Ceramic",                 imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop", price: 74.99,  stock: 10, make: "Tesla", model: "Model 3", year: "2023" },
+                    { partNumber: "TS-M3-12V",    partName: "12V Battery",            description: "OEM 12V Lithium-Ion Auxiliary Battery",            imageUrl: "https://images.unsplash.com/photo-1609188076864-c35269136b09?w=400&auto=format&fit=crop", price: 149.00, stock: 6,  make: "Tesla", model: "Model 3", year: "2023" },
+                    { partNumber: "TS-M3-CAF",    partName: "Cabin Air Filter",       description: "HEPA Cabin Air Filter w/ Activated Carbon",        imageUrl: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&auto=format&fit=crop", price: 39.99,  stock: 20, make: "Tesla", model: "Model 3", year: "2023" },
+                    { partNumber: "TS-M3-WPR",    partName: "Wiper Blade Set",        description: "OEM Front Wiper Blade Set (Driver + Passenger)",   imageUrl: "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=400&auto=format&fit=crop", price: 44.99,  stock: 15, make: "Tesla", model: "Model 3", year: "2023" }
+                ],
+                "2022": [
+                    { partNumber: "TS-M3-BRK-F22",partName: "Front Brake Pad Set",   description: "OEM Front Brake Pad Set — Ceramic (2022)",         imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop", price: 89.99,  stock: 8,  make: "Tesla", model: "Model 3", year: "2022" },
+                    { partNumber: "TS-M3-RTR-22",  partName: "Front Brake Rotor",    description: "Front Vented Brake Rotor — Left or Right",         imageUrl: "https://images.unsplash.com/photo-1562577309-4932fdd64cd1?w=400&auto=format&fit=crop", price: 129.00, stock: 4,  make: "Tesla", model: "Model 3", year: "2022" }
                 ]
             },
-            "5 Series": {
-                "2021": [
-                    { partNumber: "BM-5501-TRQ", partName: "Torque Converter",       description: "Automatic Transmission Torque Converter",      imageUrl: "https://images.unsplash.com/photo-1562577309-4932fdd64cd1?w=400&auto=format&fit=crop", price: 395.00, stock: 2, make: "BMW", model: "5 Series", year: "2021" }
+            "Model Y": {
+                "2024": [
+                    { partNumber: "TS-MY-BRK-F",  partName: "Front Brake Pad Set",   description: "OEM Front Brake Pad Set — Model Y",                imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop", price: 94.99,  stock: 10, make: "Tesla", model: "Model Y", year: "2024" },
+                    { partNumber: "TS-MY-CAF",    partName: "Cabin Air Filter",       description: "HEPA Cabin Air Filter — Model Y",                  imageUrl: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&auto=format&fit=crop", price: 44.99,  stock: 14, make: "Tesla", model: "Model Y", year: "2024" },
+                    { partNumber: "TS-MY-CLT",    partName: "Coolant (1 Gal)",        description: "OEM Electric Vehicle Coolant — 1 Gallon",          imageUrl: "https://images.unsplash.com/photo-1617650728575-1b8e7e3e19cb?w=400&auto=format&fit=crop", price: 29.99,  stock: 22, make: "Tesla", model: "Model Y", year: "2024" }
+                ],
+                "2023": [
+                    { partNumber: "TS-MY-SUS-FL", partName: "Front Strut Assembly",  description: "Front Left Strut Assembly — OEM",                  imageUrl: "https://images.unsplash.com/photo-1562577309-4932fdd64cd1?w=400&auto=format&fit=crop", price: 295.00, stock: 3,  make: "Tesla", model: "Model Y", year: "2023" },
+                    { partNumber: "TS-MY-WPR",    partName: "Wiper Blade Set",        description: "OEM Front Wiper Blade Set — Model Y",              imageUrl: "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=400&auto=format&fit=crop", price: 47.99,  stock: 12, make: "Tesla", model: "Model Y", year: "2023" }
                 ]
-            }
-        },
-        "Mercedes": {
-            "C-Class": {
+            },
+            "Model S": {
                 "2022": [
-                    { partNumber: "MB-8810-ABS", partName: "ABS Sensor",             description: "Front ABS Wheel Speed Sensor",                  imageUrl: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&auto=format&fit=crop", price: 62.00, stock: 11, make: "Mercedes", model: "C-Class", year: "2022" },
-                    { partNumber: "MB-4400-FPM", partName: "Fuel Pump Module",       description: "In-Tank Fuel Pump and Sender Assembly",         imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop", price: 178.00, stock: 4, make: "Mercedes", model: "C-Class", year: "2022" }
+                    { partNumber: "TS-MS-SUS-F",  partName: "Air Suspension Strut",  description: "Front Active Air Suspension Strut — Left",         imageUrl: "https://images.unsplash.com/photo-1562577309-4932fdd64cd1?w=400&auto=format&fit=crop", price: 498.00, stock: 2,  make: "Tesla", model: "Model S", year: "2022" },
+                    { partNumber: "TS-MS-DRH",    partName: "Door Handle Assembly",  description: "Retractable Door Handle Assembly — Front",         imageUrl: "https://images.unsplash.com/photo-1599669454699-248893623440?w=400&auto=format&fit=crop", price: 185.00, stock: 5,  make: "Tesla", model: "Model S", year: "2022" },
+                    { partNumber: "TS-MS-CAF",    partName: "Cabin Air Filter",       description: "HEPA Cabin Air Filter — Model S",                  imageUrl: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&auto=format&fit=crop", price: 49.99,  stock: 8,  make: "Tesla", model: "Model S", year: "2022" }
+                ]
+            },
+            "Cybertruck": {
+                "2024": [
+                    { partNumber: "TS-CT-BMP-F",  partName: "Front Bumper Bracket",  description: "Front Bumper Impact Absorber Bracket",             imageUrl: "https://images.unsplash.com/photo-1617788138017-80ad40651399?w=400&auto=format&fit=crop", price: 215.00, stock: 3,  make: "Tesla", model: "Cybertruck", year: "2024" },
+                    { partNumber: "TS-CT-FOG",    partName: "Fog Light Assembly",    description: "Front Fog Light Assembly — LED",                   imageUrl: "https://images.unsplash.com/photo-1599669454699-248893623440?w=400&auto=format&fit=crop", price: 168.00, stock: 4,  make: "Tesla", model: "Cybertruck", year: "2024" }
                 ]
             }
         },
-        "Nissan": {
-            "Altima": {
-                "2020": [
-                    { partNumber: "NS-3300-CVT", partName: "CVT Filter Kit",         description: "CVT Transmission Service Kit",                  imageUrl: "https://images.unsplash.com/photo-1562577309-4932fdd64cd1?w=400&auto=format&fit=crop", price: 55.00, stock: 8, make: "Nissan", model: "Altima", year: "2020" }
-                ]
-            }
-        },
-        "Hyundai": {
-            "Elantra": {
+        "Rivian": {
+            "R1T": {
+                "2023": [
+                    { partNumber: "RV-R1T-SKD",   partName: "Front Skid Plate",      description: "Aluminum Front Skid Plate — Rock Guard",           imageUrl: "https://images.unsplash.com/photo-1617788138017-80ad40651399?w=400&auto=format&fit=crop", price: 349.00, stock: 4,  make: "Rivian", model: "R1T", year: "2023" },
+                    { partNumber: "RV-R1T-RUB",   partName: "Running Board Set",     description: "Integrated Side Running Board Set (Pair)",         imageUrl: "https://images.unsplash.com/photo-1562577309-4932fdd64cd1?w=400&auto=format&fit=crop", price: 529.00, stock: 2,  make: "Rivian", model: "R1T", year: "2023" },
+                    { partNumber: "RV-R1T-CAF",   partName: "Cabin Air Filter",      description: "Cabin Air Filter — R1T",                           imageUrl: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&auto=format&fit=crop", price: 44.99,  stock: 10, make: "Rivian", model: "R1T", year: "2023" },
+                    { partNumber: "RV-R1T-12V",   partName: "12V Auxiliary Battery", description: "OEM 12V Auxiliary Battery Replacement",            imageUrl: "https://images.unsplash.com/photo-1609188076864-c35269136b09?w=400&auto=format&fit=crop", price: 189.00, stock: 5,  make: "Rivian", model: "R1T", year: "2023" }
+                ],
                 "2022": [
-                    { partNumber: "HY-6600-ORG", partName: "Oxygen Sensor",          description: "Upstream O2 Sensor — Bank 1",                  imageUrl: "https://images.unsplash.com/photo-1599669454699-248893623440?w=400&auto=format&fit=crop", price: 39.99, stock: 14, make: "Hyundai", model: "Elantra", year: "2022" },
-                    { partNumber: "HY-1100-PCV", partName: "PCV Valve",              description: "PCV Valve with Grommet",                        imageUrl: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&auto=format&fit=crop", price: 14.99, stock: 22, make: "Hyundai", model: "Elantra", year: "2022" }
+                    { partNumber: "RV-R1T-BRK22", partName: "Front Brake Pad Set",   description: "OEM Front Brake Pads — R1T (2022)",                imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop", price: 109.99, stock: 6,  make: "Rivian", model: "R1T", year: "2022" }
+                ]
+            },
+            "R1S": {
+                "2023": [
+                    { partNumber: "RV-R1S-RRK",   partName: "Roof Rail Extension",   description: "Roof Rail Cross-Bar Extension Kit",                imageUrl: "https://images.unsplash.com/photo-1617788138017-80ad40651399?w=400&auto=format&fit=crop", price: 299.00, stock: 3,  make: "Rivian", model: "R1S", year: "2023" },
+                    { partNumber: "RV-R1S-CAF",   partName: "Cabin Air Filter",      description: "HEPA Cabin Air Filter — R1S",                      imageUrl: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&auto=format&fit=crop", price: 44.99,  stock: 9,  make: "Rivian", model: "R1S", year: "2023" },
+                    { partNumber: "RV-R1S-BRK-F", partName: "Front Brake Pad Set",   description: "OEM Front Brake Pads — R1S",                       imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop", price: 114.99, stock: 7,  make: "Rivian", model: "R1S", year: "2023" },
+                    { partNumber: "RV-R1S-SUS-F", partName: "Front Strut Assembly",  description: "Front Strut Assembly — Left",                      imageUrl: "https://images.unsplash.com/photo-1562577309-4932fdd64cd1?w=400&auto=format&fit=crop", price: 385.00, stock: 2,  make: "Rivian", model: "R1S", year: "2023" }
+                ]
+            },
+            "R2": {
+                "2026": [
+                    { partNumber: "RV-R2-BRK-F",  partName: "Front Brake Rotor Set", description: "Front Vented Brake Rotor Set (Pair)",              imageUrl: "https://images.unsplash.com/photo-1562577309-4932fdd64cd1?w=400&auto=format&fit=crop", price: 198.00, stock: 5,  make: "Rivian", model: "R2", year: "2026" },
+                    { partNumber: "RV-R2-CAF",    partName: "Cabin Air Filter",      description: "Cabin Air Filter — R2",                            imageUrl: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&auto=format&fit=crop", price: 39.99,  stock: 8,  make: "Rivian", model: "R2", year: "2026" }
                 ]
             }
         }
     },
 
     // Transaction log
-    transactions: [
-        { orderId: "ORD-DEMO-001", userId: "u001", displayName: "John Smith", folderName: "Hames", customerNumber: "853934", total: 134.48, date: "2026-04-10", deliveryDate: "2026-04-15", itemCount: 3, status: "completed" }
-    ],
+    transactions: [],
 
     // Return requests: created by users, actioned by admin.
     returnRequests: []
@@ -184,7 +159,19 @@ const DB_DEFAULTS = {
 function _loadDB() {
     try {
         const saved = localStorage.getItem('partfind_db');
-        return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DB_DEFAULTS));
+        if (!saved) return JSON.parse(JSON.stringify(DB_DEFAULTS));
+        const parsed = JSON.parse(saved);
+        // Schema migration guard: if the saved users array doesn't contain any
+        // ACBW-prefixed profiles or the new 'admin' account, it's a pre-overhaul
+        // save. Replace only the users array; preserve inventory and transactions.
+        const hasNewSchema = (parsed.users || []).some(
+            u => (u.username || '').startsWith('ACBW') || u.username === 'admin'
+        );
+        if (!hasNewSchema) {
+            parsed.users = JSON.parse(JSON.stringify(DB_DEFAULTS.users));
+            localStorage.setItem('partfind_db', JSON.stringify(parsed));
+        }
+        return parsed;
     } catch (e) {
         return JSON.parse(JSON.stringify(DB_DEFAULTS));
     }
@@ -205,28 +192,18 @@ const DB = _loadDB();
 
 // ─── Inventory Module ─────────────────────────────────────────────────────────
 // IMPORTANT: Defined BEFORE Admin so Admin.addPart() can safely call Inventory.addPart().
-// Previously Inventory was defined after Admin, causing a ReferenceError at call time
-// because const declarations are not hoisted — this was the root cause of the
-// Global Inventory tab staying empty.
 
 const Inventory = {
 
     // Write a part into the Make → Model → Year index.
-    // Called automatically by Admin.addPart(); also used by _backfillInventory().
-    // Silently skips duplicates (same partNumber in the same slot).
     addPart(make, model, year, part) {
         if (!make || !model || !year) return { ok: false, error: 'Make, Model, and Year are required.' };
-
-        // Ensure DB.globalInventory exists (guard for very old localStorage saves)
         if (!DB.globalInventory) DB.globalInventory = {};
-
         const inv = DB.globalInventory;
         if (!inv[make])              inv[make] = {};
         if (!inv[make][model])       inv[make][model] = {};
         if (!inv[make][model][year]) inv[make][model][year] = [];
-
         const slot = inv[make][model][year];
-        // Update existing entry rather than silently skipping, so edits propagate
         const existing = slot.findIndex(p => p.partNumber === part.partNumber);
         if (existing === -1) {
             slot.push({ ...part });
@@ -284,7 +261,6 @@ const Inventory = {
         return n;
     },
 
-    // Return a flat list of every part across all slots — used by the search autofill.
     getAllFlat() {
         const result = [];
         for (const entry of this.getAll()) {
@@ -300,8 +276,6 @@ const Inventory = {
 // ─── Backfill ─────────────────────────────────────────────────────────────────
 // Scans every part in every folder across all users and ensures it is present
 // in globalInventory. Runs once on page load after DB and Inventory are ready.
-// This repairs inventory for parts that were added before the ordering bug was fixed,
-// and also handles any future mismatch between folder parts and the index.
 function _backfillInventory() {
     if (!DB.globalInventory) DB.globalInventory = {};
     let added = 0;
@@ -321,25 +295,6 @@ function _backfillInventory() {
 _backfillInventory();
 
 
-// ─── Past Delivery Date Cleanup ───────────────────────────────────────────────
-// Runs on every page load. Removes any delivery dates that are strictly before
-// today from every user's availableDeliveryDates array so the admin never sees
-// or accidentally re-uses stale dates.
-function _purgePastDeliveryDates() {
-    const today = new Date().toISOString().split('T')[0];
-    let changed = false;
-    for (const user of DB.users) {
-        if (!Array.isArray(user.availableDeliveryDates)) continue;
-        const before = user.availableDeliveryDates.length;
-        user.availableDeliveryDates = user.availableDeliveryDates.filter(d => d >= today);
-        if (user.availableDeliveryDates.length !== before) changed = true;
-    }
-    if (changed) saveDB();
-}
-
-_purgePastDeliveryDates();
-
-
 // ─── Admin CRUD Module ────────────────────────────────────────────────────────
 
 const Admin = {
@@ -356,7 +311,7 @@ const Admin = {
     addUser({ username, password, displayName }) {
         if (DB.users.find(u => u.username === username)) return { ok: false, error: 'Username already exists.' };
         const id = 'u' + Date.now();
-        DB.users.push({ id, username, password, role: 'user', displayName, email: username + '@example.com', availableDeliveryDates: [], orderHistory: [], serviceFolders: [] });
+        DB.users.push({ id, username, password, role: 'user', displayName, email: '', orderHistory: [], serviceFolders: [] });
         saveDB();
         return { ok: true, id };
     },
@@ -365,6 +320,14 @@ const Admin = {
         const i = DB.users.findIndex(u => u.id === userId && u.role !== 'admin');
         if (i === -1) return false;
         DB.users.splice(i, 1);
+        saveDB();
+        return true;
+    },
+
+    setUserEmail(userId, email) {
+        const user = this.getUserById(userId);
+        if (!user) return false;
+        user.email = email;
         saveDB();
         return true;
     },
@@ -401,14 +364,10 @@ const Admin = {
         const folder = user.serviceFolders.find(f => f.folderName === folderName);
         if (!folder) return { ok: false, error: 'Folder not found.' };
         if (folder.parts.find(p => p.partNumber === part.partNumber)) return { ok: false, error: 'Part # already exists in this folder.' };
-
         folder.parts.push(part);
-
-        // Sync to global inventory — Inventory is now defined above Admin so this is safe
         if (part.make && part.model && part.year) {
             Inventory.addPart(part.make, part.model, part.year, part);
         }
-
         saveDB();
         return { ok: true };
     },
@@ -465,54 +424,31 @@ const Admin = {
         }, 0);
     },
 
-    // Delivery dates
-    getDeliveryDates(userId) {
-        const user = this.getUserById(userId);
-        return user ? (user.availableDeliveryDates || []) : [];
-    },
-
-    setDeliveryDates(userId, dates) {
-        const user = this.getUserById(userId);
-        if (!user) return false;
-        user.availableDeliveryDates = dates.filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d));
-        saveDB();
-        return true;
-    },
-
-    addDeliveryDate(userId, date) {
-        const user = this.getUserById(userId);
-        if (!user) return false;
-        if (!user.availableDeliveryDates) user.availableDeliveryDates = [];
-        if (!user.availableDeliveryDates.includes(date)) {
-            user.availableDeliveryDates.push(date);
-            user.availableDeliveryDates.sort();
-        }
-        saveDB();
-        return true;
-    },
-
-    removeDeliveryDate(userId, date) {
-        const user = this.getUserById(userId);
-        if (!user) return false;
-        user.availableDeliveryDates = (user.availableDeliveryDates || []).filter(d => d !== date);
-        saveDB();
-        return true;
-    },
-
     // Order history
     getOrderHistory(userId) {
         const user = this.getUserById(userId);
         return user ? (user.orderHistory || []) : [];
     },
 
+    // Update packing status on an order — mirrors to the transactions log.
+    updateOrderPackingStatus(userId, orderId, newStatus) {
+        const user = this.getUserById(userId);
+        if (!user) return false;
+        const order = (user.orderHistory || []).find(o => o.orderId === orderId);
+        if (order) order.packingStatus = newStatus;
+        // Mirror to transactions log so the Transactions panel stays in sync
+        const tx = (DB.transactions || []).find(t => t.orderId === orderId);
+        if (tx) tx.packingStatus = newStatus;
+        saveDB();
+        return true;
+    },
+
     // Add a part directly to the global inventory (not tied to a folder).
-    // Smart upsert: if the partNumber already exists anywhere in globalInventory,
-    // increment its stock by `quantity` instead of creating a duplicate entry.
+    // Smart upsert: if the partNumber already exists, increments stock instead.
     addGlobalPart({ partNumber, make, model, year, partName, description, imageUrl, price, quantity }) {
         if (!partNumber || !make || !model)
             return { ok: false, error: 'Part #, Make, and Model are required.' };
         const resolvedYear = year || String(new Date().getFullYear());
-
         const qty = Math.max(1, parseInt(quantity) || 1);
         if (!DB.globalInventory) DB.globalInventory = {};
         const inv = DB.globalInventory;
@@ -532,7 +468,7 @@ const Admin = {
             }
         }
 
-        // Not found — create a new entry in the specified slot
+        // Not found — create a new entry
         const newPart = {
             partNumber,
             partName:    partName || '',
@@ -606,19 +542,48 @@ const Checkout = {
         return `ORD-${ts}-${rand}`;
     },
 
-    async processPayment({ total, cardToken, method }) {
-        // Test mode: the Stripe test card number bypasses the simulated delay
-        // and immediately returns a success token flagged as a test transaction.
-        if (cardToken === 'tok_test_4242') {
-            return { ok: true, token: 'pay_TEST_' + Date.now().toString(36).toUpperCase(), testMode: true };
+    // Returns an array of 10 valid business-day date strings (YYYY-MM-DD).
+    // Rule A: start with the next calendar day after today.
+    // Rule B: if current hour >= 18 (6 PM), push out one additional day.
+    // Rule C: skip any Saturday/Sunday until a valid weekday is reached,
+    //         then collect the next 10 consecutive Mon–Fri dates.
+    calcPickupDates() {
+        const now  = new Date();
+        const hour = now.getHours();
+
+        // Start with tomorrow
+        let start = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+
+        // Rule B: if after 6 PM, skip one extra day
+        if (hour >= 18) {
+            start = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 1);
         }
-        // Production placeholder: simulate a short network round-trip
-        await new Promise(r => setTimeout(r, 1400));
-        if (!cardToken && method !== 'paypal') return { ok: false, error: 'No payment token provided.' };
-        return { ok: true, token: 'pay_' + Math.random().toString(36).substring(2, 14) };
+
+        // Advance past any leading weekend days
+        while (start.getDay() === 0 || start.getDay() === 6) {
+            start = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 1);
+        }
+
+        // Collect 10 business days (Mon–Fri)
+        const dates = [];
+        let cur = new Date(start);
+        while (dates.length < 10) {
+            const dow = cur.getDay();
+            if (dow !== 0 && dow !== 6) {
+                const y = cur.getFullYear();
+                const m = String(cur.getMonth() + 1).padStart(2, '0');
+                const d = String(cur.getDate()).padStart(2, '0');
+                dates.push(`${y}-${m}-${d}`);
+            }
+            cur = new Date(cur.getFullYear(), cur.getMonth(), cur.getDate() + 1);
+        }
+        return dates;
     },
 
-    async placeOrder({ userId, folderName, deliveryDate, cardToken, paymentMethod }) {
+    // Place a pickup order — no payment processing.
+    // Decrements inventory stock, saves order to user history and transactions log,
+    // and clears the cart. Orders default to packingStatus 'Prepare for Pickup'.
+    async submitOrder({ userId, folderName, pickupDate }) {
         const user   = Admin.getUserById(userId);
         const folder = user?.serviceFolders.find(f => f.folderName === folderName);
         const cart   = folder?.cart || [];
@@ -626,25 +591,13 @@ const Checkout = {
         if (!user)           return { ok: false, error: 'User not found.' };
         if (!folder)         return { ok: false, error: 'Folder not found.' };
         if (cart.length < 1) return { ok: false, error: 'Cart is empty.' };
-        if (!deliveryDate)   return { ok: false, error: 'No delivery date selected.' };
-        if (!(user.availableDeliveryDates || []).includes(deliveryDate))
-                             return { ok: false, error: 'Selected date is not available.' };
+        if (!pickupDate)     return { ok: false, error: 'No pickup date selected.' };
 
         const total   = cart.reduce((n, i) => n + i.price * i.qty, 0);
         const orderId = this.generateOrderId();
         const now     = new Date().toISOString().split('T')[0];
 
-        const payment = await this.processPayment({ total, cardToken, method: paymentMethod });
-        if (!payment.ok) return { ok: false, error: payment.error };
-
-        // ── Remove purchased parts from the folder's recommended list ────────────
-        const purchasedNums = new Set(cart.map(i => i.partNumber));
-        folder.parts = (folder.parts || []).filter(p => !purchasedNums.has(p.partNumber));
-
-        // ── Decrement stock in global inventory ────────────────────────────────
-        // The part entry is NEVER removed — only its stock count is decremented.
-        // If a part doesn't have a stock field yet, we default it to 10 before decrementing
-        // so older entries (added before stock tracking was introduced) still work correctly.
+        // Decrement stock in global inventory for each purchased item
         for (const item of cart) {
             for (const make of Object.keys(DB.globalInventory || {})) {
                 for (const model of Object.keys(DB.globalInventory[make])) {
@@ -652,7 +605,6 @@ const Checkout = {
                         const slot = DB.globalInventory[make][model][year];
                         const idx  = slot.findIndex(p => p.partNumber === item.partNumber);
                         if (idx !== -1) {
-                            // Default stock to 10 for parts that predate stock tracking
                             if (slot[idx].stock === undefined) slot[idx].stock = 10;
                             slot[idx].stock = Math.max(0, slot[idx].stock - item.qty);
                         }
@@ -667,12 +619,10 @@ const Checkout = {
             folderName,
             customerNumber: folder.customerNumber,
             date:           now,
-            deliveryDate,
-            paymentToken:   payment.token,
-            paymentMethod:  paymentMethod || 'card',
+            deliveryDate:   pickupDate,
             total:          Math.round(total * 100) / 100,
             status:         'confirmed',
-            testMode:       payment.testMode || false,
+            packingStatus:  'Prepare for Pickup',
             items:          cart.map(i => ({ ...i }))
         };
         user.orderHistory.unshift(order);
@@ -686,9 +636,11 @@ const Checkout = {
             customerNumber: folder.customerNumber,
             total:          Math.round(total * 100) / 100,
             date:           now,
-            deliveryDate,
+            deliveryDate:   pickupDate,
             itemCount:      cart.reduce((n, i) => n + i.qty, 0),
-            status:         'completed'
+            status:         'completed',
+            packingStatus:  'Prepare for Pickup',
+            items:          cart.map(i => ({ ...i }))
         });
 
         folder.cart = [];
@@ -698,16 +650,12 @@ const Checkout = {
 };
 
 
-// --- Returns Module ----------------------------------------------------------
+// ─── Returns Module ───────────────────────────────────────────────────────────
 
 const Returns = {
 
-    // Create a new return request from the user side.
-    // orderId + partNumber uniquely identify the line item being returned.
     create({ userId, displayName, orderId, folderName, customerNumber, part, reason }) {
         if (!DB.returnRequests) DB.returnRequests = [];
-
-        // Prevent duplicate requests for the same order line
         const dup = DB.returnRequests.find(
             r => r.orderId === orderId && r.partNumber === part.partNumber && r.status === 'pending'
         );
@@ -715,24 +663,18 @@ const Returns = {
 
         const reqId = 'RET-' + Date.now().toString(36).toUpperCase();
         DB.returnRequests.push({
-            reqId,
-            userId,
-            displayName,
-            orderId,
-            folderName,
-            customerNumber,
-            partNumber:  part.partNumber,
-            partName:    part.partName || part.description,
-            partPrice:   part.price,
-            partQty:     part.qty,
-            imageUrl:    part.imageUrl || '',
+            reqId, userId, displayName, orderId, folderName, customerNumber,
+            partNumber:   part.partNumber,
+            partName:     part.partName || part.description,
+            partPrice:    part.price,
+            partQty:      part.qty,
+            imageUrl:     part.imageUrl || '',
             reason,
-            status:      'pending',      // pending | approved | rejected
-            dateCreated: new Date().toISOString().split('T')[0],
+            status:       'pending',
+            dateCreated:  new Date().toISOString().split('T')[0],
             dateActioned: null
         });
 
-        // Mark the item in the user's order history as "Return Pending"
         const user = DB.users.find(u => u.id === userId);
         if (user) {
             const order = (user.orderHistory || []).find(o => o.orderId === orderId);
@@ -746,27 +688,22 @@ const Returns = {
         return { ok: true, reqId };
     },
 
-    // Admin: get all return requests, optionally filtered by status.
     getAll(status = null) {
         const reqs = DB.returnRequests || [];
         return status ? reqs.filter(r => r.status === status) : reqs;
     },
 
-    // Count of pending requests — used for the notification bell.
     pendingCount() {
         return (DB.returnRequests || []).filter(r => r.status === 'pending').length;
     },
 
-    // Admin: approve a return. Restocks the part in global inventory.
     approve(reqId) {
         const req = (DB.returnRequests || []).find(r => r.reqId === reqId);
         if (!req) return { ok: false, error: 'Request not found.' };
         if (req.status !== 'pending') return { ok: false, error: 'Request already actioned.' };
-
-        req.status      = 'approved';
+        req.status       = 'approved';
         req.dateActioned = new Date().toISOString().split('T')[0];
 
-        // Restock in global inventory — find matching part and increment stock
         let restocked = false;
         const inv = DB.globalInventory || {};
         outer: for (const make of Object.keys(inv)) {
@@ -774,16 +711,11 @@ const Returns = {
                 for (const year of Object.keys(inv[make][model])) {
                     const slot = inv[make][model][year];
                     const part = slot.find(p => p.partNumber === req.partNumber);
-                    if (part) {
-                        part.stock = (part.stock || 0) + req.partQty;
-                        restocked = true;
-                        break outer;
-                    }
+                    if (part) { part.stock = (part.stock || 0) + req.partQty; restocked = true; break outer; }
                 }
             }
         }
 
-        // Update the item's returnStatus in the user's order history
         const user = DB.users.find(u => u.id === req.userId);
         if (user) {
             const order = (user.orderHistory || []).find(o => o.orderId === req.orderId);
@@ -797,12 +729,10 @@ const Returns = {
         return { ok: true, restocked };
     },
 
-    // Admin: reject a return.
     reject(reqId) {
         const req = (DB.returnRequests || []).find(r => r.reqId === reqId);
         if (!req) return { ok: false, error: 'Request not found.' };
         if (req.status !== 'pending') return { ok: false, error: 'Request already actioned.' };
-
         req.status       = 'rejected';
         req.dateActioned = new Date().toISOString().split('T')[0];
 

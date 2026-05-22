@@ -71,7 +71,7 @@
         .order-total-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
         .order-total-price { font-family: 'Bebas Neue', sans-serif; font-size: 32px; }
 
-        /* ── Delivery calendar ── */
+        /* ── Pickup calendar ── */
         .calendar-wrap { margin-bottom: 8px; }
         .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
         .cal-month { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: .04em; }
@@ -104,27 +104,19 @@
         .selected-date-display { margin-top: 16px; padding: 12px 16px; border-radius: 8px; font-size: 13px; background: rgba(232,255,71,.07); border: 1px solid rgba(232,255,71,.2); color: var(--accent); display: none; }
         .selected-date-display.visible { display: block; }
 
-        /* ── Payment form ── */
-        .payment-methods { display: flex; gap: 10px; margin-bottom: 24px; }
-        .pay-method { flex: 1; padding: 14px; border: 1.5px solid var(--border2); border-radius: 10px; cursor: pointer; text-align: center; transition: all .15s; }
-        .pay-method:hover { border-color: rgba(255,255,255,.25); }
-        .pay-method.active { border-color: var(--accent); background: rgba(232,255,71,.06); }
-        .pay-method-icon { font-size: 22px; margin-bottom: 4px; }
-        .pay-method-label { font-size: 12px; font-weight: 500; }
-        .pay-method.active .pay-method-label { color: var(--accent); }
+        /* ── Pickup notice ── */
+        .pickup-notice { background: var(--surf2); border: 1px solid var(--border2); border-radius: 10px; padding: 14px 16px; margin-bottom: 24px; font-size: 13px; color: var(--muted); line-height: 1.6; }
+        .pickup-notice strong { color: var(--text); }
 
-        .stripe-notice { background: var(--surf2); border: 1px solid var(--border2); border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; font-size: 12px; color: var(--muted); line-height: 1.6; }
-        .stripe-notice strong { color: var(--text); }
-        .stripe-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(99,91,255,.15); border: 1px solid rgba(99,91,255,.3); border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 700; color: #a89fff; letter-spacing: .05em; margin-left: 4px; }
-
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-        .form-row.full { grid-template-columns: 1fr; }
-        .form-group { display: flex; flex-direction: column; gap: 5px; }
-        .form-label { font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-        .form-input { padding: 11px 14px; background: var(--surf2); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color .15s; }
-        .form-input:focus { border-color: var(--accent); }
-        .form-input::placeholder { color: rgba(240,237,232,0.22); }
-        .form-input:disabled { opacity: .4; cursor: not-allowed; }
+        /* ── Step 3: Confirm receipt ── */
+        .receipt-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .receipt-table th { font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 0 0 10px; text-align: left; border-bottom: 1px solid var(--border2); }
+        .receipt-table th:not(:first-child) { text-align: right; }
+        .receipt-table td { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+        .receipt-table td:not(:first-child) { text-align: right; }
+        .receipt-meta { background: var(--surf2); border: 1px solid var(--border2); border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; font-size: 13px; line-height: 1.8; }
+        .receipt-meta strong { color: var(--text); }
+        .receipt-meta span { color: var(--muted); }
 
         /* ── Buttons ── */
         .btn-row { display: flex; gap: 10px; margin-top: 28px; }
@@ -146,12 +138,8 @@
         .success-icon { width: 64px; height: 64px; background: rgba(71,255,178,.1); border: 1px solid rgba(71,255,178,.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .success-icon svg { width: 28px; height: 28px; color: var(--success); }
         .success-title { font-family: 'Bebas Neue', sans-serif; font-size: 36px; }
-        .success-sub { font-size: 14px; color: var(--muted); font-weight: 300; max-width: 380px; line-height: 1.7; }
-        .order-id-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--surf2); border: 1px solid var(--border2); border-radius: 99px; padding: 6px 14px; font-size: 12px; font-weight: 500; letter-spacing: .06em; color: var(--text); }
-        .order-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 8px; }
-        .order-meta-card { background: var(--surf2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; text-align: left; }
-        .order-meta-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
-        .order-meta-val { font-size: 14px; font-weight: 500; }
+        .success-msg { font-size: 14px; color: var(--muted); font-weight: 300; max-width: 420px; line-height: 1.7; text-align: center; }
+        .success-msg strong { color: var(--text); }
         .success-actions { display: flex; gap: 10px; margin-top: 8px; width: 100%; }
         .btn-outline { flex: 1; padding: 12px; background: transparent; border: 1px solid var(--border2); border-radius: 10px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all .15s; text-decoration: none; text-align: center; }
         .btn-outline:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
@@ -163,9 +151,6 @@
 
         @media (max-width: 560px) {
             .card { padding: 24px 20px; }
-            .form-row { grid-template-columns: 1fr; }
-            .order-meta-grid { grid-template-columns: 1fr; }
-            .payment-methods { flex-direction: column; }
         }
     </style>
 </head>
@@ -191,12 +176,12 @@
     <div class="step-line"></div>
     <div class="step" id="step-ind-2">
         <div class="step-num">2</div>
-        <div class="step-label">Delivery date</div>
+        <div class="step-label">Pickup date</div>
     </div>
     <div class="step-line"></div>
     <div class="step" id="step-ind-3">
         <div class="step-num">3</div>
-        <div class="step-label">Payment</div>
+        <div class="step-label">Confirm</div>
     </div>
 </div>
 
@@ -214,19 +199,22 @@
         </div>
         <div class="btn-row">
             <a class="btn-back" href="recommended-parts.html">← Back to cart</a>
-            <button class="btn-next" onclick="goToStep(2)">Select delivery date →</button>
+            <button class="btn-next" onclick="goToStep(2)">Select pickup date →</button>
         </div>
     </div>
 
-    <!-- ── Step 2: Delivery calendar ── -->
+    <!-- ── Step 2: Pickup calendar ── -->
     <div id="step-2" style="display:none;">
-        <div class="card-title">Delivery date</div>
-        <div class="card-sub">Select one of your available delivery dates below.</div>
+        <div class="card-title">Pickup date</div>
+        <div class="card-sub">Select your preferred pickup date below.</div>
         <div class="error-banner" id="step2-error"></div>
+
+        <div class="pickup-notice">
+            All orders are available for pickup at <strong>5411 Wasson Road</strong> between the hours of
+            <strong>8:00 AM and 6:00 PM</strong>. Orders will be held for <strong>10 business days</strong>.
+        </div>
+
         <div class="calendar-wrap">
-            <div id="cal-no-dates-notice" style="display:none;padding:14px 16px;border-radius:8px;background:rgba(255,92,92,.07);border:1px solid rgba(255,92,92,.2);color:var(--danger);font-size:13px;margin-bottom:16px;">
-                No delivery dates have been configured for your account yet. Please contact your service representative.
-            </div>
             <div class="cal-nav">
                 <button class="cal-arrow" onclick="prevMonth()">
                     <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 2L4 7l5 5"/></svg>
@@ -255,96 +243,42 @@
         <div class="selected-date-display" id="selected-date-display"></div>
         <div class="btn-row">
             <button class="btn-back" onclick="goToStep(1)">← Back</button>
-            <button class="btn-next" id="step2-next" onclick="goToStep(3)" disabled title="Select an available date to continue">Continue to payment →</button>
+            <button class="btn-next" id="step2-next" onclick="goToStep(3)" disabled>Continue →</button>
         </div>
     </div>
 
-    <!-- ── Step 3: Payment ── -->
+    <!-- ── Step 3: Confirm ── -->
     <div id="step-3" style="display:none;">
-        <div class="card-title">Payment</div>
-        <div class="card-sub">Complete your order securely.</div>
+        <div class="card-title">Confirm order</div>
+        <div class="card-sub">Review your order details and confirm pickup.</div>
         <div class="error-banner" id="step3-error"></div>
-
-        <div class="payment-methods">
-            <div class="pay-method active" id="pm-card" onclick="selectPayMethod('card')">
-                <div class="pay-method-icon">💳</div>
-                <div class="pay-method-label">Credit / Debit</div>
-            </div>
-            <div class="pay-method" id="pm-paypal" onclick="selectPayMethod('paypal')">
-                <div class="pay-method-icon">🅿️</div>
-                <div class="pay-method-label">PayPal</div>
-            </div>
-            <div class="pay-method" id="pm-stripe" onclick="selectPayMethod('stripe')">
-                <div class="pay-method-icon">⚡</div>
-                <div class="pay-method-label">Stripe Link</div>
-            </div>
+        <div class="receipt-meta" id="receipt-meta"></div>
+        <table class="receipt-table" id="receipt-table">
+            <thead>
+                <tr>
+                    <th>Part</th>
+                    <th>Part #</th>
+                    <th>Qty</th>
+                    <th>Unit</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody id="receipt-tbody"></tbody>
+        </table>
+        <div class="order-total-row">
+            <span class="order-total-label">Order total</span>
+            <span class="order-total-price" id="confirm-total">$0.00</span>
         </div>
-
-        <!-- Placeholder notice -->
-        <div class="stripe-notice">
-            <strong>Payment sandbox</strong> — This is a placeholder integration.
-            <span class="stripe-badge">DEV</span><br>
-            In production, replace this form with the <strong>Stripe Elements</strong> or <strong>PayPal JS SDK</strong> mount point.
-            Card data entered here is <strong>not transmitted anywhere</strong> and is for UI demonstration only.
-        </div>
-
-        <!-- Test mode banner — shown when the test card number is detected -->
-        <div id="test-mode-banner" style="display:none;margin-bottom:16px;padding:11px 14px;border-radius:8px;background:rgba(71,255,178,.07);border:1px solid rgba(71,255,178,.25);font-size:12px;color:#47ffb2;display:flex;align-items:center;gap:8px;">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><polyline points="1,7 5,11 13,3"/></svg>
-            <span><strong>Test mode active</strong> — payment will be bypassed and a real order will be recorded.</span>
-        </div>
-
-        <!-- Card form (shown for card / stripe) -->
-        <div id="card-form">
-            <div class="form-row full">
-                <div class="form-group">
-                    <label class="form-label">Cardholder name</label>
-                    <input class="form-input" id="card-name" placeholder="Jane Smith">
-                </div>
-            </div>
-            <div class="form-row full">
-                <div class="form-group">
-                    <label class="form-label">Card number</label>
-                    <input class="form-input" id="card-number" placeholder="4242 4242 4242 4242" maxlength="19" oninput="formatCard(this); detectTestCard(this.value);">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Expiry</label>
-                    <input class="form-input" id="card-expiry" placeholder="MM / YY" maxlength="7" oninput="formatExpiry(this)">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">CVC</label>
-                    <input class="form-input" id="card-cvc" placeholder="•••" maxlength="4" type="password">
-                </div>
-            </div>
-        </div>
-
-        <!-- PayPal placeholder -->
-        <div id="paypal-form" style="display:none;">
-            <div style="background:var(--surf2);border:1px solid var(--border2);border-radius:10px;padding:24px;text-align:center;">
-                <div style="font-size:32px;margin-bottom:8px;">🅿️</div>
-                <div style="font-size:14px;font-weight:500;margin-bottom:4px;">PayPal</div>
-                <div style="font-size:12px;color:var(--muted);font-weight:300;">You would be redirected to PayPal to complete payment. Mount the PayPal JS SDK button here.</div>
-            </div>
-        </div>
-
-        <!-- Order total recap -->
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding:20px 0 0;border-top:1px solid var(--border2);margin-top:20px;">
-            <span style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Charging today</span>
-            <span style="font-family:'Bebas Neue',sans-serif;font-size:28px;" id="pay-total">$0.00</span>
-        </div>
-
         <div class="btn-row">
             <button class="btn-back" onclick="goToStep(2)">← Back</button>
-            <button class="btn-next" id="pay-btn" onclick="submitPayment()">Confirm order →</button>
+            <button class="btn-next" id="confirm-btn" onclick="confirmOrder()">Place order →</button>
         </div>
     </div>
 
     <!-- ── Processing ── -->
     <div class="processing" id="processing">
         <div class="spinner"></div>
-        <p id="processing-msg">Processing your order…</p>
+        <p>Placing your order…</p>
     </div>
 
     <!-- ── Success ── -->
@@ -353,12 +287,10 @@
             <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="4,14 10,20 24,6"/></svg>
         </div>
         <h2 class="success-title">Order confirmed</h2>
-        <p class="success-sub" id="success-sub">Your parts have been ordered and will be delivered on your selected date.</p>
-        <div class="order-id-chip" id="success-order-id"></div>
-        <div class="order-meta-grid" id="success-meta"></div>
+        <div class="success-msg" id="success-message"></div>
         <div class="success-actions">
             <a class="btn-outline" href="recommended-parts.html">← Back to folders</a>
-            <a class="btn-solid" href="recommended-parts.html" id="view-history-btn">View order history</a>
+            <a class="btn-solid" href="recommended-parts.html">View order history</a>
         </div>
     </div>
 
@@ -376,19 +308,9 @@ if (session && session.role === 'admin') Auth.redirectByRole('admin');
 
 if (session && folderName) {
 
-    const dbUser  = Admin.getUserById(session.id);
-    const folder  = dbUser?.serviceFolders.find(f => f.folderName === folderName);
-    const cart    = folder?.cart || [];
-
-    // Always read delivery dates fresh from the live DB object so schema changes
-    // and admin edits are reflected without requiring a page reload.
-    // (Previously this was a const captured once at load — if the user had an old
-    // localStorage save without availableDeliveryDates, it would be undefined → []
-    // and no dates would ever be clickable.)
-    function getAvDates() {
-        const u = Admin.getUserById(session.id);
-        return u?.availableDeliveryDates || [];
-    }
+    const dbUser = Admin.getUserById(session.id);
+    const folder = dbUser?.serviceFolders.find(f => f.folderName === folderName);
+    const cart   = folder?.cart || [];
 
     // Redirect back if cart is empty
     if (cart.length === 0) {
@@ -396,38 +318,67 @@ if (session && folderName) {
     }
 
     // ── State ─────────────────────────────────────────────────────────────────
-    let currentStep    = 1;
-    let selectedDate   = null;
-    let paymentMethod  = 'card';
-    let calYear        = new Date().getFullYear();
-    let calMonth       = new Date().getMonth(); // 0-indexed
+    let currentStep  = 1;
+    let selectedDate = null;
+    let calYear      = new Date().getFullYear();
+    let calMonth     = new Date().getMonth(); // 0-indexed
+
+    // Pickup dates are auto-calculated from business day rules
+    const pickupDates = Checkout.calcPickupDates();
 
     // ── Step 1: Render order summary ──────────────────────────────────────────
     function renderSummary() {
         const itemsEl = document.getElementById('order-items');
         const totalEl = document.getElementById('order-total');
         const subEl   = document.getElementById('step1-sub');
-        subEl.textContent = `${folder.folderName} — Customer #${folder.customerNumber}`;
+        subEl.textContent = folder.folderName + ' — Customer #' + folder.customerNumber;
         let total = 0;
         itemsEl.innerHTML = '';
         cart.forEach(item => {
             total += item.price * item.qty;
             const el = document.createElement('div');
             el.className = 'order-item';
-            el.innerHTML = `
-                ${item.imageUrl ? `<img class="order-item-thumb" src="${item.imageUrl}" alt="">` : `<div class="order-item-thumb" style="background:var(--surf3);border-radius:6px;"></div>`}
-                <div class="order-item-info">
-                    <div class="order-item-name">${item.partName || item.description}</div>
-                    <div class="order-item-num">${item.partNumber}</div>
-                </div>
-                <div class="order-item-right">
-                    <div class="order-item-price">$${(item.price * item.qty).toFixed(2)}</div>
-                    <div class="order-item-qty">qty ${item.qty} × $${item.price.toFixed(2)}</div>
-                </div>`;
+            el.innerHTML =
+                (item.imageUrl ? '<img class="order-item-thumb" src="' + item.imageUrl + '" alt="">' : '<div class="order-item-thumb" style="background:var(--surf3);border-radius:6px;"></div>') +
+                '<div class="order-item-info">' +
+                    '<div class="order-item-name">' + (item.partName || item.description) + '</div>' +
+                    '<div class="order-item-num">' + item.partNumber + '</div>' +
+                '</div>' +
+                '<div class="order-item-right">' +
+                    '<div class="order-item-price">$' + (item.price * item.qty).toFixed(2) + '</div>' +
+                    '<div class="order-item-qty">qty ' + item.qty + ' \xd7 $' + item.price.toFixed(2) + '</div>' +
+                '</div>';
             itemsEl.appendChild(el);
         });
         totalEl.textContent = '$' + total.toFixed(2);
-        document.getElementById('pay-total').textContent = '$' + total.toFixed(2);
+    }
+
+    // ── Step 3: Render receipt ────────────────────────────────────────────────
+    function renderReceipt() {
+        const fmtPickup = selectedDate
+            ? new Date(selectedDate + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+            : '—';
+
+        document.getElementById('receipt-meta').innerHTML =
+            '<strong>Folder:</strong> <span>' + folder.folderName + '</span> &nbsp;&nbsp; ' +
+            '<strong>Customer #:</strong> <span>' + folder.customerNumber + '</span><br>' +
+            '<strong>Pickup date:</strong> <span>' + fmtPickup + '</span>';
+
+        let total = 0;
+        const tbody = document.getElementById('receipt-tbody');
+        tbody.innerHTML = '';
+        cart.forEach(item => {
+            total += item.price * item.qty;
+            const tr = document.createElement('tr');
+            tr.innerHTML =
+                '<td>' + (item.partName || item.description) + '</td>' +
+                '<td style="text-align:right;font-size:10px;color:var(--accent);">' + item.partNumber + '</td>' +
+                '<td style="text-align:right;">' + item.qty + '</td>' +
+                '<td style="text-align:right;">$' + item.price.toFixed(2) + '</td>' +
+                '<td style="text-align:right;font-weight:500;">$' + (item.price * item.qty).toFixed(2) + '</td>';
+            tbody.appendChild(tr);
+        });
+        document.getElementById('confirm-total').textContent = '$' + total.toFixed(2);
     }
 
     // ── Step indicator ────────────────────────────────────────────────────────
@@ -435,14 +386,15 @@ if (session && folderName) {
         [1,2,3].forEach(n => {
             const el = document.getElementById('step-ind-' + n);
             el.className = 'step' + (n === step ? ' active' : n < step ? ' done' : '');
-            if (n < step) el.querySelector('.step-num').innerHTML = `<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="12" height="12"><polyline points="2,7 5,10 11,3"/></svg>`;
+            if (n < step) el.querySelector('.step-num').innerHTML = '<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="12" height="12"><polyline points="2,7 5,10 11,3"/></svg>';
             else          el.querySelector('.step-num').textContent = n;
         });
     }
 
     function goToStep(n) {
         if (n === 2 && cart.length === 0) { showError('step1-error', 'Your cart is empty.'); return; }
-        if (n === 3 && !selectedDate)     { showError('step2-error', 'Please select a delivery date.'); return; }
+        if (n === 3 && !selectedDate)     { showError('step2-error', 'Please select a pickup date.'); return; }
+        if (n === 3) renderReceipt();
         currentStep = n;
         [1,2,3].forEach(i => document.getElementById('step-' + i).style.display = i === n ? 'block' : 'none');
         updateStepIndicator(n);
@@ -463,16 +415,10 @@ if (session && folderName) {
     const TODAY_STR = new Date().toISOString().split('T')[0];
 
     function renderCalendar() {
-        const avDates = getAvDates(); // always read fresh from DB
-        const label   = document.getElementById('cal-month-label');
-        const grid    = document.getElementById('cal-grid');
-        const dt      = new Date(calYear, calMonth, 1);
+        const label = document.getElementById('cal-month-label');
+        const grid  = document.getElementById('cal-grid');
+        const dt    = new Date(calYear, calMonth, 1);
         label.textContent = dt.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-
-        // Show a helpful message if admin hasn't configured any dates yet
-        const noticEl = document.getElementById('cal-no-dates-notice');
-        const futureAvail = avDates.filter(d => d >= TODAY_STR);
-        if (noticEl) noticEl.style.display = avDates.length === 0 ? 'block' : 'none';
 
         grid.innerHTML = '';
 
@@ -498,24 +444,22 @@ if (session && folderName) {
 
         // Current-month day cells
         for (let day = 1; day <= daysInMonth; day++) {
-            const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const dateStr = calYear + '-' + String(calMonth + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
             const isPast  = dateStr < TODAY_STR;
             const isToday = dateStr === TODAY_STR;
-            const isAvail = avDates.includes(dateStr) && !isPast;
+            const isAvail = pickupDates.includes(dateStr);
             const isSel   = dateStr === selectedDate;
 
             const cell = document.createElement('div');
             cell.textContent = day;
 
-            // Build class list explicitly so selected always wins over available
             const classes = ['cal-day'];
-            if (isToday)  classes.push('today');
-            if (isPast)   classes.push('past');
-            if (isAvail)  classes.push('available');
-            if (isSel)    classes.push('selected');
+            if (isToday) classes.push('today');
+            if (isPast)  classes.push('past');
+            if (isAvail) classes.push('available');
+            if (isSel)   classes.push('selected');
             cell.className = classes.join(' ');
 
-            // Attach click handler only to available (future) dates
             if (isAvail) {
                 cell.addEventListener('click', () => selectDate(dateStr));
             }
@@ -539,7 +483,7 @@ if (session && folderName) {
         renderCalendar();
         const display = document.getElementById('selected-date-display');
         const formatted = new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        display.textContent = '✓ Delivery scheduled for ' + formatted;
+        display.textContent = '✓ Pickup scheduled for ' + formatted;
         display.classList.add('visible');
         document.getElementById('step2-next').disabled = false;
     }
@@ -553,90 +497,24 @@ if (session && folderName) {
         renderCalendar();
     }
 
-    // ── Payment ───────────────────────────────────────────────────────────────
-    function selectPayMethod(method) {
-        paymentMethod = method;
-        ['card','paypal','stripe'].forEach(m => {
-            document.getElementById('pm-' + m).classList.toggle('active', m === method);
-        });
-        const isCard = method === 'card' || method === 'stripe';
-        document.getElementById('card-form').style.display   = isCard   ? 'block' : 'none';
-        document.getElementById('paypal-form').style.display = !isCard  ? 'block' : 'none';
-    }
-
-    function formatCard(input) {
-        let v = input.value.replace(/\D/g, '').substring(0, 16);
-        input.value = v.match(/.{1,4}/g)?.join(' ') || v;
-    }
-    function formatExpiry(input) {
-        let v = input.value.replace(/\D/g, '').substring(0, 4);
-        if (v.length >= 3) v = v.substring(0, 2) + ' / ' + v.substring(2);
-        input.value = v;
-    }
-
-    const TEST_CARD = '4242424242424242';
-
-    function detectTestCard(rawValue) {
-        const digits  = rawValue.replace(/\s/g, '');
-        const isTest  = digits === TEST_CARD;
-        const banner  = document.getElementById('test-mode-banner');
-        const payBtn  = document.getElementById('pay-btn');
-        if (banner) banner.style.display = isTest ? 'flex' : 'none';
-        if (payBtn) payBtn.textContent   = isTest ? 'Place test order →' : 'Confirm order →';
-    }
-
-    async function submitPayment() {
+    // ── Confirm & place order ─────────────────────────────────────────────────
+    async function confirmOrder() {
         hideError('step3-error');
-        const btn = document.getElementById('pay-btn');
-
-        // ── Determine whether this is a test transaction ────────────────────────
-        const rawNum    = paymentMethod !== 'paypal' ? document.getElementById('card-number').value.replace(/\s/g, '') : '';
-        const isTestCard = rawNum === TEST_CARD;
-
-        // ── Validation — skipped for test card number, required otherwise ───────
-        if (paymentMethod !== 'paypal' && !isTestCard) {
-            const exp = document.getElementById('card-expiry').value;
-            const cvc = document.getElementById('card-cvc').value;
-            if (!document.getElementById('card-name').value.trim()) {
-                showError('step3-error', 'Please enter the cardholder name.'); return;
-            }
-            if (rawNum.length < 13) {
-                showError('step3-error', 'Please enter a valid card number.'); return;
-            }
-            if (!exp.includes('/')) {
-                showError('step3-error', 'Please enter a valid expiry date.'); return;
-            }
-            if (cvc.length < 3) {
-                showError('step3-error', 'Please enter a valid CVC.'); return;
-            }
-        }
-
-        // ── Show processing spinner ─────────────────────────────────────────────
+        const btn = document.getElementById('confirm-btn');
         btn.disabled = true;
-        document.getElementById('step-3').style.display   = 'none';
+
+        document.getElementById('step-3').style.display    = 'none';
         document.getElementById('processing').style.display = 'flex';
-        document.getElementById('processing-msg').textContent = isTestCard
-            ? 'Running test order…'
-            : 'Processing payment…';
-        document.getElementById('steps').style.display = 'none';
+        document.getElementById('steps').style.display     = 'none';
 
-        // ── Pass the special test token so Checkout.processPayment skips the delay
-        const cardToken = isTestCard
-            ? 'tok_test_4242'
-            : (paymentMethod !== 'paypal' ? 'tok_live_' + Date.now() : null);
-
-        // ── Execute the full purchase logic (order history, inventory, cart, transaction)
-        const result = await Checkout.placeOrder({
-            userId:       session.id,
+        const result = await Checkout.submitOrder({
+            userId:     session.id,
             folderName,
-            deliveryDate: selectedDate,
-            cardToken,
-            paymentMethod
+            pickupDate: selectedDate
         });
 
         document.getElementById('processing').style.display = 'none';
 
-        // ── Handle failure ──────────────────────────────────────────────────────
         if (!result.ok) {
             document.getElementById('step-3').style.display = 'block';
             document.getElementById('steps').style.display  = 'flex';
@@ -645,47 +523,42 @@ if (session && folderName) {
             return;
         }
 
-        // ── All purchases redirect to recommended-parts.html with a toast param ─
-        // The toast message is read by recommended-parts.html on load.
-        const order  = result.order;
-        const toastMsg = isTestCard
-            ? `TEST ORDER ${order.orderId} confirmed — ${order.items.length} part${order.items.length !== 1 ? 's' : ''} · $${order.total.toFixed(2)}`
-            : `Order ${order.orderId} confirmed — delivery ${order.deliveryDate}`;
+        const fmtPickup = new Date(selectedDate + 'T12:00:00').toLocaleDateString('en-US', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+        const freshUser = Admin.getUserById(session.id);
+        const userEmail = (freshUser && freshUser.email && freshUser.email.trim())
+            ? freshUser.email.trim()
+            : 'the registered email address';
 
-        window.location.href = 'recommended-parts.html?toast=' + encodeURIComponent(toastMsg);
+        document.getElementById('success-message').innerHTML =
+            '<p>Order has been received and will be available for pickup at <strong>' + fmtPickup +
+            '</strong> between the hours of <strong>8am and 6pm</strong>.</p>' +
+            '<p style="margin-top:8px;">A confirmation email has been sent to <strong>' + userEmail + '</strong>.</p>';
+
+        document.getElementById('success-screen').style.display = 'flex';
     }
 
-    // ── Expose functions to global scope ──────────────────────────────────────
-    // All functions called by HTML onclick attributes must be on window because
-    // they are defined inside an if() block and are not visible to global scope.
-    window.goToStep        = goToStep;
-    window.prevMonth       = prevMonth;
-    window.nextMonth       = nextMonth;
-    window.selectPayMethod = selectPayMethod;
-    window.formatCard      = formatCard;
-    window.formatExpiry    = formatExpiry;
-    window.detectTestCard  = detectTestCard;
-    window.submitPayment   = submitPayment;
-    window.selectDate      = selectDate;
+    // ── Expose to global scope (called by inline onclick handlers) ────────────
+    window.goToStep   = goToStep;
+    window.prevMonth  = prevMonth;
+    window.nextMonth  = nextMonth;
+    window.selectDate = selectDate;
+    window.confirmOrder = confirmOrder;
 
     // ── Init ──────────────────────────────────────────────────────────────────
     renderSummary();
 
-    // Jump the calendar to the first future available date's month BEFORE
-    // the initial render so the user immediately sees clickable dates.
-    // (Previously this jump ran AFTER renderCalendar, so the first render
-    // always showed the current month with no available dates visible.)
-    const _initDates = getAvDates().filter(d => d >= TODAY_STR).sort();
-    if (_initDates.length > 0) {
-        const [y, m] = _initDates[0].split('-').map(Number);
+    // Jump calendar to month of first available pickup date
+    if (pickupDates.length > 0) {
+        const [y, m] = pickupDates[0].split('-').map(Number);
         calYear  = y;
-        calMonth = m - 1; // JS months are 0-indexed
+        calMonth = m - 1;
     }
 
     renderCalendar();
 
 } else if (session) {
-    // No folder param — redirect back
     window.location.href = 'recommended-parts.html';
 }
 </script>
