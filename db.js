@@ -11,7 +11,10 @@
 //   6. Returns
 // ─────────────────────────────────────────────────────────────────────────────
 
+const DB_VERSION = 3; // bump this to force-reset users on all browsers
+
 const DB_DEFAULTS = {
+    _version: DB_VERSION,
     users: [
         {
             id: "u001",
@@ -161,13 +164,10 @@ function _loadDB() {
         const saved = localStorage.getItem('partfind_db');
         if (!saved) return JSON.parse(JSON.stringify(DB_DEFAULTS));
         const parsed = JSON.parse(saved);
-        // Schema migration guard: if the saved users array doesn't contain any
-        // ACBW-prefixed profiles or the new 'admin' account, it's a pre-overhaul
-        // save. Replace only the users array; preserve inventory and transactions.
-        const hasNewSchema = (parsed.users || []).some(
-            u => (u.username || '').startsWith('ACBW') || u.username === 'admin'
-        );
-        if (!hasNewSchema) {
+        // Version guard: if stored version doesn't match current, reset users.
+        // Preserves inventory and transactions across resets.
+        if (parsed._version !== DB_VERSION) {
+            parsed._version = DB_VERSION;
             parsed.users = JSON.parse(JSON.stringify(DB_DEFAULTS.users));
             localStorage.setItem('partfind_db', JSON.stringify(parsed));
         }
