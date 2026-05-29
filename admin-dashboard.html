@@ -1,1947 +1,1323 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PartFind — Admin Dashboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #0d0d0f;
-            --surface: #16161a;
-            --surface2: #1e1e24;
-            --surface3: #26262e;
-            --border: rgba(255,255,255,0.07);
-            --border2: rgba(255,255,255,0.13);
-            --accent: #e8ff47;
-            --accent2: #c8dc30;
-            --text: #f0ede8;
-            --muted: rgba(240,237,232,0.45);
-            --danger: #ff5c5c;
-            --danger-bg: rgba(255,92,92,0.1);
-            --success: #47ffb2;
-            --success-bg: rgba(71,255,178,0.1);
-            --info: #47b8ff;
-            --info-bg: rgba(71,184,255,0.1);
-        }
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { height: 100%; }
-        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autocraft OEM — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #111214; --surface: #1A1B1F; --surface2: #22242A; --surface3: #2C2F38;
+  --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.14);
+  --accent: #1B48D6; --accent2: #1038BC;
+  --text: #F5F5F7; --muted: rgba(245,245,247,0.45);
+  --danger: #ff5c5c; --success: #47ffb2;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; }
 
-        /* ── Noise ── */
-        .noise { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.03; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 180px; }
+/* ── Noise ── */
+.noise { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px; }
 
-        /* ── Sidebar ── */
-        .sidebar { width: 56px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 20px 0; gap: 6px; position: relative; z-index: 10; flex-shrink: 0; }
-        .logo-mark { width: 34px; height: 34px; background: var(--accent); color: #0d0d0f; font-family: 'Bebas Neue', sans-serif; font-size: 20px; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin-bottom: 16px; flex-shrink: 0; }
-        .nav-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer; color: var(--muted); transition: background .15s, color .15s; position: relative; border: none; background: transparent; }
-        .nav-icon:hover { background: var(--surface2); color: var(--text); }
-        .nav-icon.active { background: var(--surface2); color: var(--accent); }
-        .nav-icon svg { width: 18px; height: 18px; }
-        .nav-tooltip { position: absolute; left: 52px; background: var(--surface3); color: var(--text); font-size: 12px; padding: 5px 10px; border-radius: 6px; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .15s; border: 1px solid var(--border2); z-index: 100; }
-        .nav-icon:hover .nav-tooltip { opacity: 1; }
-        .sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-        .signout-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer; color: var(--muted); transition: background .15s, color .15s; background: transparent; border: none; position: relative; }
-        .signout-btn:hover { background: var(--danger-bg); color: var(--danger); }
+/* ── Sidebar ── */
+.sidebar { width: 56px; background: var(--bg); position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 16px 0; z-index: 10; flex-shrink: 0; }
+.sidebar::after {
+  content: '';
+  position: absolute;
+  right: -14px;
+  top: 0;
+  width: 14px;
+  height: 100%;
+  background: linear-gradient(90deg,
+    var(--accent) 0px 6px,
+    var(--bg)     6px 8px,
+    var(--accent) 8px 10px,
+    var(--bg)     10px 12px,
+    var(--accent) 12px 14px
+  );
+  z-index: 11;
+  pointer-events: none;
+}
+.sidebar-logo { width: 40px; height: 40px; object-fit: contain;
+  filter: brightness(0) invert(1); margin-bottom: 20px; flex-shrink: 0; }
+.sidebar-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.sidebar-bottom { display: flex; flex-direction: column; gap: 4px; }
+.nav-btn { position: relative; width: 40px; height: 40px; border-radius: 10px; border: none;
+  background: transparent; color: rgba(245,245,247,0.45); cursor: pointer; display: flex;
+  align-items: center; justify-content: center; transition: all .15s; }
+.nav-btn:hover { background: rgba(27,72,214,.15); color: rgba(245,245,247,0.9); }
+.nav-btn.active { background: rgba(27,72,214,.25); color: var(--accent); }
+.nav-btn svg { width: 18px; height: 18px; }
+.nav-btn .tip { position: absolute; left: 48px; background: var(--surface3); color: var(--text);
+  font-size: 11px; font-weight: 500; white-space: nowrap; padding: 5px 10px; border-radius: 6px;
+  border: 1px solid var(--border2); pointer-events: none; opacity: 0; transition: opacity .15s;
+  z-index: 100; }
+.nav-btn:hover .tip { opacity: 1; }
+.notif-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px;
+  background: var(--danger); border-radius: 50%; display: none; }
+.notif-dot.visible { display: block; }
 
-        /* ── Layout ── */
-        .shell { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; z-index: 1; }
-        .topbar { height: 56px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 28px; gap: 16px; flex-shrink: 0; }
-        .topbar-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: .04em; color: var(--text); }
-        .topbar-subtitle { font-size: 12px; color: var(--muted); margin-left: 4px; }
-        .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-        .admin-badge { font-size: 10px; font-weight: 500; letter-spacing: .08em; padding: 3px 9px; border-radius: 99px; background: rgba(232,255,71,.1); color: var(--accent); border: 1px solid rgba(232,255,71,.2); }
+/* ── Main ── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; margin-left: 14px; }
+.topbar { height: 52px; border-bottom: 1px solid var(--border2); display: flex;
+  align-items: center; justify-content: space-between; padding: 0 24px; flex-shrink: 0; }
+.topbar-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: .05em; }
+.topbar-actions { display: flex; gap: 8px; }
+.panel-wrap { flex: 1; overflow-y: auto; padding: 24px; }
 
-        .workspace { flex: 1; display: flex; overflow: hidden; min-width: 0; }
+/* ── Panels ── */
+.panel { display: none; }
+.panel.active { display: block; }
 
-        /* ── User List Panel ── */
-        .user-panel { width: 280px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
-        .panel-head { padding: 16px 18px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-        .panel-label { font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
-        .add-user-btn { width: 100%; padding: 9px 14px; background: rgba(232,255,71,.08); border: 1px solid rgba(232,255,71,.2); border-radius: 8px; color: var(--accent); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background .15s; }
-        .add-user-btn:hover { background: rgba(232,255,71,.14); }
-        .user-list { flex: 1; overflow-y: auto; padding: 8px; }
-        .user-list::-webkit-scrollbar { width: 4px; }
-        .user-list::-webkit-scrollbar-track { background: transparent; }
-        .user-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-        .user-card { padding: 12px 14px; border-radius: 10px; cursor: pointer; transition: background .15s; border: 1px solid transparent; margin-bottom: 4px; }
-        .user-card:hover { background: var(--surface2); }
-        .user-card.active { background: var(--surface2); border-color: var(--border2); }
-        .user-card-name { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
-        .user-card-meta { font-size: 11px; color: var(--muted); display: flex; gap: 8px; }
-        .user-card-actions { display: flex; gap: 6px; margin-top: 8px; opacity: 0; transition: opacity .15s; }
-        .user-card:hover .user-card-actions, .user-card.active .user-card-actions { opacity: 1; }
-        .icon-btn { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 500; cursor: pointer; border: 1px solid var(--border2); background: transparent; color: var(--muted); transition: all .15s; display: flex; align-items: center; gap: 4px; }
-        .icon-btn:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
-        .icon-btn.danger:hover { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
-        .icon-btn svg { width: 11px; height: 11px; }
+/* ── Buttons ── */
+.btn-primary { padding: 9px 18px; background: var(--accent); color: #ffffff; border: none;
+  border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: background .15s; white-space: nowrap; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-outline { padding: 8px 16px; background: transparent; color: var(--muted);
+  border: 1px solid var(--border2); border-radius: 8px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; cursor: pointer; transition: all .15s; white-space: nowrap; }
+.btn-outline:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
+.btn-danger { padding: 8px 16px; background: rgba(255,92,92,.1); color: var(--danger);
+  border: 1px solid rgba(255,92,92,.3); border-radius: 8px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; cursor: pointer; transition: all .15s; }
+.btn-danger:hover { background: rgba(255,92,92,.2); }
+.btn-sm { padding: 5px 12px; font-size: 11px; font-weight: 500; border-radius: 6px;
+  cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+.btn-sm.accent { background: rgba(27,72,214,.12); color: var(--text); border: 1px solid rgba(27,72,214,.35); }
+.btn-sm.accent:hover { background: rgba(27,72,214,.22); }
+.btn-sm.danger { background: rgba(255,92,92,.08); color: var(--danger); border: 1px solid rgba(255,92,92,.25); }
+.btn-sm.danger:hover { background: rgba(255,92,92,.18); }
+.btn-sm.muted { background: var(--surface2); color: var(--muted); border: 1px solid var(--border2); }
+.btn-sm.muted:hover { color: var(--text); }
 
-        /* ── Detail Panel ── */
-        .detail-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
-        .detail-tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--surface); flex-shrink: 0; padding: 0 24px; }
-        .detail-tab { padding: 14px 18px; font-size: 13px; font-weight: 400; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color .15s, border-color .15s; white-space: nowrap; }
-        .detail-tab:hover { color: var(--text); }
-        .detail-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-        .detail-content { flex: 1; overflow-y: auto; padding: 28px 32px; min-width: 0; box-sizing: border-box; }
-        .detail-content::-webkit-scrollbar { width: 4px; }
-        .detail-content::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+/* ── Users Layout ── */
+.users-layout { display: grid; grid-template-columns: 260px 1fr; gap: 20px; min-height: 500px; }
+.user-list-wrap { display: flex; flex-direction: column; gap: 8px; }
+.user-card { background: var(--surface); border: 1px solid var(--border2); border-radius: 12px;
+  padding: 14px 16px; cursor: pointer; transition: all .15s; }
+.user-card:hover { border-color: rgba(255,255,255,.22); }
+.user-card.active { border-color: var(--accent); background: rgba(27,72,214,.05); }
+.user-card-name { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
+.user-card-sub { font-size: 11px; color: var(--muted); }
+.user-detail { background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; padding: 24px; }
+.empty-detail { display: flex; align-items: center; justify-content: center;
+  height: 200px; color: var(--muted); font-size: 13px; font-weight: 300; }
 
-        /* ── Empty state ── */
-        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 12px; color: var(--muted); }
-        .empty-state svg { width: 48px; height: 48px; opacity: .3; }
-        .empty-state p { font-size: 14px; font-weight: 300; }
+/* ── Stat cards ── */
+.stat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 24px; }
+.stat-card { background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px; padding: 16px 18px; }
+.stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 30px; line-height: 1; display: block; margin-bottom: 2px; }
+.stat-lbl { font-size: 11px; color: var(--muted); }
+.stat-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
-        /* ── Section ── */
-        .section { margin-bottom: 32px; }
-        .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-        .section-title { font-size: 13px; font-weight: 500; color: var(--text); }
-        .section-count { font-size: 11px; color: var(--muted); background: var(--surface2); padding: 2px 8px; border-radius: 99px; }
 
-        /* ── Folder cards ── */
-        .folder-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
-        .folder-card { background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; padding: 16px 18px; }
-        .folder-card-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
-        .folder-name { font-size: 15px; font-weight: 500; }
-        .folder-num { font-size: 11px; color: var(--accent); font-weight: 500; letter-spacing: .04em; margin-top: 2px; }
-        .folder-part-count { font-size: 11px; color: var(--muted); margin-top: 6px; }
-        .delete-folder-btn { background: transparent; border: none; cursor: pointer; color: var(--muted); padding: 2px; border-radius: 4px; transition: color .15s; }
-        .delete-folder-btn:hover { color: var(--danger); }
-        .delete-folder-btn svg { width: 14px; height: 14px; }
-        .add-folder-card { background: transparent; border: 1px dashed var(--border2); border-radius: 12px; padding: 16px 18px; cursor: pointer; color: var(--muted); font-size: 13px; display: flex; align-items: center; gap: 8px; transition: border-color .15s, color .15s; }
-        .add-folder-card:hover { border-color: rgba(232,255,71,.4); color: var(--accent); }
+/* ── Section title ── */
+.section-title { font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 12px; }
 
-        /* ── Parts table ── */
-        .parts-area { margin-top: 10px; }
-        .folder-selector { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-        .folder-pill { padding: 6px 14px; border-radius: 99px; font-size: 12px; border: 1px solid var(--border2); background: transparent; color: var(--muted); cursor: pointer; transition: all .15s; }
-        .folder-pill:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
-        .folder-pill.active { background: var(--accent); border-color: var(--accent); color: #0d0d0f; font-weight: 500; }
-        .parts-table-wrap { background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        thead th { padding: 11px 16px; text-align: left; font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); }
-        tbody td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-        tbody tr:last-child td { border-bottom: none; }
-        tbody tr:hover td { background: var(--surface2); }
-        .part-thumb { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; background: var(--surface2); display: block; }
-        .part-thumb-placeholder { width: 40px; height: 40px; border-radius: 6px; background: var(--surface2); display: flex; align-items: center; justify-content: center; }
-        .part-num-badge { font-size: 10px; font-weight: 500; letter-spacing: .06em; color: var(--accent); }
-        .price-cell { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: .02em; }
+/* ── Folder chips ── */
+.folder-row { display: flex; align-items: center; justify-content: space-between;
+  background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px;
+  padding: 12px 14px; margin-bottom: 8px; }
+.folder-name { font-size: 14px; font-weight: 500; }
+.folder-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
-        /* ── Add part form ── */
-        .add-part-form { background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; padding: 20px 22px; }
-        .form-title { font-size: 13px; font-weight: 500; margin-bottom: 16px; color: var(--text); }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .form-group { display: flex; flex-direction: column; gap: 5px; }
-        .form-group.full { grid-column: 1 / -1; }
-        .form-label { font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-        .form-input { padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; transition: border-color .15s; }
-        .form-input:focus { border-color: var(--accent); }
-        .form-input::placeholder { color: rgba(240,237,232,0.25); }
-        .image-input-group { display: flex; gap: 8px; }
-        .image-preview-box { width: 60px; height: 60px; border-radius: 8px; background: var(--surface2); border: 1px solid var(--border2); overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-        .image-preview-box img { width: 100%; height: 100%; object-fit: cover; }
-        .submit-btn { padding: 10px 20px; background: var(--accent); color: #0d0d0f; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: background .15s, transform .1s; margin-top: 14px; }
-        .submit-btn:hover { background: var(--accent2); }
-        .submit-btn:active { transform: scale(.98); }
+/* ── Data table ── */
+.table-wrap { overflow-x: auto; }
+table.data-tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.data-tbl th { font-size: 10px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); padding: 0 12px 10px; text-align: center; border-bottom: 1px solid var(--border2); }
+table.data-tbl th:first-child { text-align: left; }
+table.data-tbl td { padding: 11px 12px; border-bottom: 1px solid var(--border); text-align: center; vertical-align: middle; }
+table.data-tbl td:first-child { text-align: left; }
+table.data-tbl tr:last-child td { border-bottom: none; }
+.part-badge { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 99px;
+  background: rgba(27,72,214,.12); color: var(--text); border: 1px solid rgba(27,72,214,.3); letter-spacing: .04em; }
+.price-cell { font-family: 'Bebas Neue', sans-serif; font-size: 18px; }
 
-        /* ── Data tables (Transactions, Delivery, Returns) ── */
-        .data-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; margin-bottom: 16px; width: 100%; }
-        .data-table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; min-width: 600px; }
-        .data-table thead th { padding: 11px 14px; text-align: center; font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .data-table thead th:first-child { text-align: left; }
-        .data-table tbody td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .data-table tbody td:first-child { text-align: left; }
-        .data-table tbody tr:last-child td { border-bottom: none; }
-        .data-table tbody tr:hover td { background: var(--surface2); }
+/* ── Expandable tx rows ── */
+.tx-row { cursor: pointer; }
+.tx-row:hover td { background: rgba(255,255,255,.02); }
+.tx-expand { display: none; }
+.tx-expand td { padding: 0; }
+.tx-inner { padding: 14px 20px; background: var(--surface2); border-bottom: 1px solid var(--border2); }
+.chevron { display: inline-block; font-size: 10px; color: var(--muted); margin-left: 6px; transition: transform .15s; }
+.chevron.open { transform: rotate(180deg); }
 
-        /* ── Cart panel ── */
-        .cart-user-selector { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-        .cart-table-wrap { background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; overflow: hidden; }
-        .cart-summary { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-top: 1px solid var(--border2); }
-        .cart-total { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: .02em; }
-        .clear-cart-btn { padding: 8px 16px; background: var(--danger-bg); border: 1px solid rgba(255,92,92,.3); border-radius: 8px; color: var(--danger); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: background .15s; }
-        .clear-cart-btn:hover { background: rgba(255,92,92,.18); }
-        .qty-badge { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; font-size: 11px; font-weight: 500; }
+/* ── Packing badges ── */
+.badge { font-size: 10px; font-weight: 500; padding: 3px 10px; border-radius: 99px; }
+.badge-prepare { background: rgba(255,184,0,.1); color: #F5A623; border: 1px solid rgba(255,184,0,.3); }
+.badge-ready { background: rgba(71,255,178,.1); color: var(--success); border: 1px solid rgba(71,255,178,.3); }
+.badge-status { background: rgba(71,255,178,.1); color: var(--success); border: 1px solid rgba(71,255,178,.25); }
+.badge-pending { background: rgba(255,184,0,.1); color: #F5A623; border: 1px solid rgba(255,184,0,.3); }
+.badge-approved { background: rgba(71,255,178,.1); color: var(--success); border: 1px solid rgba(71,255,178,.3); }
+.badge-rejected { background: rgba(255,92,92,.1); color: var(--danger); border: 1px solid rgba(255,92,92,.3); }
 
-        /* ── Toast ── */
-        .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; opacity: 0; transform: translateY(8px); transition: opacity .2s, transform .2s; pointer-events: none; z-index: 999; border: 1px solid; }
-        .toast.show { opacity: 1; transform: translateY(0); }
-        .toast.success { background: var(--success-bg); color: var(--success); border-color: rgba(71,255,178,.3); }
-        .toast.error   { background: var(--danger-bg);  color: var(--danger);  border-color: rgba(255,92,92,.3); }
+/* ── Form inputs ── */
+.form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.form-label { font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.form-input { padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px;
+  outline: none; transition: border-color .15s; appearance: none; -webkit-appearance: none; }
+.form-input:focus { border-color: var(--accent); }
+.form-input::placeholder { color: var(--muted); }
+select.form-input { cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none' stroke='rgba(240,237,232,0.45)' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+select.form-input option { background: var(--surface2); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-        /* ── Modal ── */
-        .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .2s; }
-        .modal-backdrop.open { opacity: 1; pointer-events: all; }
-        .modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 16px; padding: 28px 28px 24px; width: 100%; max-width: 400px; }
-        .modal-title { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
-        .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
-        .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
-        .btn-secondary { padding: 9px 16px; background: transparent; border: 1px solid var(--border2); border-radius: 8px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all .15s; }
-        .btn-secondary:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
-        .btn-danger { padding: 9px 16px; background: var(--danger-bg); border: 1px solid rgba(255,92,92,.3); border-radius: 8px; color: var(--danger); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: background .15s; }
-        .btn-danger:hover { background: rgba(255,92,92,.18); }
-        .btn-primary { padding: 9px 16px; background: var(--accent); border: none; border-radius: 8px; color: #0d0d0f; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: background .15s; }
-        .btn-primary:hover { background: var(--accent2); }
+/* ── Image preview ── */
+.img-preview { width: 60px; height: 60px; border-radius: 8px; object-fit: cover;
+  background: var(--surface3); border: 1px solid var(--border2); display: none; margin-top: 8px; }
 
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-in { animation: fadeUp .3s ease both; }
+/* ── Cart ── */
+.pill-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.pill { padding: 7px 16px; border-radius: 99px; border: 1px solid var(--border2); background: var(--surface2);
+  font-size: 12px; font-weight: 500; cursor: pointer; color: var(--muted); transition: all .15s; }
+.pill:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
+.pill.active { border-color: var(--accent); background: rgba(27,72,214,.13); color: var(--text); }
 
-        /* -- Inventory Browser Modal -- */
-        .inv-browser-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:250; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
-        .inv-browser-backdrop.open { opacity:1; pointer-events:all; }
-        .inv-browser-modal { background:var(--surface); border:1px solid var(--border2); border-radius:18px; width:100%; max-width:680px; max-height:80vh; display:flex; flex-direction:column; overflow:hidden; }
-        .inv-browser-head { padding:22px 24px 16px; border-bottom:1px solid var(--border); flex-shrink:0; }
-        .inv-browser-head h3 { font-size:16px; font-weight:500; margin-bottom:10px; }
-        .inv-browser-search { width:100%; padding:10px 14px; background:var(--surface2); border:1px solid var(--border2); border-radius:8px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:13px; outline:none; transition:border-color .15s; box-sizing:border-box; }
-        .inv-browser-search:focus { border-color:var(--accent); }
-        .inv-browser-search::placeholder { color:rgba(240,237,232,0.3); }
-        .inv-browser-body { flex:1; overflow-y:auto; }
-        .inv-browser-body::-webkit-scrollbar { width:4px; }
-        .inv-browser-body::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
-        .inv-part-row { display:flex; align-items:center; gap:12px; padding:12px 24px; border-bottom:1px solid var(--border); cursor:pointer; transition:background .12s; }
-        .inv-part-row:hover { background:var(--surface2); }
-        .inv-part-row:last-child { border-bottom:none; }
-        .inv-part-row img { width:40px; height:40px; border-radius:6px; object-fit:cover; flex-shrink:0; }
-        .inv-part-thumb { width:40px; height:40px; border-radius:6px; background:var(--surface3); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
-        .inv-part-info { flex:1; min-width:0; }
-        .inv-part-row-name { font-size:13px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-        .inv-part-row-meta { font-size:11px; color:var(--muted); margin-top:2px; }
-        .inv-part-row-num { font-size:10px; color:var(--accent); letter-spacing:.07em; }
-        .inv-part-row-price { font-family:'Bebas Neue',sans-serif; font-size:17px; flex-shrink:0; }
-        .inv-part-row-stock { font-size:11px; padding:2px 7px; border-radius:99px; flex-shrink:0; }
-        .inv-part-row-stock.ok { background:rgba(71,255,178,.08); color:#47ffb2; border:1px solid rgba(71,255,178,.2); }
-        .inv-part-row-stock.low { background:rgba(255,184,0,.08); color:#F5A623; border:1px solid rgba(255,184,0,.2); }
-        .inv-browser-foot { padding:14px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; flex-shrink:0; }
-        .inv-browser-cancel { padding:9px 18px; background:transparent; border:1px solid var(--border2); border-radius:8px; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; transition:all .15s; }
-        .inv-browser-cancel:hover { border-color:rgba(255,255,255,.25); color:var(--text); }
+/* ── Part picker ── */
+.part-picker-filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: flex-end; }
+.part-picker-filters select { padding: 9px 32px 9px 12px; background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none;
+  appearance: none; -webkit-appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none' stroke='rgba(240,237,232,0.45)' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center; }
+.part-picker-filters select:focus { border-color: var(--accent); }
+.part-picker-filters select option { background: var(--surface2); }
+.part-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+.part-card { background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; overflow: hidden;
+  display: flex; flex-direction: column; transition: border-color .15s; }
+.part-card:hover { border-color: rgba(255,255,255,.22); }
+.part-card-img { width: 100%; height: 140px; object-fit: cover; background: var(--surface2); display: block; flex-shrink: 0; }
+.part-card-img-placeholder { width: 100%; height: 140px; background: var(--surface2); display: flex;
+  align-items: center; justify-content: center; flex-shrink: 0; }
+.part-card-body { padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.part-card-name { font-size: 13px; font-weight: 500; }
+.part-card-num { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 99px;
+  background: rgba(27,72,214,.12); color: var(--text); border: 1px solid rgba(27,72,214,.3); display: inline-block; width: fit-content; }
+.part-card-meta { font-size: 11px; color: var(--muted); }
+.part-card-price { font-family: 'Bebas Neue', sans-serif; font-size: 20px; margin-top: auto; padding-top: 6px; }
+.part-card-footer { padding: 10px 12px; border-top: 1px solid var(--border); display: flex; gap: 6px; align-items: center; }
+.part-card-footer input[type=number] { width: 56px; padding: 6px 8px; background: var(--surface2);
+  border: 1px solid var(--border2); border-radius: 6px; color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-size: 12px; outline: none; }
+.part-card-footer input[type=number]:focus { border-color: var(--accent); }
 
-        /* -- Notification bell -- */
-        .notif-btn { width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:10px; cursor:pointer; color:var(--muted); transition:background .15s, color .15s; background:transparent; border:none; position:relative; }
-        .notif-btn:hover { background:var(--surface2); color:var(--text); }
-        .notif-btn svg { width:18px; height:18px; }
-        .notif-dot { position:absolute; top:7px; right:7px; width:8px; height:8px; background:var(--danger); border-radius:50%; border:2px solid var(--surface); display:none; }
-        .notif-dot.visible { display:block; }
-        /* ── Stat cards (Transactions / Returns summary row) ── */
-        .stat-card { background: var(--surface); border: 1px solid var(--border2); border-radius: 10px; padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; }
-        .stat-num  { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: .02em; line-height: 1; color: var(--text); }
-        .stat-label { font-size: 11px; color: var(--muted); }
+/* ── Empty state ── */
+.empty { display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; padding: 60px 0; color: var(--muted); font-size: 13px; font-weight: 300; text-align: center; }
+.empty svg { opacity: .3; }
 
-        /* ── Admin multi-select delivery calendar ── */
-        .admin-cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-        .admin-cal-month { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: .04em; }
-        .admin-cal-arrow { width: 28px; height: 28px; background: var(--surface3); border: 1px solid var(--border2); border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); transition: all .12s; }
-        .admin-cal-arrow:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
-        .admin-cal-arrow svg { width: 12px; height: 12px; }
-        .admin-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-        .admin-cal-dow { text-align: center; font-size: 10px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 6px 0; }
-        .admin-cal-day { aspect-ratio: 1; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: default; border: 1px solid transparent; transition: all .12s; color: var(--muted); }
-        .admin-cal-day.other-month { opacity: .15; pointer-events: none; }
-        .admin-cal-day.today { color: var(--text); font-weight: 500; border-color: var(--border2); }
-        .admin-cal-day.past { opacity: .25; pointer-events: none; }
-        .admin-cal-day.selectable { cursor: pointer; }
-        .admin-cal-day.selectable:hover { background: var(--surface3); color: var(--text); border-color: var(--border2); }
-        .admin-cal-day.saved { background: rgba(232,255,71,.1); border-color: rgba(232,255,71,.3); color: var(--accent); font-weight: 500; cursor: pointer; }
-        .admin-cal-day.selected { background: var(--accent) !important; border-color: var(--accent) !important; color: #0d0d0f !important; font-weight: 700; cursor: pointer; }
+/* ── Modal ── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 200;
+  display: none; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 16px;
+  padding: 28px 32px; width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto; }
+.modal h2 { font-family: 'Bebas Neue', sans-serif; font-size: 26px; margin-bottom: 20px; }
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+.error-inline { font-size: 12px; color: var(--danger); margin-top: -8px; margin-bottom: 8px; display: none; }
 
-        /* ── Required field highlight (Add Part form) ── */
-        .gi-required-input { border-color: rgba(255,255,255,0.45) !important; }
-        .gi-required-input::placeholder { color: rgba(255,255,255,0.55) !important; }
-
-        /* -- Return request table -- */
-        .return-tag { font-size:10px; font-weight:500; padding:2px 8px; border-radius:99px; }
-        .return-tag.pending  { background:rgba(255,184,0,.1);  color:#F5A623; border:1px solid rgba(255,184,0,.3); }
-        .return-tag.approved { background:rgba(71,255,178,.1); color:#47ffb2; border:1px solid rgba(71,255,178,.3); }
-        .return-tag.rejected { background:rgba(255,92,92,.1);  color:var(--danger); border:1px solid rgba(255,92,92,.3); }
-        .approve-btn { padding:5px 12px; border-radius:6px; font-size:11px; font-weight:500; cursor:pointer; border:1px solid rgba(71,255,178,.3); background:rgba(71,255,178,.07); color:#47ffb2; transition:all .15s; }
-        .approve-btn:hover { background:rgba(71,255,178,.15); }
-        .reject-btn  { padding:5px 12px; border-radius:6px; font-size:11px; font-weight:500; cursor:pointer; border:1px solid rgba(255,92,92,.3); background:rgba(255,92,92,.07); color:var(--danger); transition:all .15s; }
-        .reject-btn:hover  { background:rgba(255,92,92,.15); }
-
-        /* -- Packing list -- */
-        .pl-badge { font-size:10px; font-weight:500; padding:3px 10px; border-radius:99px; white-space:nowrap; }
-        .pl-badge-prepare { background:rgba(255,184,0,.12); color:#F5A623; border:1px solid rgba(255,184,0,.3); }
-        .pl-badge-ready   { background:rgba(71,255,178,.1);  color:#47ffb2; border:1px solid rgba(71,255,178,.3); }
-        .pl-mark-ready-btn { padding:5px 14px; border-radius:6px; font-size:11px; font-weight:500; cursor:pointer; border:1px solid rgba(232,255,71,.3); background:rgba(232,255,71,.07); color:var(--accent); transition:all .15s; white-space:nowrap; }
-        .pl-mark-ready-btn:hover { background:rgba(232,255,71,.15); }
-
-        /* -- Expandable transaction rows -- */
-        .tx-row-clickable { cursor:pointer; }
-        .tx-row-clickable:hover td { background:var(--surface2); }
-        .tx-expand-row td { padding:0 !important; border-bottom:1px solid var(--border) !important; }
-        .tx-expand-inner { padding:16px 20px; background:rgba(232,255,71,.02); border-top:1px solid var(--border); }
-        .tx-expand-table { width:100%; border-collapse:collapse; font-size:12px; }
-        .tx-expand-table th { padding:6px 12px; text-align:left; font-size:10px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border); }
-        .tx-expand-table td { padding:9px 12px; border-bottom:1px solid var(--border); vertical-align:middle; }
-        .tx-expand-table tr:last-child td { border-bottom:none; }
-        .tx-chevron { transition:transform .2s; display:inline-block; }
-        .tx-chevron.open { transform:rotate(180deg); }
-
-        /* -- Email field in user detail -- */
-        .email-field-row { display:flex; gap:8px; align-items:center; margin-bottom:28px; }
-        .email-field-row input { flex:1; padding:9px 12px; background:var(--surface2); border:1px solid var(--border2); border-radius:8px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:13px; outline:none; transition:border-color .15s; }
-        .email-field-row input:focus { border-color:var(--accent); }
-        .email-save-btn { padding:9px 16px; background:rgba(232,255,71,.08); border:1px solid rgba(232,255,71,.25); border-radius:8px; color:var(--accent); font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; cursor:pointer; white-space:nowrap; transition:background .15s; }
-        .email-save-btn:hover { background:rgba(232,255,71,.16); }
-
-        /* -- Image file upload -- */
-        .file-upload-label { display:flex; align-items:center; gap:8px; padding:9px 14px; background:var(--surface2); border:1px solid var(--border2); border-radius:8px; cursor:pointer; font-size:12px; color:var(--muted); transition:border-color .15s; white-space:nowrap; }
-        .file-upload-label:hover { border-color:rgba(255,255,255,.25); color:var(--text); }
-        .file-upload-label svg { width:13px; height:13px; flex-shrink:0; }
-    </style>
+/* ── Toast ── */
+#toast-wrap { position: fixed; bottom: 24px; right: 24px; z-index: 300; display: flex;
+  flex-direction: column; gap: 10px; pointer-events: none; }
+.toast { background: var(--surface3); border: 1px solid var(--border2); border-radius: 10px;
+  padding: 12px 18px; font-size: 13px; color: var(--text); animation: slideIn .25s ease;
+  pointer-events: all; max-width: 340px; }
+.toast.error { border-color: rgba(255,92,92,.4); background: rgba(255,92,92,.08); color: var(--danger); }
+@keyframes slideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+</style>
 </head>
 <body>
 <div class="noise"></div>
 
-<!-- Sidebar icons -->
+<!-- Sidebar -->
 <aside class="sidebar">
-    <div class="logo-mark">P</div>
+  <div class="sidebar-logo" style="display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1;">
+    <span style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:.18em;color:#F5F5F7;">AUTO</span>
+    <span style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:.18em;color:#F5F5F7;">CRAFT</span>
+    <span style="font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:.2em;color:#1B48D6;">OEM</span>
+  </div>
 
-    <button class="nav-icon active" data-panel="users" onclick="switchPanel('users', this)">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="6" r="3"/><path d="M2 17c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="15" cy="7" r="2"/><path d="M17.5 16c0-2.2-1.1-4-2.5-4"/></svg>
-        <span class="nav-tooltip">Users</span>
+  <nav class="sidebar-nav">
+    <button class="nav-btn active" data-panel="users" onclick="switchPanel('users',this)">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="7" r="3"/><path d="M2 17c0-4 3-6 6-6s6 2 6 6"/><circle cx="15" cy="7" r="2.5"/><path d="M18 16.5c0-2.5-1.5-4-3.5-4.5"/></svg>
+      <span class="tip">Users</span>
     </button>
-
-    <button class="nav-icon" data-panel="folders" onclick="switchPanel('folders', this)">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 6a2 2 0 012-2h3l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V6z"/></svg>
-        <span class="nav-tooltip">Folders &amp; Parts</span>
+    <button class="nav-btn" data-panel="folders" onclick="switchPanel('folders',this)">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 6a2 2 0 012-2h4l2 2h6a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/></svg>
+      <span class="tip">Folders &amp; Parts</span>
     </button>
-
-    <button class="nav-icon" data-panel="cart" onclick="switchPanel('cart', this)">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 3h2l.5 2M7 13h10l2-7H5.5M7 13L5.5 5M7 13l-2 4h12"/><circle cx="9" cy="19" r="1"/><circle cx="17" cy="19" r="1"/></svg>
-        <span class="nav-tooltip">Cart Viewer</span>
+    <button class="nav-btn" data-panel="cart" onclick="switchPanel('cart',this)">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 1h2l2.5 10h10l2-6H5.5"/><circle cx="9" cy="17" r="1.5"/><circle cx="15" cy="17" r="1.5"/></svg>
+      <span class="tip">Cart Viewer</span>
     </button>
-
-    <button class="nav-icon" data-panel="inventory" onclick="switchPanel('inventory', this)">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="14" height="14" rx="2"/><line x1="3" y1="8" x2="17" y2="8"/><line x1="3" y1="13" x2="17" y2="13"/><line x1="8" y1="8" x2="8" y2="17"/></svg>
-        <span class="nav-tooltip">Global Inventory</span>
+    <button class="nav-btn" data-panel="inventory" onclick="switchPanel('inventory',this)">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="3" width="16" height="14" rx="2"/><path d="M2 8h16M8 8v9"/></svg>
+      <span class="tip">Global Inventory</span>
     </button>
-
-    <button class="nav-icon" data-panel="packinglist" onclick="switchPanel('packinglist', this)">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="4" y="2" width="12" height="16" rx="2"/><line x1="8" y1="6" x2="14" y2="6"/><line x1="8" y1="10" x2="14" y2="10"/><line x1="8" y1="14" x2="11" y2="14"/><polyline points="5,9 6.5,10.5 5,12" style="display:none"/></svg>
-        <span class="nav-tooltip">Packing List</span>
+    <button class="nav-btn" data-panel="packing" onclick="switchPanel('packing',this)">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="4" y="2" width="12" height="16" rx="2"/><path d="M8 6h4M8 10h4M8 14h2"/></svg>
+      <span class="tip">Packing List</span>
     </button>
-
-    <button class="nav-icon" data-panel="transactions" onclick="switchPanel('transactions', this)">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 10h14M7 6l-4 4 4 4M13 6l4 4-4 4"/></svg>
-        <span class="nav-tooltip">Transactions</span>
+    <button class="nav-btn" data-panel="transactions" onclick="switchPanel('transactions',this)">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 5h14M3 10h10M3 15h6"/><path d="M16 12l2 2-2 2"/></svg>
+      <span class="tip">Transactions</span>
     </button>
-
-    <button class="nav-icon" data-panel="returns" onclick="switchPanel('returns', this)">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 8h9a4 4 0 010 8H8"/><polyline points="7,4 4,8 7,12"/></svg>
-        <span class="nav-tooltip">Return Requests</span>
+    <button class="nav-btn" data-panel="returns" onclick="switchPanel('returns',this)">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 9l4-4-4-4M4 5h8a5 5 0 010 10H4"/></svg>
+      <span class="tip">Returns</span>
+      <span class="notif-dot" id="notif-dot"></span>
     </button>
+  </nav>
 
-    <div class="sidebar-bottom">
-        <!-- Notification bell -->
-        <button class="notif-btn" onclick="switchPanel('returns', document.querySelector('[data-panel=returns]')); updateBell();">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M10 2a6 6 0 00-6 6v3l-2 3h16l-2-3V8a6 6 0 00-6-6z"/><path d="M10 18a2 2 0 002-2H8a2 2 0 002 2z"/></svg>
-            <span class="notif-dot" id="notif-dot"></span>
-            <span class="nav-tooltip">Return Requests</span>
-        </button>
-        <a href="index.html" style="color:inherit;text-decoration:none;">
-            <button class="nav-icon" style="color:var(--muted);">
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 10l7-7 7 7M5 8v8a1 1 0 001 1h3v-4h2v4h3a1 1 0 001-1V8"/></svg>
-                <span class="nav-tooltip">Home</span>
-            </button>
-        </a>
-        <button class="signout-btn" onclick="Auth.logout()">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="18" height="18"><path d="M13 15l4-5-4-5M17 10H7"/><path d="M7 3H4a1 1 0 00-1 1v12a1 1 0 001 1h3"/></svg>
-            <span class="nav-tooltip">Sign out</span>
-        </button>
-    </div>
+  <div class="sidebar-bottom">
+    <button class="nav-btn" onclick="window.location.href='recommended-parts.html'">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 10L10 3l7 7M5 8v9h4v-5h2v5h4V8"/></svg>
+      <span class="tip">Home</span>
+    </button>
+    <button class="nav-btn" onclick="Auth.logout()">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M13 3h4v14h-4M9 15l5-5-5-5M14 10H4"/></svg>
+      <span class="tip">Sign out</span>
+    </button>
+  </div>
 </aside>
 
-<!-- Main shell -->
-<div class="shell">
-    <div class="topbar">
-        <span class="topbar-title" id="topbar-title">Users</span>
-        <span class="topbar-subtitle" id="topbar-sub"></span>
-        <div class="topbar-right">
-            <span class="admin-badge">Administrator</span>
-            <span style="font-size:13px;color:var(--muted);" id="admin-name"></span>
-        </div>
+<!-- Main -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Users</div>
+    <div class="topbar-actions" id="topbar-actions"></div>
+  </div>
+  <div class="panel-wrap">
+
+    <!-- Users -->
+    <div id="panel-users" class="panel active">
+      <div class="users-layout">
+        <div class="user-list-wrap" id="user-list"></div>
+        <div id="user-detail-wrap"></div>
+      </div>
     </div>
 
-    <div class="workspace">
-        <!-- User list (left column) -->
-        <div class="user-panel">
-            <div class="panel-head">
-                <div class="panel-label">Customer accounts</div>
-                <button class="add-user-btn" onclick="openAddUserModal()">
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="7" y1="2" x2="7" y2="12"/><line x1="2" y1="7" x2="12" y2="7"/></svg>
-                    Add user
-                </button>
-            </div>
-            <div class="user-list" id="user-list"></div>
-        </div>
-
-        <!-- Detail panels (right) -->
-        <div class="detail-panel">
-            <!-- Panel: Users overview -->
-            <div id="panel-users" class="detail-content">
-                <div class="empty-state" id="users-empty">
-                    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="20" cy="14" r="7"/><path d="M6 42c0-7.7 6.3-14 14-14s14 6.3 14 14"/><circle cx="36" cy="18" r="5"/><path d="M40 38c0-4.4-2-8-4-8"/></svg>
-                    <p>Select a user to view their profile</p>
-                </div>
-                <div id="users-detail" style="display:none"></div>
-            </div>
-
-            <!-- Panel: Folders & Parts -->
-            <div id="panel-folders" style="display:none; flex:1; flex-direction:column; overflow:hidden;">
-                <div class="detail-tabs">
-                    <div class="detail-tab active" onclick="switchTab('tab-folders', this)">Service folders</div>
-                    <div class="detail-tab" onclick="switchTab('tab-parts', this)">Add parts</div>
-                </div>
-                <div class="detail-content">
-                    <div id="tab-folders">
-                        <div class="empty-state" id="folders-empty">
-                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 14a4 4 0 014-4h7l4 4h13a4 4 0 014 4v14a4 4 0 01-4 4H12a4 4 0 01-4-4V14z"/></svg>
-                            <p>Select a user to manage their folders</p>
-                        </div>
-                        <div id="folders-content" style="display:none">
-                            <div class="section">
-                                <div class="section-head">
-                                    <span class="section-title" id="folders-user-label">—</span>
-                                    <span class="section-count" id="folders-count"></span>
-                                </div>
-                                <div class="folder-grid" id="folder-grid"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="tab-parts" style="display:none">
-                        <div class="empty-state" id="parts-empty">
-                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="8" y="8" width="32" height="32" rx="4"/><line x1="24" y1="18" x2="24" y2="30"/><line x1="18" y1="24" x2="30" y2="24"/></svg>
-                            <p>Select a user to add parts</p>
-                        </div>
-                        <div id="parts-content" style="display:none">
-                            <div class="section">
-                                <div class="section-head">
-                                    <span class="section-title">Current parts</span>
-                                    <span class="section-count" id="parts-count"></span>
-                                </div>
-                                <div class="folder-selector" id="parts-folder-pills"></div>
-                                <div class="parts-table-wrap">
-                                    <table>
-                                        <thead><tr><th></th><th>Part #</th><th>Name</th><th>Description</th><th>Price</th><th></th></tr></thead>
-                                        <tbody id="parts-tbody"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <!-- Add Part from Global Inventory -->
-                            <div class="section">
-                                <div class="add-part-form">
-                                    <div class="form-title">Add Part from Global Inventory</div>
-                                    <div style="font-size:11px;color:var(--muted);margin-bottom:16px;">Only in-stock parts (quantity ≥ 1) are shown. Use the Global Inventory tab to add new parts first.</div>
-
-                                    <!-- Target folder selector -->
-                                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
-                                        <div class="form-group" style="flex:0 0 auto;min-width:200px;">
-                                            <label class="form-label">Add to folder <span style="color:var(--accent);">*</span></label>
-                                            <select class="form-input" id="f-folder"></select>
-                                        </div>
-                                    </div>
-
-                                    <!-- Filter bar (Tesla / Rivian only) -->
-                                    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;">
-                                        <span style="font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Filter:</span>
-                                        <select class="form-input" id="fp-filter-make" style="font-size:12px;padding:6px 10px;min-width:130px;" onchange="fpFilterMakeChanged()">
-                                            <option value="">All Makes</option>
-                                            <option value="Tesla">Tesla</option>
-                                            <option value="Rivian">Rivian</option>
-                                        </select>
-                                        <select class="form-input" id="fp-filter-model" style="font-size:12px;padding:6px 10px;min-width:130px;" onchange="renderFolderPartList()">
-                                            <option value="">All Models</option>
-                                        </select>
-                                        <span style="font-size:11px;color:var(--muted);" id="fp-inv-count"></span>
-                                    </div>
-
-                                    <!-- Parts list -->
-                                    <div id="fp-inv-list"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Panel: Cart -->
-            <div id="panel-cart" style="display:none;" class="detail-content">
-                <div class="section-head" style="margin-bottom:16px;">
-                    <span class="section-title">View customer cart</span>
-                </div>
-                <div class="cart-user-selector" id="cart-user-pills"></div>
-                <div id="cart-content">
-                    <div class="empty-state">
-                        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 6h4l1 4M12 14h24l-3 14H13L12 14z"/><circle cx="17" cy="34" r="2"/><circle cx="31" cy="34" r="2"/></svg>
-                        <p>Select a customer to view their cart</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Panel: Global Inventory -->
-            <div id="panel-inventory" style="display:none;" class="detail-content">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
-                    <div>
-                        <div class="section-title">Global inventory</div>
-                        <div style="font-size:12px;color:var(--muted);margin-top:3px;">All parts indexed by Make &rarr; Model &rarr; Year</div>
-                    </div>
-                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                        <span class="section-count" id="inv-total-count"></span>
-                        <select class="form-input" id="inv-filter-make" style="font-size:12px;padding:6px 10px;" onchange="filterInventory()">
-                            <option value="">All makes</option>
-                        </select>
-                        <select class="form-input" id="inv-filter-model" style="font-size:12px;padding:6px 10px;" onchange="filterInventoryModel()">
-                            <option value="">All models</option>
-                        </select>
-                        <button class="icon-btn" onclick="if(confirm('Reset all data to defaults?'))resetDB();" title="Reset DB to defaults" style="font-size:11px;padding:5px 10px;color:var(--danger);border-color:rgba(255,92,92,.3);">Reset DB</button>
-                    </div>
-                </div>
-                <div id="inv-content"></div>
-
-                <!-- ── Add New Part to Global Inventory ── -->
-                <div style="margin-top:28px;border-top:1px solid var(--border2);padding-top:24px;">
-                    <div class="section-title" style="margin-bottom:4px;">Add New Part</div>
-                    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Tesla &amp; Rivian models only. If the Part # already exists, its stock will be incremented instead.</div>
-                    <div class="add-part-form" id="global-inv-form">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">Part # <span style="color:var(--accent);">*</span></label>
-                                <input class="form-input gi-required-input" id="gi-partNumber" placeholder="e.g. TS-4401-BRK">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Part Name</label>
-                                <input class="form-input" id="gi-partName" placeholder="e.g. Brake Caliper">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Make <span style="color:var(--accent);">*</span></label>
-                                <select class="form-input gi-required-input" id="gi-make" onchange="giPopulateModel()">
-                                    <option value="">— Select Make —</option>
-                                    <option value="Tesla">Tesla</option>
-                                    <option value="Rivian">Rivian</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Model <span style="color:var(--accent);">*</span></label>
-                                <select class="form-input gi-required-input" id="gi-model">
-                                    <option value="">— Select Make first —</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Year</label>
-                                <select class="form-input" id="gi-year">
-                                    <option value="">— Select Year —</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Price ($)</label>
-                                <input class="form-input" id="gi-price" type="number" min="0" step="0.01" placeholder="0.00">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Quantity <span style="color:var(--accent);">*</span></label>
-                                <input class="form-input gi-required-input" id="gi-quantity" type="number" min="1" step="1" placeholder="1" value="1">
-                            </div>
-                            <div class="form-group full">
-                                <label class="form-label">Description</label>
-                                <input class="form-input" id="gi-description" placeholder="e.g. OEM Front Brake Caliper — Left">
-                            </div>
-                            <div class="form-group full">
-                                <label class="form-label">Image</label>
-                                <div class="image-input-group" style="flex-wrap:wrap;gap:8px;">
-                                    <div class="image-preview-box"><img id="gi-img-preview" src="" alt="" style="display:none"></div>
-                                    <div style="flex:1;display:flex;flex-direction:column;gap:6px;min-width:180px;">
-                                        <input class="form-input" id="gi-imageUrl" placeholder="https://… paste URL" style="width:100%;" oninput="giPreviewImage(this.value)">
-                                        <label class="file-upload-label" for="gi-imageFile">
-                                            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M2 10v1a1 1 0 001 1h8a1 1 0 001-1v-1M7 2v7M4.5 4.5L7 2l2.5 2.5"/></svg>
-                                            <span id="gi-file-name">Upload image file</span>
-                                        </label>
-                                        <input type="file" id="gi-imageFile" accept="image/*" style="display:none;" onchange="giHandleFileUpload(this)">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <button class="submit-btn" onclick="submitGlobalPart()">Add to Inventory</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Panel: Packing List -->
-            <div id="panel-packinglist" style="display:none;" class="detail-content">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
-                    <div>
-                        <div class="section-title">Packing list</div>
-                        <div style="font-size:12px;color:var(--muted);margin-top:3px;">All pending orders sorted by pickup date — prepare and mark ready for pickup.</div>
-                    </div>
-                    <span class="section-count" id="pl-count"></span>
-                </div>
-                <div id="pl-content"></div>
-            </div>
-
-            <!-- Panel: Transactions -->
-            <div id="panel-transactions" style="display:none;" class="detail-content">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
-                    <div>
-                        <div class="section-title">Transaction log</div>
-                        <div style="font-size:12px;color:var(--muted);margin-top:3px;">All completed orders — company financial record</div>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-                        <button onclick="downloadTransactionsCSV()" style="display:flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(232,255,71,.08);border:1px solid rgba(232,255,71,.25);border-radius:8px;color:var(--accent);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='rgba(232,255,71,.15)'" onmouseout="this.style.background='rgba(232,255,71,.08)'">
-                            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 9v2a1 1 0 001 1h7a1 1 0 001-1V9M6.5 1v7M4 6l2.5 2.5L9 6"/></svg>
-                            Download CSV
-                        </button>
-                        <span class="section-count" id="tx-count"></span>
-                    </div>
-                </div>
-                <div id="tx-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;"></div>
-                <div id="tx-content"></div>
-            </div>
-
-            <!-- Panel: Return Requests -->
-            <div id="panel-returns" style="display:none;" class="detail-content">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
-                    <div>
-                        <div class="section-title">Return requests</div>
-                        <div style="font-size:12px;color:var(--muted);margin-top:3px;">Review, approve, or reject customer return requests.</div>
-                    </div>
-                    <div style="display:flex;gap:8px;align-items:center;">
-                        <span class="section-count" id="ret-count"></span>
-                        <select class="form-input" id="ret-filter" style="font-size:12px;padding:6px 10px;" onchange="renderReturnsPanel()">
-                            <option value="">All requests</option>
-                            <option value="pending">Pending only</option>
-                            <option value="approved">Approved</option>
-                            <option value="rejected">Rejected</option>
-                        </select>
-                    </div>
-                </div>
-                <div id="ret-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;"></div>
-                <div id="ret-content"></div>
-            </div>
-        </div>
+    <!-- Folders & Parts -->
+    <div id="panel-folders" class="panel">
+      <div id="folders-content"></div>
     </div>
+
+    <!-- Cart Viewer -->
+    <div id="panel-cart" class="panel">
+      <div id="cart-content"></div>
+    </div>
+
+    <!-- Global Inventory -->
+    <div id="panel-inventory" class="panel">
+      <div id="inventory-content"></div>
+    </div>
+
+    <!-- Packing List -->
+    <div id="panel-packing" class="panel">
+      <div id="packing-content"></div>
+    </div>
+
+    <!-- Transactions -->
+    <div id="panel-transactions" class="panel">
+      <div id="tx-content"></div>
+    </div>
+
+    <!-- Returns -->
+    <div id="panel-returns" class="panel">
+      <div id="returns-content"></div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Modals -->
+<div class="modal-overlay" id="modal-add-user">
+  <div class="modal">
+    <h2>Add Location</h2>
+    <div class="form-group"><label class="form-label">Display Name</label><input class="form-input" id="new-display" placeholder="e.g. ACBW Downtown"></div>
+    <div class="form-group"><label class="form-label">Username (login)</label><input class="form-input" id="new-user" placeholder="e.g. ACBW Downtown"></div>
+    <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="new-pass" placeholder="••••••••"></div>
+    <div class="error-inline" id="add-user-err"></div>
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeModal('modal-add-user')">Cancel</button>
+      <button class="btn-primary" onclick="submitAddUser()">Add Location</button>
+    </div>
+  </div>
 </div>
 
-<!-- Inventory Browser Modal -->
-<div class="inv-browser-backdrop" id="inv-browser-backdrop">
-    <div class="inv-browser-modal">
-        <div class="inv-browser-head">
-            <h3>Browse Master Inventory</h3>
-            <input class="inv-browser-search" id="inv-browser-search"
-                placeholder="Search by name, part #, make, or model…"
-                oninput="renderInvBrowserList(this.value)"
-                autocomplete="off">
-        </div>
-        <div class="inv-browser-body" id="inv-browser-body"></div>
-        <div class="inv-browser-foot">
-            <button class="inv-browser-cancel" onclick="closeInvBrowser()">Cancel</button>
-        </div>
+<div class="modal-overlay" id="modal-add-folder">
+  <div class="modal">
+    <h2>New Folder</h2>
+    <input type="hidden" id="af-uid">
+    <div class="form-group"><label class="form-label">Folder / Job Name</label><input class="form-input" id="af-name" placeholder="e.g. Tesla Fleet Q1"></div>
+    <div class="form-group"><label class="form-label">Customer Number</label><input class="form-input" id="af-cnum" placeholder="e.g. 10042"></div>
+    <div class="error-inline" id="add-folder-err"></div>
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeModal('modal-add-folder')">Cancel</button>
+      <button class="btn-primary" onclick="submitAddFolder()">Create Folder</button>
     </div>
+  </div>
 </div>
 
-<!-- Toast -->
-<div class="toast" id="toast"></div>
 
-<!-- Add user modal -->
-<div class="modal-backdrop" id="add-user-modal">
-    <div class="modal">
-        <div class="modal-title">Add new user</div>
-        <div class="modal-sub">Create a customer account they can log into.</div>
-        <div class="form-group" style="margin-bottom:12px;">
-            <label class="form-label">Display name</label>
-            <input class="form-input" id="new-displayName" placeholder="e.g. Jane Doe" style="width:100%">
-        </div>
-        <div class="form-group" style="margin-bottom:12px;">
-            <label class="form-label">Username</label>
-            <input class="form-input" id="new-username" placeholder="e.g. jdoe" style="width:100%">
-        </div>
-        <div class="form-group">
-            <label class="form-label">Password</label>
-            <input class="form-input" id="new-password" type="password" placeholder="••••••••" style="width:100%">
-        </div>
-        <div class="modal-actions">
-            <button class="btn-secondary" onclick="closeModal('add-user-modal')">Cancel</button>
-            <button class="btn-primary" onclick="submitAddUser()">Create user</button>
-        </div>
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal">
+    <h2 id="confirm-title">Confirm</h2>
+    <p id="confirm-msg" style="font-size:14px;color:var(--muted);font-weight:300;margin-bottom:24px;"></p>
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeModal('modal-confirm')">Cancel</button>
+      <button class="btn-danger" id="confirm-ok" onclick="">Confirm</button>
     </div>
+  </div>
 </div>
 
-<!-- Add folder modal -->
-<div class="modal-backdrop" id="add-folder-modal">
-    <div class="modal">
-        <div class="modal-title">New service folder</div>
-        <div class="modal-sub" id="add-folder-sub">For selected user</div>
-        <div class="form-group" style="margin-bottom:12px;">
-            <label class="form-label">Folder name (last name)</label>
-            <input class="form-input" id="new-folderName" placeholder="e.g. Hames" style="width:100%">
-        </div>
-        <div class="form-group">
-            <label class="form-label">Customer #</label>
-            <input class="form-input" id="new-customerNumber" placeholder="e.g. 853934" style="width:100%">
-        </div>
-        <div class="modal-actions">
-            <button class="btn-secondary" onclick="closeModal('add-folder-modal')">Cancel</button>
-            <button class="btn-primary" onclick="submitAddFolder()">Create folder</button>
-        </div>
+<!-- Add Global Part -->
+<div class="modal-overlay" id="modal-gi">
+  <div class="modal">
+    <h2>Add to Global Inventory</h2>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Part Number</label><input class="form-input" id="gi-num" placeholder="e.g. TS-M3-BRK-F"></div>
+      <div class="form-group"><label class="form-label">Price ($)</label><input class="form-input" type="number" id="gi-price" placeholder="0.00" step="0.01" min="0"></div>
     </div>
+    <div class="form-group"><label class="form-label">Part Name</label><input class="form-input" id="gi-partname" placeholder="e.g. Front Brake Pad Set"></div>
+    <div class="form-group"><label class="form-label">Description</label><input class="form-input" id="gi-desc" placeholder="Short description"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Make</label>
+        <select class="form-input" id="gi-make" onchange="giPopulateModels()">
+          <option value="">-- Make --</option><option>Tesla</option><option>Rivian</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Model</label>
+        <select class="form-input" id="gi-model"><option value="">-- Model --</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Year</label><input class="form-input" id="gi-year" placeholder="e.g. 2024"></div>
+      <div class="form-group"><label class="form-label">Stock Qty</label><input class="form-input" type="number" id="gi-qty" placeholder="1" min="1" value="1"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Images <span style="font-weight:300;letter-spacing:0;text-transform:none;font-size:10px;">(first image = presentation / primary)</span></label>
+      <div id="gi-images-wrap" style="min-height:40px;margin-bottom:8px;"></div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--muted);padding:6px 12px;background:var(--surface2);border:1px dashed var(--border2);border-radius:7px;white-space:nowrap;" for="gi-file">
+          <svg width="12" height="12" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6.5 1v8M4 3.5L6.5 1 9 3.5M2 10h9"/></svg>
+          <span id="gi-file-label">Upload images</span>
+        </label>
+        <input type="file" id="gi-file" accept="image/*" multiple style="display:none" onchange="giFileUpload(this)">
+        <input class="form-input" id="gi-imgurl-new" placeholder="Or paste an image URL…" style="flex:1;min-width:100px;font-size:12px;padding:6px 10px;">
+        <button type="button" class="btn-sm muted" onclick="giAddUrl()" style="white-space:nowrap;">Add URL</button>
+      </div>
+    </div>
+    <div class="error-inline" id="gi-err"></div>
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeModal('modal-gi')">Cancel</button>
+      <button class="btn-primary" onclick="submitGIPart()">Add Part</button>
+    </div>
+  </div>
 </div>
 
-<!-- Confirm delete modal -->
-<div class="modal-backdrop" id="confirm-modal">
-    <div class="modal">
-        <div class="modal-title" id="confirm-title">Are you sure?</div>
-        <div class="modal-sub" id="confirm-msg">This cannot be undone.</div>
-        <div class="modal-actions">
-            <button class="btn-secondary" onclick="closeModal('confirm-modal')">Cancel</button>
-            <button class="btn-danger" id="confirm-ok">Delete</button>
-        </div>
-    </div>
-</div>
+<div id="toast-wrap"></div>
 
 <script src="db.js"></script>
 <script>
-// ─── Auth guard ───────────────────────────────────────────────────────────────
-const session = Auth.requireAuth('admin');
-if (!session) throw new Error('Not authorized');
-document.getElementById('admin-name').textContent = session.displayName;
+// ── Auth guard ────────────────────────────────────────────────────────────────
+var session = Auth.requireAuth('admin');
+if (!session) { window.location.href = 'login.html'; }
 
-// ─── State ────────────────────────────────────────────────────────────────────
-let activeUserId    = null;
-let activePanel     = 'users';
-let activeFolderTab = null;   // for parts tab
-let activeCartUser  = null;
+// ── State ─────────────────────────────────────────────────────────────────────
+var activePanel   = 'users';
+var activeUserId  = null;
+var folderUserId  = null;
+var folderActive  = null;
+var cartUserId    = null;
+var cartFolder    = null;
+var pendingDelete = null;
+var addPartView   = null; // { uid, folderName, filterMake, filterModel }
 
-// ─── Toast ────────────────────────────────────────────────────────────────────
-let toastTimer;
-function toast(msg, type = 'success') {
-    const el = document.getElementById('toast');
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function toast(msg, type) {
+    var wrap = document.getElementById('toast-wrap');
+    var el   = document.createElement('div');
+    el.className = 'toast' + (type === 'error' ? ' error' : '');
     el.textContent = msg;
-    el.className = `toast ${type} show`;
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+    wrap.appendChild(el);
+    setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 3500);
 }
 
-// ─── Modal helpers ────────────────────────────────────────────────────────────
+// ── Modals ────────────────────────────────────────────────────────────────────
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function confirm(title, msg, onOk) {
-    document.getElementById('confirm-title').textContent = title;
-    document.getElementById('confirm-msg').textContent = msg;
-    const btn = document.getElementById('confirm-ok');
-    btn.onclick = () => { closeModal('confirm-modal'); onOk(); };
-    openModal('confirm-modal');
-}
 
-// ─── Panel switching ──────────────────────────────────────────────────────────
-const panelTitles = { users: 'Users', folders: 'Folders & Parts', cart: 'Cart Viewer', inventory: 'Global Inventory', packinglist: 'Packing List', transactions: 'Transactions', returns: 'Return Requests' };
+// ── Panel switching ───────────────────────────────────────────────────────────
+var panelTitles = {
+    users:'Users', folders:'Folders & Parts', cart:'Cart Viewer',
+    inventory:'Global Inventory', packing:'Packing List',
+    transactions:'Transactions', returns:'Return Requests'
+};
 
 function switchPanel(panel, btn) {
     activePanel = panel;
-    document.querySelectorAll('.nav-icon').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
     if (btn) btn.classList.add('active');
     document.getElementById('topbar-title').textContent = panelTitles[panel] || panel;
-
-    ['users','folders','cart','inventory','packinglist','transactions','returns'].forEach(p => {
-        const el = document.getElementById('panel-' + p);
-        if (el) el.style.display = p === panel ? (p === 'folders' ? 'flex' : 'block') : 'none';
+    var panels = ['users','folders','cart','inventory','packing','transactions','returns'];
+    panels.forEach(function(p) {
+        var el = document.getElementById('panel-' + p);
+        if (el) el.className = 'panel' + (p === panel ? ' active' : '');
     });
-
-    if (panel === 'cart')        renderCartPanel();
-    if (panel === 'inventory')   renderInventoryPanel();
-    if (panel === 'packinglist') renderPackingListPanel();
-    if (panel === 'transactions') renderTransactionsPanel();
-    if (panel === 'returns')     { renderReturnsPanel(); updateBell(); }
+    var acts = document.getElementById('topbar-actions');
+    acts.innerHTML = '';
+    if (panel === 'users') {
+        var b = document.createElement('button');
+        b.className = 'btn-primary'; b.textContent = '+ Add Location';
+        b.onclick = openAddUserModal;
+        acts.appendChild(b);
+        renderUserList();
+    } else if (panel === 'folders') {
+        renderFoldersPanel();
+    } else if (panel === 'cart') {
+        renderCartPanel();
+    } else if (panel === 'inventory') {
+        var b2 = document.createElement('button');
+        b2.className = 'btn-primary'; b2.textContent = '+ Add Part';
+        b2.onclick = openGIModal;
+        acts.appendChild(b2);
+        renderInventoryPanel();
+    } else if (panel === 'packing') {
+        renderPackingPanel();
+    } else if (panel === 'transactions') {
+        var b3 = document.createElement('button');
+        b3.className = 'btn-outline'; b3.textContent = 'Export CSV';
+        b3.onclick = exportTxCSV;
+        acts.appendChild(b3);
+        renderTransactionsPanel();
+    } else if (panel === 'returns') {
+        renderReturnsPanel();
+        updateBell();
+    }
 }
 
-function switchTab(tabId, btn) {
-    document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
-    if (btn) btn.classList.add('active');
-    ['tab-folders','tab-parts'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.display = id === tabId ? 'block' : 'none';
-    });
-    if (tabId === 'tab-parts') refreshPartsTab();
-}
-
-// ─── User list ────────────────────────────────────────────────────────────────
+// ─── Users Panel ─────────────────────────────────────────────────────────────
 function renderUserList() {
-    const ul = document.getElementById('user-list');
-    const users = Admin.getUsers();
-    ul.innerHTML = '';
-    users.forEach(u => {
-        const el = document.createElement('div');
-        el.className = 'user-card' + (u.id === activeUserId ? ' active' : '');
-        el.innerHTML = `
-            <div class="user-card-name">${u.displayName}</div>
-            <div class="user-card-meta">
-                <span>${u.username}</span>
-                <span>${u.serviceFolders.length} folder${u.serviceFolders.length !== 1 ? 's' : ''}</span>
-            </div>
-            <div class="user-card-actions">
-                <button class="icon-btn" onclick="event.stopPropagation(); openFolderPanel('${u.id}')">
-                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 3a1 1 0 011-1h2l1 1h4a1 1 0 011 1v4a1 1 0 01-1 1H2a1 1 0 01-1-1V3z"/></svg>
-                    Folders
-                </button>
-                <button class="icon-btn danger" onclick="event.stopPropagation(); deleteUser('${u.id}', '${u.displayName}')">
-                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 3h8M5 3V2h2v1M4 3l.5 6h3L8 3"/></svg>
-                    Delete
-                </button>
-            </div>`;
-        el.addEventListener('click', () => selectUser(u.id));
-        ul.appendChild(el);
+    var users = Admin.getUsers();
+    var listEl = document.getElementById('user-list');
+    var html = '';
+    users.forEach(function(u) {
+        var active = u.id === activeUserId ? ' active' : '';
+        html += '<div class="user-card' + active + '" onclick="selectUser(\'' + u.id + '\')">';
+        html += '<div class="user-card-name">' + esc(u.displayName) + '</div>';
+        html += '<div class="user-card-sub">' + u.serviceFolders.length + ' folder' + (u.serviceFolders.length !== 1 ? 's' : '') + '</div>';
+        html += '</div>';
     });
+    if (!html) html = '<p style="font-size:13px;color:var(--muted);">No locations found.</p>';
+    listEl.innerHTML = html;
+    renderUserDetail(activeUserId);
 }
 
-function selectUser(id) {
-    activeUserId = id;
+function selectUser(uid) {
+    activeUserId = uid;
     renderUserList();
-    renderUserDetail(id);
-    updateFolderPanelIfOpen();
 }
 
-function renderUserDetail(id) {
-    const user = Admin.getUserById(id);
-    const detail = document.getElementById('users-detail');
-    const empty  = document.getElementById('users-empty');
-    if (!user) { detail.style.display = 'none'; empty.style.display = 'flex'; return; }
-
-    empty.style.display = 'none';
-    detail.style.display = 'block';
-    detail.className = 'fade-in';
-
-    const totalParts     = user.serviceFolders.reduce((n, f) => n + f.parts.length, 0);
-    const totalCartItems = Admin.getTotalCartCount(user.id);
-    const cartTotal      = user.serviceFolders.reduce(
-        (sum, f) => sum + (f.cart || []).reduce((n, i) => n + i.price * i.qty, 0), 0
-    );
-
-    detail.innerHTML = `
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
-            <div>
-                <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;margin-bottom:4px;">${user.displayName}</div>
-                <div style="font-size:13px;color:var(--muted);">${user.username} &nbsp;·&nbsp; ID: ${user.id}</div>
-            </div>
-            <div style="display:flex;gap:8px;">
-                <button class="icon-btn" onclick="openFolderPanel('${user.id}')">
-                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="12" height="12"><path d="M1 3a1 1 0 011-1h2l1 1h4a1 1 0 011 1v4a1 1 0 01-1 1H2a1 1 0 01-1-1V3z"/></svg>
-                    Manage folders
-                </button>
-                <button class="icon-btn danger" onclick="deleteUser('${user.id}', '${user.displayName}')">
-                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="12" height="12"><path d="M2 3h8M5 3V2h2v1M4 3l.5 6h3L8 3"/></svg>
-                    Delete user
-                </button>
-            </div>
-        </div>
-        <div style="margin-bottom:20px;">
-            <div style="font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Confirmation email</div>
-            <div class="email-field-row">
-                <input type="email" id="user-email-input-${user.id}" value="${user.email || ''}" placeholder="e.g. wasson@acbw.com">
-                <button class="email-save-btn" onclick="saveUserEmail('${user.id}')">Save</button>
-            </div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;">
-            ${statCard(user.serviceFolders.length, 'Service folders')}
-            ${statCard(totalParts, 'Parts on file')}
-            ${statCard(totalCartItems, 'Items in cart', cartTotal > 0 ? '$' + cartTotal.toFixed(2) : '')}
-        </div>
-        <div class="section-title" style="margin-bottom:12px;">Service folders</div>
-        ${user.serviceFolders.length === 0 ? '<p style="font-size:13px;color:var(--muted);font-weight:300;">No folders yet.</p>' : `
-        <div style="display:flex;flex-direction:column;gap:8px;">
-            ${user.serviceFolders.map(f => `
-                <div style="background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
-                    <div>
-                        <div style="font-size:14px;font-weight:500;margin-bottom:2px;">${f.folderName}</div>
-                        <div style="font-size:11px;color:var(--accent);font-weight:500;">Customer #${f.customerNumber} &nbsp;·&nbsp; <span style="color:var(--muted);">${f.parts.length} part${f.parts.length!==1?'s':''}</span></div>
-                    </div>
-                </div>`).join('')}
-        </div>`}`;
+function renderUserDetail(uid) {
+    var wrap = document.getElementById('user-detail-wrap');
+    if (!uid) {
+        wrap.innerHTML = '<div class="empty-detail">Select a location to view details</div>';
+        return;
+    }
+    var user = Admin.getUserById(uid);
+    if (!user) { wrap.innerHTML = ''; return; }
+    var totalParts = user.serviceFolders.reduce(function(n, f) { return n + f.parts.length; }, 0);
+    var cartItems  = Admin.getTotalCartCount(uid);
+    var cartVal    = user.serviceFolders.reduce(function(s, f) {
+        return s + (f.cart || []).reduce(function(n, i) { return n + i.price * i.qty; }, 0);
+    }, 0);
+    var html = '<div class="user-detail">';
+    html += '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">';
+    html += '<div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:34px;line-height:1;">' + esc(user.displayName) + '</div>';
+    html += '<div style="font-size:12px;color:var(--muted);margin-top:2px;">' + esc(user.username) + ' &nbsp;&middot;&nbsp; ID: ' + user.id + '</div></div>';
+    html += '<div style="display:flex;gap:8px;">';
+    html += '<button class="btn-sm muted" onclick="openFolderPanel(\'' + uid + '\')">Manage folders</button>';
+    html += '<button class="btn-sm danger" onclick="confirmDelete(\'user\',\'' + uid + '\',\'' + esc(user.displayName) + '\')">Delete</button>';
+    html += '</div></div>';
+    html += '<div class="stat-grid">';
+    html += statCard(user.serviceFolders.length, 'Service folders', '');
+    html += statCard(totalParts, 'Parts on file', '');
+    html += statCard(cartItems, 'Items in cart', cartVal > 0 ? '$' + cartVal.toFixed(2) : '');
+    html += '</div>';
+    html += '<div class="section-title">Service folders</div>';
+    if (user.serviceFolders.length === 0) {
+        html += '<p style="font-size:13px;color:var(--muted);font-weight:300;">No folders yet.</p>';
+    } else {
+        user.serviceFolders.forEach(function(f) {
+            html += '<div class="folder-row">';
+            html += '<div><div class="folder-name">' + esc(f.folderName) + '</div>';
+            html += '<div class="folder-sub">Customer #' + esc(f.customerNumber) + ' &nbsp;&middot;&nbsp; <span style="color:var(--muted);">' + f.parts.length + ' part' + (f.parts.length !== 1 ? 's' : '') + '</span></div></div>';
+            html += '<button class="btn-sm muted" onclick="openFolderPanel(\'' + uid + '\')">View</button>';
+            html += '</div>';
+        });
+    }
+    html += '</div>';
+    wrap.innerHTML = html;
 }
 
-function statCard(num, label, sub = '') {
-    return `<div style="background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:16px 18px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;line-height:1;margin-bottom:2px;">${num}</div>
-        <div style="font-size:11px;color:var(--muted);">${label}</div>
-        ${sub ? `<div style="font-size:11px;color:var(--accent);margin-top:2px;">${sub}</div>` : ''}
-    </div>`;
+function statCard(num, label, sub) {
+    var h = '<div class="stat-card"><span class="stat-num">' + num + '</span><span class="stat-lbl">' + label + '</span>';
+    if (sub) h += '<div class="stat-sub">' + sub + '</div>';
+    h += '</div>';
+    return h;
 }
 
-// ─── Add user ─────────────────────────────────────────────────────────────────
+
 function openAddUserModal() {
-    document.getElementById('new-displayName').value = '';
-    document.getElementById('new-username').value = '';
-    document.getElementById('new-password').value = '';
-    openModal('add-user-modal');
+    document.getElementById('new-display').value = '';
+    document.getElementById('new-user').value = '';
+    document.getElementById('new-pass').value = '';
+    document.getElementById('add-user-err').style.display = 'none';
+    openModal('modal-add-user');
 }
 
 function submitAddUser() {
-    const displayName = document.getElementById('new-displayName').value.trim();
-    const username    = document.getElementById('new-username').value.trim();
-    const password    = document.getElementById('new-password').value;
-    if (!displayName || !username || !password) { toast('Please fill in all fields.', 'error'); return; }
-    const result = Admin.addUser({ username, password, displayName });
-    if (!result.ok) { toast(result.error, 'error'); return; }
-    closeModal('add-user-modal');
+    var dn  = document.getElementById('new-display').value.trim();
+    var un  = document.getElementById('new-user').value.trim();
+    var pw  = document.getElementById('new-pass').value;
+    var err = document.getElementById('add-user-err');
+    if (!dn || !un || !pw) { err.textContent = 'All fields required.'; err.style.display = 'block'; return; }
+    var res = Admin.addUser({ username: un, password: pw, displayName: dn });
+    if (!res.ok) { err.textContent = res.error; err.style.display = 'block'; return; }
+    closeModal('modal-add-user');
+    toast('Location added.');
     renderUserList();
-    toast(`User "${displayName}" created.`);
 }
 
-// ─── Delete user ──────────────────────────────────────────────────────────────
-function deleteUser(id, name) {
-    confirm('Delete user?', `This will permanently remove "${name}" and all their folders and parts.`, () => {
-        Admin.deleteUser(id);
-        if (activeUserId === id) {
-            activeUserId = null;
-            document.getElementById('users-detail').style.display = 'none';
-            document.getElementById('users-empty').style.display = 'flex';
-        }
+// ─── Confirm / Delete ─────────────────────────────────────────────────────────
+function confirmDelete(type, id, name) {
+    pendingDelete = { type: type, id: id, name: name };
+    document.getElementById('confirm-title').textContent = 'Delete ' + (type === 'user' ? 'Location' : 'Folder');
+    document.getElementById('confirm-msg').textContent = 'Delete "' + name + '"? This cannot be undone.';
+    document.getElementById('confirm-ok').onclick = doDelete;
+    openModal('modal-confirm');
+}
+
+function doDelete() {
+    if (!pendingDelete) return;
+    closeModal('modal-confirm');
+    if (pendingDelete.type === 'user') {
+        Admin.deleteUser(pendingDelete.id);
+        if (activeUserId === pendingDelete.id) activeUserId = null;
+        toast(pendingDelete.name + ' deleted.');
         renderUserList();
-        toast(`"${name}" deleted.`);
-    });
+    } else if (pendingDelete.type === 'folder') {
+        Admin.deleteFolder(pendingDelete.uid, pendingDelete.id);
+        if (folderActive === pendingDelete.id) folderActive = null;
+        toast('Folder deleted.');
+        renderFoldersPanel();
+    } else if (pendingDelete.type === 'part') {
+        Admin.deletePart(pendingDelete.uid, pendingDelete.folder, pendingDelete.id);
+        toast('Part removed.');
+        renderFoldersPanel();
+    }
+    pendingDelete = null;
 }
 
-// ─── Folders panel ────────────────────────────────────────────────────────────
-function openFolderPanel(userId) {
-    activeUserId = userId;
-    renderUserList();
+// ─── Folders & Parts Panel ────────────────────────────────────────────────────
+function openFolderPanel(uid) {
+    folderUserId = uid;
+    var user = Admin.getUserById(uid);
+    if (user && user.serviceFolders.length > 0 && !folderActive) {
+        folderActive = user.serviceFolders[0].folderName;
+    }
     switchPanel('folders', document.querySelector('[data-panel="folders"]'));
-    refreshFolderTab();
-    refreshPartsTab();
 }
 
-function updateFolderPanelIfOpen() {
-    if (activePanel === 'folders') { refreshFolderTab(); refreshPartsTab(); }
-}
+function renderFoldersPanel() {
+    var content = document.getElementById('folders-content');
+    var acts    = document.getElementById('topbar-actions');
+    if (!folderUserId) {
+        var users = Admin.getUsers();
+        if (users.length > 0) folderUserId = users[0].id;
+    }
+    var user = folderUserId ? Admin.getUserById(folderUserId) : null;
+    if (!user) { content.innerHTML = '<div class="empty">No location selected.</div>'; return; }
 
-function refreshFolderTab() {
-    const empty   = document.getElementById('folders-empty');
-    const content = document.getElementById('folders-content');
-    if (!activeUserId) { empty.style.display = 'flex'; content.style.display = 'none'; return; }
+    if (addPartView) {
+        acts.innerHTML = '';
+        content.innerHTML = renderPartPicker();
+        return;
+    }
 
-    const user = Admin.getUserById(activeUserId);
-    if (!user) return;
+    acts.innerHTML = '';
+    var b1 = document.createElement('button');
+    b1.className = 'btn-outline'; b1.textContent = 'New Folder';
+    b1.onclick = function() {
+        document.getElementById('af-uid').value = folderUserId;
+        document.getElementById('af-name').value = '';
+        document.getElementById('af-cnum').value = '';
+        document.getElementById('add-folder-err').style.display = 'none';
+        openModal('modal-add-folder');
+    };
+    acts.appendChild(b1);
 
-    empty.style.display = 'none';
-    content.style.display = 'block';
-    document.getElementById('folders-user-label').textContent = user.displayName + "'s folders";
-    document.getElementById('folders-count').textContent = user.serviceFolders.length;
+    var html = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">';
+    html += '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;">' + esc(user.displayName) + '</div>';
+    html += '</div>';
 
-    const grid = document.getElementById('folder-grid');
-    grid.innerHTML = '';
-    user.serviceFolders.forEach(f => {
-        const card = document.createElement('div');
-        card.className = 'folder-card fade-in';
-        card.innerHTML = `
-            <div class="folder-card-head">
-                <div>
-                    <div class="folder-name">${f.folderName}</div>
-                    <div class="folder-num">#${f.customerNumber}</div>
-                </div>
-                <button class="delete-folder-btn" title="Delete folder" onclick="deleteFolder('${activeUserId}','${f.folderName}')">
-                    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 3.5h10M5.5 3.5V2.5h3v1M4.5 3.5l.5 7h4l.5-7"/></svg>
-                </button>
-            </div>
-            <div class="folder-part-count">${f.parts.length} part${f.parts.length !== 1 ? 's' : ''}</div>`;
-        grid.appendChild(card);
+    // Folder pills
+    html += '<div class="pill-row">';
+    user.serviceFolders.forEach(function(f) {
+        var active = f.folderName === folderActive ? ' active' : '';
+        html += '<button class="pill' + active + '" onclick="selectFolder(\'' + esc(f.folderName) + '\')">' + esc(f.folderName) + '</button>';
     });
+    html += '</div>';
 
-    // Add folder card
-    const addCard = document.createElement('div');
-    addCard.className = 'add-folder-card';
-    addCard.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="7" y1="2" x2="7" y2="12"/><line x1="2" y1="7" x2="12" y2="7"/></svg> New folder`;
-    addCard.onclick = () => openAddFolderModal(activeUserId, user.displayName);
-    grid.appendChild(addCard);
+    if (folderActive) {
+        var folder = user.serviceFolders.find(function(f) { return f.folderName === folderActive; });
+        if (folder) {
+            html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">';
+            html += '<div><div style="font-size:16px;font-weight:500;">' + esc(folder.folderName) + '</div>';
+            html += '<div style="font-size:11px;color:var(--muted);">Customer #' + esc(folder.customerNumber) + '</div></div>';
+            html += '<div style="display:flex;gap:8px;">';
+            html += '<button class="btn-sm accent" onclick="openAddPartModal(\'' + folderUserId + '\',\'' + esc(folder.folderName) + '\')">+ Add Part</button>';
+            html += '<button class="btn-sm danger" onclick="confirmFolderDelete(\'' + folderUserId + '\',\'' + esc(folder.folderName) + '\')">Delete Folder</button>';
+            html += '</div></div>';
+            html += buildPartsTable(folder.parts, folderUserId, folder.folderName);
+        }
+    } else if (user.serviceFolders.length === 0) {
+        html += '<div class="empty"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 12a4 4 0 014-4h8l4 4h16a4 4 0 014 4v16a4 4 0 01-4 4H8a4 4 0 01-4-4V12z"/></svg><p>No folders yet. Create one to get started.</p></div>';
+    }
+    content.innerHTML = html;
 }
 
-function openAddFolderModal(userId, userName) {
-    document.getElementById('new-folderName').value = '';
-    document.getElementById('new-customerNumber').value = '';
-    document.getElementById('add-folder-sub').textContent = `For ${userName}`;
-    openModal('add-folder-modal');
+function selectFolder(name) {
+    folderActive = name;
+    renderFoldersPanel();
+}
+
+function confirmFolderDelete(uid, folderName) {
+    pendingDelete = { type: 'folder', uid: uid, id: folderName, name: folderName };
+    document.getElementById('confirm-title').textContent = 'Delete Folder';
+    document.getElementById('confirm-msg').textContent = 'Delete folder "' + folderName + '"? This cannot be undone.';
+    document.getElementById('confirm-ok').onclick = doDelete;
+    openModal('modal-confirm');
+}
+
+function buildPartsTable(parts, uid, folderName) {
+    if (!parts || parts.length === 0) {
+        return '<div class="empty" style="height:160px;"><p>No parts in this folder yet.</p></div>';
+    }
+    var h = '<div class="table-wrap"><table class="data-tbl">';
+    h += '<thead><tr><th>Part #</th><th>Name</th><th>Make / Model / Year</th><th>Price</th><th>Qty</th><th></th></tr></thead><tbody>';
+    parts.forEach(function(p) {
+        h += '<tr>';
+        h += '<td><span class="part-badge">' + esc(p.partNumber) + '</span></td>';
+        h += '<td>' + esc(p.partName || p.description || '') + '</td>';
+        h += '<td style="font-size:11px;color:var(--muted);">' + esc((p.make || '') + ' ' + (p.model || '') + ' ' + (p.year || '')) + '</td>';
+        h += '<td class="price-cell">$' + Number(p.price).toFixed(2) + '</td>';
+        h += '<td style="font-weight:500;">' + (p.quantity !== undefined ? p.quantity : '—') + '</td>';
+        h += '<td><button class="btn-sm danger" onclick="confirmPartDelete(\'' + uid + '\',\'' + esc(folderName) + '\',\'' + esc(p.partNumber) + '\')">Remove</button></td>';
+        h += '</tr>';
+    });
+    h += '</tbody></table></div>';
+    return h;
+}
+
+function confirmPartDelete(uid, folderName, partNum) {
+    pendingDelete = { type: 'part', uid: uid, folder: folderName, id: partNum, name: partNum };
+    document.getElementById('confirm-title').textContent = 'Remove Part';
+    document.getElementById('confirm-msg').textContent = 'Remove part ' + partNum + ' from this folder?';
+    document.getElementById('confirm-ok').onclick = doDelete;
+    openModal('modal-confirm');
 }
 
 function submitAddFolder() {
-    const folderName     = document.getElementById('new-folderName').value.trim();
-    const customerNumber = document.getElementById('new-customerNumber').value.trim();
-    if (!folderName || !customerNumber) { toast('Please fill in all fields.', 'error'); return; }
-    const result = Admin.addFolder(activeUserId, { folderName, customerNumber });
-    if (!result.ok) { toast(result.error, 'error'); return; }
-    closeModal('add-folder-modal');
-    refreshFolderTab();
-    refreshPartsTab();
-    renderUserList();
-    if (activeUserId) renderUserDetail(activeUserId);
-    toast(`Folder "${folderName}" created.`);
+    var uid  = document.getElementById('af-uid').value;
+    var name = document.getElementById('af-name').value.trim();
+    var cnum = document.getElementById('af-cnum').value.trim();
+    var err  = document.getElementById('add-folder-err');
+    if (!name || !cnum) { err.textContent = 'All fields required.'; err.style.display = 'block'; return; }
+    var res = Admin.addFolder(uid, { folderName: name, customerNumber: cnum });
+    if (!res.ok) { err.textContent = res.error; err.style.display = 'block'; return; }
+    folderActive = name;
+    closeModal('modal-add-folder');
+    toast('Folder created.');
+    renderFoldersPanel();
 }
 
-function deleteFolder(userId, folderName) {
-    confirm('Delete folder?', `This will remove the "${folderName}" folder and all its parts.`, () => {
-        Admin.deleteFolder(userId, folderName);
-        refreshFolderTab();
-        refreshPartsTab();
-        renderUserList();
-        if (activeUserId) renderUserDetail(activeUserId);
-        toast(`Folder "${folderName}" deleted.`);
+function openAddPartModal(uid, folderName) {
+    addPartView = { uid: uid, folderName: folderName, filterMake: '', filterModel: '' };
+    renderFoldersPanel();
+}
+
+function apFilterMake(val) {
+    if (addPartView) { addPartView.filterMake = val; addPartView.filterModel = ''; }
+    renderFoldersPanel();
+}
+
+function apFilterModel(val) {
+    if (addPartView) addPartView.filterModel = val;
+    renderFoldersPanel();
+}
+
+function submitAddPart(partNum, qty) {
+    if (!addPartView) return;
+    var uid = addPartView.uid, folderName = addPartView.folderName;
+    var res = Admin.addPart(uid, folderName, { partNumber: partNum, quantity: qty });
+    if (!res.ok) { toast(res.error, 'error'); return; }
+    toast('Part added to folder.');
+    addPartView = null;
+    renderFoldersPanel();
+}
+
+function renderPartPicker() {
+    var v = addPartView;
+    var makes  = Inventory.getMakes();
+    var models = v.filterMake ? Inventory.getModels(v.filterMake) : [];
+    var parts  = Inventory.getAllFlat().filter(function(p) {
+        if (v.filterMake  && p.make  !== v.filterMake)  return false;
+        if (v.filterModel && p.model !== v.filterModel) return false;
+        return true;
     });
-}
 
-// ─── Parts tab ────────────────────────────────────────────────────────────────
-function refreshPartsTab() {
-    const empty   = document.getElementById('parts-empty');
-    const content = document.getElementById('parts-content');
-    if (!activeUserId) { empty.style.display = 'flex'; content.style.display = 'none'; return; }
+    var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">';
+    html += '<div><div style="font-size:16px;font-weight:500;">Add Part to <span style="color:var(--accent);">' + esc(v.folderName) + '</span></div></div>';
+    html += '<button class="btn-outline" onclick="addPartView=null;renderFoldersPanel();">&#8592; Back</button>';
+    html += '</div>';
 
-    const user = Admin.getUserById(activeUserId);
-    if (!user) return;
+    html += '<div class="part-picker-filters">';
+    html += '<select onchange="apFilterMake(this.value)">';
+    html += '<option value="">All Makes</option>';
+    makes.forEach(function(m) {
+        html += '<option value="' + esc(m) + '"' + (v.filterMake === m ? ' selected' : '') + '>' + esc(m) + '</option>';
+    });
+    html += '</select>';
 
-    empty.style.display = 'none';
-    content.style.display = 'block';
-
-    // Populate folder pills
-    const pillsEl = document.getElementById('parts-folder-pills');
-    pillsEl.innerHTML = '';
-    const folderSelect = document.getElementById('f-folder');
-    folderSelect.innerHTML = '';
-
-    if (user.serviceFolders.length === 0) {
-        pillsEl.innerHTML = '<span style="font-size:13px;color:var(--muted);font-weight:300;">No folders yet — create one first.</span>';
+    if (v.filterMake) {
+        html += '<select onchange="apFilterModel(this.value)">';
+        html += '<option value="">All Models</option>';
+        models.forEach(function(m) {
+            html += '<option value="' + esc(m) + '"' + (v.filterModel === m ? ' selected' : '') + '>' + esc(m) + '</option>';
+        });
+        html += '</select>';
     }
+    html += '</div>';
 
-    user.serviceFolders.forEach((f, i) => {
-        const pill = document.createElement('button');
-        pill.className = 'folder-pill' + (i === 0 && !activeFolderTab ? ' active' : activeFolderTab === f.folderName ? ' active' : '');
-        pill.textContent = f.folderName;
-        pill.onclick = () => {
-            activeFolderTab = f.folderName;
-            document.querySelectorAll('.folder-pill').forEach(p => p.classList.remove('active'));
-            pill.classList.add('active');
-            renderPartsTable(user, f.folderName);
-        };
-        pillsEl.appendChild(pill);
-
-        const opt = document.createElement('option');
-        opt.value = f.folderName;
-        opt.textContent = f.folderName;
-        folderSelect.appendChild(opt);
-    });
-
-    const firstFolder = activeFolderTab || (user.serviceFolders[0] ? user.serviceFolders[0].folderName : null);
-    if (firstFolder) renderPartsTable(user, firstFolder);
-    else document.getElementById('parts-tbody').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px;">No folders</td></tr>';
-
-    renderFolderPartList();
-}
-
-function renderPartsTable(user, folderName) {
-    const folder = user.serviceFolders.find(f => f.folderName === folderName);
-    const tbody  = document.getElementById('parts-tbody');
-    const count  = document.getElementById('parts-count');
-    if (!folder) { tbody.innerHTML = ''; return; }
-
-    count.textContent = folder.parts.length + ' part' + (folder.parts.length !== 1 ? 's' : '');
-    tbody.innerHTML = '';
-
-    if (folder.parts.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px;font-size:13px;">No parts in this folder yet.</td></tr>';
-        return;
+    if (parts.length === 0) {
+        html += '<div class="empty"><p>No parts match the selected filters.</p></div>';
+    } else {
+        html += '<div class="part-cards">';
+        parts.forEach(function(p) {
+            var imgSrc = (p.images && p.images.length > 0) ? p.images[0] : (p.imageUrl || '');
+            var inputId = 'qty-' + esc(p.partNumber).replace(/[^a-z0-9]/gi, '_');
+            html += '<div class="part-card">';
+            if (imgSrc) {
+                html += '<img class="part-card-img" src="' + esc(imgSrc) + '" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">';
+                html += '<div class="part-card-img-placeholder" style="display:none;"><svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="rgba(245,245,247,0.2)" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="5" width="26" height="22" rx="2"/><circle cx="11" cy="13" r="3"/><path d="M3 24l7-7 5 5 4-4 9 9"/></svg></div>';
+            } else {
+                html += '<div class="part-card-img-placeholder"><svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="rgba(245,245,247,0.2)" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="5" width="26" height="22" rx="2"/><circle cx="11" cy="13" r="3"/><path d="M3 24l7-7 5 5 4-4 9 9"/></svg></div>';
+            }
+            html += '<div class="part-card-body">';
+            html += '<span class="part-card-num">' + esc(p.partNumber) + '</span>';
+            html += '<div class="part-card-name">' + esc(p.partName || p.description || p.partNumber) + '</div>';
+            html += '<div class="part-card-meta">' + esc(p.make) + ' ' + esc(p.model) + ' ' + esc(p.year) + '</div>';
+            html += '<div class="part-card-meta">In stock: ' + (p.stock !== undefined ? p.stock : '—') + '</div>';
+            html += '<div class="part-card-price">$' + Number(p.price).toFixed(2) + '</div>';
+            html += '</div>';
+            html += '<div class="part-card-footer">';
+            html += '<input type="number" id="' + inputId + '" value="1" min="1" style="width:56px;">';
+            html += '<button class="btn-sm accent" style="flex:1;" onclick="submitAddPart(\'' + esc(p.partNumber) + '\',parseInt(document.getElementById(\'' + inputId + '\').value)||1)">Add</button>';
+            html += '</div>';
+            html += '</div>';
+        });
+        html += '</div>';
     }
+    return html;
+}
 
-    folder.parts.forEach(p => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${p.imageUrl ? `<img class="part-thumb" src="${p.imageUrl}" alt="">` : `<div class="part-thumb-placeholder"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".3"><rect x="2" y="2" width="12" height="12" rx="2"/><circle cx="6" cy="6" r="1.5"/><path d="M14 10l-4-3-3 3-1.5-1.5L2 12"/></svg></div>`}</td>
-            <td><span class="part-num-badge">${p.partNumber}</span></td>
-            <td style="font-weight:500;">${p.partName || '—'}</td>
-            <td style="color:var(--muted);max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.description}</td>
-            <td class="price-cell">$${Number(p.price).toFixed(2)}</td>
-            <td><button class="icon-btn danger" onclick="deletePart('${user.id}','${folderName}','${p.partNumber}')">
-                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="11" height="11"><path d="M2 3h8M5 3V2h2v1M4 3l.5 6h3L8 3"/></svg>
-            </button></td>`;
-        tbody.appendChild(tr);
+// ─── Cart Viewer ──────────────────────────────────────────────────────────────
+function renderCartPanel() {
+    var content = document.getElementById('cart-content');
+    var users   = Admin.getUsers();
+    if (!cartUserId && users.length > 0) cartUserId = users[0].id;
+    var html = '<div class="section-title">Select Location</div><div class="pill-row">';
+    users.forEach(function(u) {
+        var a = u.id === cartUserId ? ' active' : '';
+        html += '<button class="pill' + a + '" onclick="cartSelectUser(\'' + u.id + '\')">' + esc(u.displayName) + '</button>';
     });
-}
-
-// ─── Global Inventory Form ────────────────────────────────────────────────────
-const GI_MAKES = {
-    'Tesla':  ['Roadster','Model S','Model X','Model 3','Model Y','Cybertruck'],
-    'Rivian': ['R1T','R1S','R2','R3','R3X']
-};
-
-function giPopulateModel() {
-    const make   = document.getElementById('gi-make').value;
-    const modSel = document.getElementById('gi-model');
-    modSel.innerHTML = '<option value="">' + (make ? '— Select Model —' : '— Select Make first —') + '</option>';
-    (GI_MAKES[make] || []).forEach(m => {
-        const opt = document.createElement('option');
-        opt.value = m; opt.textContent = m;
-        modSel.appendChild(opt);
-    });
-}
-
-function giPreviewImage(url) {
-    const img = document.getElementById('gi-img-preview');
-    if (url) { img.src = url; img.style.display = 'block'; }
-    else      { img.style.display = 'none'; }
-}
-
-function giHandleFileUpload(input) {
-    const file = input.files[0];
-    if (!file) return;
-    const nameEl = document.getElementById('gi-file-name');
-    if (nameEl) nameEl.textContent = file.name;
-    const reader = new FileReader();
-    reader.onload = e => {
-        document.getElementById('gi-imageUrl').value = e.target.result;
-        giPreviewImage(e.target.result);
-    };
-    reader.readAsDataURL(file);
-}
-
-function initGlobalInventoryForm() {
-    const yrSel = document.getElementById('gi-year');
-    if (!yrSel) return;
-    for (let y = new Date().getFullYear() + 1; y >= 2000; y--) {
-        const opt = document.createElement('option');
-        opt.value = y; opt.textContent = y;
-        yrSel.appendChild(opt);
-    }
-}
-
-function submitGlobalPart() {
-    const partNumber  = document.getElementById('gi-partNumber').value.trim();
-    const partName    = document.getElementById('gi-partName').value.trim();
-    const make        = document.getElementById('gi-make').value;
-    const model       = document.getElementById('gi-model').value;
-    const year        = document.getElementById('gi-year').value;
-    const price       = document.getElementById('gi-price').value;
-    const quantity    = document.getElementById('gi-quantity').value;
-    const description = document.getElementById('gi-description').value.trim();
-    const imageUrl    = document.getElementById('gi-imageUrl').value.trim();
-
-    if (!partNumber || !make || !model || !quantity) {
-        toast('Please fill all required fields (Part #, Make, Model, Quantity).', 'error'); return;
-    }
-
-    const result = Admin.addGlobalPart({ partNumber, partName, make, model, year, price, quantity, description, imageUrl });
-    if (!result.ok) { toast(result.error, 'error'); return; }
-
-    // Reset form
-    ['gi-partNumber','gi-partName','gi-description','gi-imageUrl','gi-price'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('gi-quantity').value = '1';
-    document.getElementById('gi-make').value  = '';
-    document.getElementById('gi-year').value  = '';
-    giPopulateModel();
-    document.getElementById('gi-img-preview').style.display = 'none';
-    const fileInput = document.getElementById('gi-imageFile');
-    if (fileInput) fileInput.value = '';
-    const fileName = document.getElementById('gi-file-name');
-    if (fileName) fileName.textContent = 'Upload image file';
-
-    renderInventoryPanel();
-    const msg = result.upserted ? `Stock updated for part "${partNumber}".` : `"${partNumber}" added to global inventory.`;
-    toast(msg);
-}
-
-// ─── Folder Parts Inline Browser ──────────────────────────────────────────────
-function fpFilterMakeChanged() {
-    const make     = document.getElementById('fp-filter-make').value;
-    const modelSel = document.getElementById('fp-filter-model');
-    modelSel.innerHTML = '<option value="">All Models</option>';
-    (GI_MAKES[make] || []).forEach(m => {
-        const opt = document.createElement('option');
-        opt.value = m; opt.textContent = m;
-        modelSel.appendChild(opt);
-    });
-    renderFolderPartList();
-}
-
-function renderFolderPartList() {
-    const make  = document.getElementById('fp-filter-make')?.value  || '';
-    const model = document.getElementById('fp-filter-model')?.value || '';
-    const listEl  = document.getElementById('fp-inv-list');
-    const countEl = document.getElementById('fp-inv-count');
-    if (!listEl) return;
-
-    const allParts = Inventory.getAllFlat();
-    const inStock  = allParts.filter(p => {
-        const stock   = p.stock !== undefined ? p.stock : 0;
-        const makeOk  = !make  || p.make  === make;
-        const modelOk = !model || p.model === model;
-        return stock >= 1 && makeOk && modelOk;
-    });
-
-    if (countEl) countEl.textContent = inStock.length + ' part' + (inStock.length !== 1 ? 's' : '') + ' in stock';
-
-    if (inStock.length === 0) {
-        listEl.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:16px 0;">No in-stock parts match the selected filters.</div>';
-        return;
-    }
-
-    listEl.innerHTML = '';
-    inStock.forEach(p => {
-        const stockClass = (p.stock !== undefined && p.stock <= 3) ? 'low' : 'ok';
-        const row = document.createElement('div');
-        row.className = 'inv-part-row';
-        row.style.cssText = 'padding:10px 14px;cursor:default;';
-        row.innerHTML = `
-            ${p.imageUrl
-                ? `<img src="${p.imageUrl}" alt="" style="width:40px;height:40px;border-radius:6px;object-fit:cover;flex-shrink:0;">`
-                : `<div class="inv-part-thumb"></div>`}
-            <div class="inv-part-info">
-                <div class="inv-part-row-name">${p.partName || p.description}</div>
-                <div class="inv-part-row-meta">${p.make} ${p.model} · ${p.year}</div>
-                <div class="inv-part-row-num">${p.partNumber}</div>
-            </div>
-            <div class="inv-part-row-price" style="margin-right:8px;">$${Number(p.price).toFixed(2)}</div>
-            <div class="inv-part-row-stock ${stockClass}">Stock: ${p.stock}</div>
-            <button onclick='addPartFromInventory(${JSON.stringify(p).replace(/'/g,"&#39;")})'
-                style="margin-left:10px;padding:6px 14px;background:rgba(232,255,71,.08);border:1px solid rgba(232,255,71,.25);border-radius:7px;color:var(--accent);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">
-                + Add to folder
-            </button>`;
-        listEl.appendChild(row);
-    });
-}
-
-function addPartFromInventory(part) {
-    if (!activeUserId) { toast('Select a user first.', 'error'); return; }
-    const folderName = document.getElementById('f-folder')?.value;
-    if (!folderName) { toast('Select a target folder.', 'error'); return; }
-
-    const result = Admin.addPart(activeUserId, folderName, part);
-    if (!result.ok) { toast(result.error, 'error'); return; }
-
-    activeFolderTab = folderName;
-    refreshPartsTab();
-    if (activeUserId) renderUserDetail(activeUserId);
-    toast(`"${part.partName || part.partNumber}" added to "${folderName}".`);
-}
-
-// ─── Inventory Browser Modal ──────────────────────────────────────────────────
-
-function _getAllInventoryParts() {
-    const inv = DB.globalInventory || {};
-    const parts = [];
-    for (const make of Object.keys(inv).sort()) {
-        for (const model of Object.keys(inv[make]).sort()) {
-            for (const year of Object.keys(inv[make][model]).sort((a, b) => b - a)) {
-                for (const p of inv[make][model][year]) {
-                    parts.push({ ...p, make, model, year });
+    html += '</div>';
+    var user = cartUserId ? Admin.getUserById(cartUserId) : null;
+    if (user) {
+        var folders = user.serviceFolders;
+        if (!cartFolder && folders.length > 0) cartFolder = folders[0].folderName;
+        if (folders.length > 0) {
+            html += '<div class="section-title" style="margin-top:16px;">Folder</div><div class="pill-row">';
+            folders.forEach(function(f) {
+                var a = f.folderName === cartFolder ? ' active' : '';
+                html += '<button class="pill' + a + '" onclick="cartSelectFolder(\'' + esc(f.folderName) + '\')">' + esc(f.folderName) + '</button>';
+            });
+            html += '</div>';
+            var folder = folders.find(function(f) { return f.folderName === cartFolder; });
+            if (folder) {
+                var cart = folder.cart || [];
+                if (cart.length === 0) {
+                    html += '<div class="empty" style="height:160px;"><p>Cart is empty for this folder.</p></div>';
+                } else {
+                    var total = 0;
+                    html += '<div class="table-wrap"><table class="data-tbl"><thead><tr><th>Part #</th><th>Name</th><th>Qty</th><th>Unit</th><th>Subtotal</th><th></th></tr></thead><tbody>';
+                    cart.forEach(function(item, idx) {
+                        total += item.price * item.qty;
+                        html += '<tr>';
+                        html += '<td><span class="part-badge">' + esc(item.partNumber) + '</span></td>';
+                        html += '<td>' + esc(item.partName || item.description || '') + '</td>';
+                        html += '<td>' + item.qty + '</td>';
+                        html += '<td>$' + Number(item.price).toFixed(2) + '</td>';
+                        html += '<td class="price-cell">$' + (item.price * item.qty).toFixed(2) + '</td>';
+                        html += '<td><button class="btn-sm danger" onclick="removeCartItem(\'' + cartUserId + '\',\'' + esc(cartFolder) + '\',\'' + esc(item.partNumber) + '\')">Remove</button></td>';
+                        html += '</tr>';
+                    });
+                    html += '</tbody></table></div>';
+                    html += '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:16px 0;border-top:1px solid var(--border2);margin-top:8px;">';
+                    html += '<span style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Cart total</span>';
+                    html += '<span style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;">$' + total.toFixed(2) + '</span></div>';
+                    html += '<button class="btn-danger" onclick="clearCartFolder()">Clear cart</button>';
                 }
             }
+        } else {
+            html += '<div class="empty" style="height:140px;"><p>No folders for this location.</p></div>';
         }
     }
-    return parts;
+    content.innerHTML = html;
 }
 
-function openInvBrowser() {
-    document.getElementById('inv-browser-search').value = '';
-    renderInvBrowserList('');
-    document.getElementById('inv-browser-backdrop').classList.add('open');
-    document.body.style.overflow = 'hidden';
-    setTimeout(() => document.getElementById('inv-browser-search').focus(), 80);
+function cartSelectUser(uid) { cartUserId = uid; cartFolder = null; renderCartPanel(); }
+function cartSelectFolder(f) { cartFolder = f; renderCartPanel(); }
+function removeCartItem(uid, folder, partNum) {
+    Admin.removeCartItem(uid, folder, partNum);
+    renderCartPanel();
+    toast('Item removed from cart.');
+}
+function clearCartFolder() {
+    if (!cartUserId || !cartFolder) return;
+    Admin.clearCart(cartUserId, cartFolder);
+    renderCartPanel();
+    toast('Cart cleared.');
 }
 
-function closeInvBrowser() {
-    document.getElementById('inv-browser-backdrop').classList.remove('open');
-    document.body.style.overflow = '';
-}
-
-function renderInvBrowserList(query) {
-    const q      = (query || '').trim().toLowerCase();
-    const all    = _getAllInventoryParts();
-    const shown  = q
-        ? all.filter(p =>
-            (p.partName   || '').toLowerCase().includes(q) ||
-            (p.partNumber || '').toLowerCase().includes(q) ||
-            (p.description|| '').toLowerCase().includes(q) ||
-            (p.make       || '').toLowerCase().includes(q) ||
-            (p.model      || '').toLowerCase().includes(q))
-        : all;
-
-    const body = document.getElementById('inv-browser-body');
-    body.innerHTML = '';
-
-    if (all.length === 0) {
-        body.innerHTML = '<div style="padding:32px;text-align:center;font-size:13px;color:var(--muted);">No parts in the global inventory yet. Add parts using the Folders &amp; Parts panel.</div>';
-        return;
-    }
-    if (shown.length === 0) {
-        body.innerHTML = '<div style="padding:32px;text-align:center;font-size:13px;color:var(--muted);">No parts match your search.</div>';
-        return;
-    }
-
-    shown.forEach(p => {
-        const stockNum  = p.stock !== undefined ? p.stock : '—';
-        const stockClass = (p.stock !== undefined && p.stock <= 3) ? 'low' : 'ok';
-        const row = document.createElement('div');
-        row.className = 'inv-part-row';
-        row.innerHTML = `
-            ${p.imageUrl
-                ? `<img src="${p.imageUrl}" alt="">`
-                : `<div class="inv-part-thumb"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".35"><rect x="2" y="2" width="12" height="12" rx="2"/><circle cx="6" cy="6" r="1.5"/><path d="M14 10l-4-3-3 3-2-2L2 12"/></svg></div>`}
-            <div class="inv-part-info">
-                <div class="inv-part-row-name">${p.partName || p.description}</div>
-                <div class="inv-part-row-meta">${p.make} ${p.model} · ${p.year}</div>
-            </div>
-            <div class="inv-part-row-num">${p.partNumber}</div>
-            <div class="inv-part-row-price">$${Number(p.price).toFixed(2)}</div>
-            <div class="inv-part-row-stock ${stockClass}">Stock: ${stockNum}</div>`;
-        row.addEventListener('click', () => {
-            autofillFromInventory(p);
-            closeInvBrowser();
-        });
-        body.appendChild(row);
-    });
-}
-
-function autofillFromInventory(part) {
-    // Old form removed — add the part directly to the selected folder instead
-    addPartFromInventory(part);
-}
-
-function clearInvSelection() { /* no-op: old form removed */ }
-
-// Close browser modal on backdrop click
-document.getElementById('inv-browser-backdrop').addEventListener('click', function(e) {
-    if (e.target === this) closeInvBrowser();
-});
-
-// initMakeSelect, populateModelSelect, submitAddPart removed — superseded by
-// initGlobalInventoryForm / giPopulateModel / submitGlobalPart (global inventory tab)
-// and addPartFromInventory / renderFolderPartList (folder parts tab).
-
-function deletePart(userId, folderName, partNumber) {
-    confirm('Remove part?', `Remove part #${partNumber} from the "${folderName}" folder?`, () => {
-        Admin.deletePart(userId, folderName, partNumber);
-        refreshPartsTab();
-        if (activeUserId) renderUserDetail(activeUserId);
-        toast('Part removed.');
-    });
-}
-
-// ─── Cart panel (folder-scoped) ───────────────────────────────────────────────
-// State for cart panel: which user and which folder is selected
-let activeCartFolder = null;
-
-function renderCartPanel() {
-    const users   = Admin.getUsers();
-    const pillsEl = document.getElementById('cart-user-pills');
-    pillsEl.innerHTML = '';
-
-    users.forEach(u => {
-        const totalItems = Admin.getTotalCartCount(u.id);
-        const pill = document.createElement('button');
-        pill.className = 'folder-pill' + (activeCartUser === u.id ? ' active' : '');
-        pill.innerHTML = `${u.displayName} <span style="opacity:.6;font-size:10px;">(${totalItems} item${totalItems !== 1 ? 's' : ''})</span>`;
-        pill.onclick = () => {
-            activeCartUser   = u.id;
-            activeCartFolder = null;
-            document.querySelectorAll('#cart-user-pills .folder-pill').forEach(p => p.classList.remove('active'));
-            pill.classList.add('active');
-            renderCartFolderPicker(u.id);
-        };
-        pillsEl.appendChild(pill);
-    });
-
-    if (activeCartUser) renderCartFolderPicker(activeCartUser);
-    else document.getElementById('cart-content').innerHTML = `<div class="empty-state" style="height:200px;"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 6h4l1 4M12 14h24l-3 14H13L12 14z"/><circle cx="17" cy="34" r="2"/><circle cx="31" cy="34" r="2"/></svg><p>Select a customer above</p></div>`;
-}
-
-function renderCartFolderPicker(userId) {
-    const user    = Admin.getUserById(userId);
-    const folders = user ? user.serviceFolders : [];
-    const el      = document.getElementById('cart-content');
-
-    if (!user || folders.length === 0) {
-        el.innerHTML = `<div class="empty-state" style="height:140px;"><p style="font-size:13px;color:var(--muted);">This user has no service folders.</p></div>`;
-        return;
-    }
-
-    // Build folder picker pills then table below
-    let pickerHtml = `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">`;
-    folders.forEach(f => {
-        const count = Admin.getCart(userId, f.folderName).reduce((n,i) => n + i.qty, 0);
-        const isActive = activeCartFolder === f.folderName;
-        pickerHtml += `<button class="folder-pill${isActive ? ' active' : ''}"
-            onclick="selectCartFolder('${userId}', '${f.folderName}')" style="position:relative;">
-            ${f.folderName}
-            ${count > 0 ? `<span style="margin-left:4px;font-size:10px;opacity:.7;">(${count})</span>` : ''}
-        </button>`;
-    });
-    pickerHtml += `</div><div id="cart-table-area"></div>`;
-    el.innerHTML = pickerHtml;
-
-    if (activeCartFolder) renderCartTable(userId, activeCartFolder);
-    else {
-        document.getElementById('cart-table-area').innerHTML = `<div style="font-size:13px;color:var(--muted);padding:20px 0;">Select a folder above to view its cart.</div>`;
-    }
-}
-
-function selectCartFolder(userId, folderName) {
-    activeCartFolder = folderName;
-    renderCartFolderPicker(userId);
-}
-
-function renderCartTable(userId, folderName) {
-    const cart = Admin.getCart(userId, folderName);
-    const el   = document.getElementById('cart-table-area');
-    if (!el) return;
-
-    if (!cart || cart.length === 0) {
-        el.innerHTML = `<div class="empty-state" style="height:140px;">
-            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 6h4l1 4M12 14h24l-3 14H13L12 14z"/><circle cx="17" cy="34" r="2"/><circle cx="31" cy="34" r="2"/></svg>
-            <p>No items in the "${folderName}" cart</p>
-        </div>`;
-        return;
-    }
-
-    const total = cart.reduce((n, i) => n + i.price * i.qty, 0);
-    el.innerHTML = `
-        <div class="cart-table-wrap fade-in">
-            <table>
-                <thead><tr><th></th><th>Part #</th><th>Name</th><th>Price</th><th>Qty</th><th>Subtotal</th><th></th></tr></thead>
-                <tbody>${cart.map(item => `
-                    <tr>
-                        <td>${item.imageUrl ? `<img class="part-thumb" src="${item.imageUrl}" alt="">` : `<div class="part-thumb-placeholder"></div>`}</td>
-                        <td><span class="part-num-badge">${item.partNumber}</span></td>
-                        <td style="font-weight:500;">${item.partName || item.description}</td>
-                        <td class="price-cell" style="font-size:14px;">$${Number(item.price).toFixed(2)}</td>
-                        <td><span class="qty-badge">${item.qty}</span></td>
-                        <td class="price-cell" style="font-size:14px;">$${(item.price * item.qty).toFixed(2)}</td>
-                        <td><button class="icon-btn danger" onclick="removeCartItem('${userId}','${folderName}','${item.partNumber}')">
-                            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="11" height="11"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg>
-                        </button></td>
-                    </tr>`).join('')}
-                </tbody>
-            </table>
-            <div class="cart-summary">
-                <div>
-                    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:2px;">Folder total</div>
-                    <div class="cart-total">$${total.toFixed(2)}</div>
-                </div>
-                <button class="clear-cart-btn" onclick="clearCart('${userId}','${folderName}')">Clear this cart</button>
-            </div>
-        </div>`;
-}
-
-function removeCartItem(userId, folderName, partNumber) {
-    Admin.removeCartItem(userId, folderName, partNumber);
-    renderCartTable(userId, folderName);
-    renderCartFolderPicker(userId);
-    toast('Item removed.');
-}
-
-function clearCart(userId, folderName) {
-    confirm('Clear cart?', `Remove all items from the "${folderName}" cart?`, () => {
-        Admin.clearCart(userId, folderName);
-        activeCartFolder = folderName;
-        renderCartFolderPicker(userId);
-        renderCartTable(userId, folderName);
-        toast(`"${folderName}" cart cleared.`);
-    });
-}
-
-// ─── Global Inventory Panel ──────────────────────────────────────────────────
+// ─── Global Inventory ────────────────────────────────────────────────────────
 function renderInventoryPanel() {
-    // Always re-read from the live DB object so newly added parts are included
-    const total = Inventory.totalParts();
-    document.getElementById('inv-total-count').textContent = total + ' part' + (total !== 1 ? 's' : '') + ' total';
+    var content = document.getElementById('inventory-content');
+    var entries = Inventory.getAll();
+    if (entries.length === 0) {
+        content.innerHTML = '<div class="empty"><p>No inventory yet. Use the + Add Part button to get started.</p></div>';
+        return;
+    }
+    var html = '';
+    entries.forEach(function(entry) {
+        html += '<div style="margin-bottom:28px;">';
+        html += '<div style="font-size:14px;font-weight:500;margin-bottom:12px;color:var(--text);">';
+        html += esc(entry.make) + ' ' + esc(entry.model) + ' &mdash; ' + esc(entry.year);
+        html += '</div>';
+        html += '<div class="table-wrap"><table class="data-tbl"><thead><tr>';
+        html += '<th>Part #</th><th>Name</th><th>Description</th><th>Price</th><th>Stock</th>';
+        html += '</tr></thead><tbody>';
+        entry.parts.forEach(function(p) {
+            var stockColor = (p.stock || 0) < 3 ? 'color:var(--danger)' : '';
+            html += '<tr>';
+            html += '<td><span class="part-badge">' + esc(p.partNumber) + '</span></td>';
+            html += '<td>' + esc(p.partName || '') + '</td>';
+            html += '<td style="font-size:11px;color:var(--muted);">' + esc(p.description || '') + '</td>';
+            html += '<td class="price-cell">$' + Number(p.price).toFixed(2) + '</td>';
+            html += '<td style="font-weight:500;' + stockColor + '">' + (p.stock !== undefined ? p.stock : '—') + '</td>';
+            html += '</tr>';
+        });
+        html += '</tbody></table></div></div>';
+    });
+    content.innerHTML = html;
+}
 
-    // Preserve current selections before rebuilding options
-    const makeFilter  = document.getElementById('inv-filter-make');
-    const modelFilter = document.getElementById('inv-filter-model');
-    const savedMake   = makeFilter.value;
-    const savedModel  = modelFilter.value;
-
-    // Rebuild make options
-    makeFilter.innerHTML = '<option value="">All makes</option>';
-    Inventory.getMakes().forEach(m => {
-        const opt = document.createElement('option');
+function giPopulateModels() {
+    var make = document.getElementById('gi-make').value;
+    var sel  = document.getElementById('gi-model');
+    sel.innerHTML = '<option value="">-- Model --</option>';
+    var models = make && DB.vehicles[make] ? DB.vehicles[make].models : [];
+    models.forEach(function(m) {
+        var opt = document.createElement('option');
         opt.value = m; opt.textContent = m;
-        makeFilter.appendChild(opt);
+        sel.appendChild(opt);
     });
-    // Restore selection explicitly (setting .value after innerHTML rebuild is reliable)
-    makeFilter.value = savedMake;
-
-    // Rebuild model options based on the restored make selection
-    _rebuildModelFilter(makeFilter.value, savedModel);
-
-    // Now render the filtered content
-    _renderInventoryContent();
 }
 
-// Called by the Make filter onchange — cascades to rebuild model options then re-render
-function filterInventory() {
-    const make = document.getElementById('inv-filter-make').value;
-    _rebuildModelFilter(make, '');
-    _renderInventoryContent();
-}
+// ─── Multi-image manager for Global Inventory modal ──────────────────────────
+var giImages = [];
 
-// Called by the Model filter onchange — just re-render content
-function filterInventoryModel() {
-    _renderInventoryContent();
-}
-
-function _rebuildModelFilter(make, restoreModel) {
-    const modelFilter = document.getElementById('inv-filter-model');
-    modelFilter.innerHTML = '<option value="">All models</option>';
-    if (make) {
-        Inventory.getModels(make).forEach(m => {
-            const opt = document.createElement('option');
-            opt.value = m; opt.textContent = m;
-            modelFilter.appendChild(opt);
-        });
-    }
-    if (restoreModel) modelFilter.value = restoreModel;
-}
-
-function _renderInventoryContent() {
-    const makeFilter  = document.getElementById('inv-filter-make').value;
-    const modelFilter = document.getElementById('inv-filter-model').value;
-
-    // Read fresh from DB every time — critical so added parts appear immediately
-    const all      = Inventory.getAll();
-    const filtered = all.filter(entry =>
-        (!makeFilter  || entry.make  === makeFilter) &&
-        (!modelFilter || entry.model === modelFilter)
-    );
-
-    const container = document.getElementById('inv-content');
-    container.innerHTML = '';
-
-    if (all.length === 0) {
-        container.innerHTML = '<div class="empty-state" style="height:200px;"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="8" y="8" width="32" height="32" rx="4"/><line x1="24" y1="18" x2="24" y2="30"/><line x1="18" y1="24" x2="30" y2="24"/></svg><p>No parts in the inventory yet. Add a part using the Folders &amp; Parts panel.</p></div>';
+function giRenderImageWrap() {
+    var wrap = document.getElementById('gi-images-wrap');
+    if (!wrap) return;
+    if (giImages.length === 0) {
+        wrap.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:6px 0;">No images yet — upload files or paste URLs below.</div>';
         return;
     }
-
-    if (filtered.length === 0) {
-        container.innerHTML = '<div class="empty-state" style="height:160px;"><p style="font-size:13px;color:var(--muted);">No parts match the selected filters.</p></div>';
-        return;
-    }
-
-    // Group by Make for display
-    const byMake = {};
-    filtered.forEach(entry => {
-        if (!byMake[entry.make]) byMake[entry.make] = [];
-        byMake[entry.make].push(entry);
+    var html = '<div style="display:flex;gap:8px;flex-wrap:wrap;padding:2px 0;">';
+    giImages.forEach(function(url, idx) {
+        var isPrimary = idx === 0;
+        html += '<div style="position:relative;flex-shrink:0;">' +
+            '<img src="' + url + '" style="width:60px;height:60px;object-fit:cover;border-radius:7px;border:' +
+            (isPrimary ? '2px solid var(--accent)' : '1px solid var(--border2)') +
+            ';display:block;" onerror="this.style.opacity=\'0.3\'">' +
+            (isPrimary ? '<div style="position:absolute;bottom:0;left:0;right:0;text-align:center;font-size:7px;font-weight:700;background:var(--accent);color:#fff;padding:1px 0;border-radius:0 0 5px 5px;letter-spacing:.04em;">PRIMARY</div>' : '') +
+            '<button type="button" onclick="giRemoveImage(' + idx + ')" title="Remove" ' +
+            'style="position:absolute;top:-5px;right:-5px;width:16px;height:16px;background:var(--danger);' +
+            'color:#fff;border:none;border-radius:50%;font-size:10px;cursor:pointer;line-height:16px;text-align:center;padding:0;">✕</button>' +
+            '</div>';
     });
-
-    Object.keys(byMake).sort().forEach(make => {
-        const makeSection = document.createElement('div');
-        makeSection.style.cssText = 'margin-bottom:28px;';
-        makeSection.innerHTML = `<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;color:var(--text);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border2);">${make}</div>`;
-
-        byMake[make].forEach(entry => {
-            const group = document.createElement('div');
-            group.style.cssText = 'margin-bottom:16px;';
-            group.innerHTML = `
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                    <span style="font-size:13px;font-weight:500;color:var(--text);">${entry.model}</span>
-                    <span style="font-size:11px;color:var(--accent);background:rgba(232,255,71,.08);border:1px solid rgba(232,255,71,.18);padding:2px 8px;border-radius:99px;">${entry.year}</span>
-                    <span style="font-size:11px;color:var(--muted);">${entry.parts.length} part${entry.parts.length !== 1 ? 's' : ''}</span>
-                </div>`;
-
-            const table = document.createElement('div');
-            table.className = 'parts-table-wrap';
-            table.style.marginBottom = '0';
-            table.innerHTML = `<table>
-                <thead><tr><th></th><th>Part #</th><th>Description</th><th>Qty</th></tr></thead>
-                <tbody>${entry.parts.map(p => `
-                    <tr>
-                        <td>${p.imageUrl ? `<img class="part-thumb" src="${p.imageUrl}" alt="">` : `<div class="part-thumb-placeholder"></div>`}</td>
-                        <td><span class="part-num-badge">${p.partNumber}</span></td>
-                        <td style="color:var(--muted);max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.description || '—'}</td>
-                        <td style="font-weight:500;color:var(--text);">${p.stock ?? 0}</td>
-                    </tr>`).join('')}
-                </tbody>
-            </table>`;
-            group.appendChild(table);
-            makeSection.appendChild(group);
-        });
-
-        container.appendChild(makeSection);
-    });
+    html += '</div>';
+    wrap.innerHTML = html;
 }
 
-// ─── Packing List Panel ───────────────────────────────────────────────────────
-function renderPackingListPanel() {
-    const users     = Admin.getUsers();
-    const allOrders = [];
-
-    users.forEach(u => {
-        (u.orderHistory || []).forEach(order => {
-            allOrders.push({
-                ...order,
-                userDisplayName: u.displayName,
-                userEmail:       u.email || '',
-                userId:          u.id
-            });
+function giFileUpload(input) {
+    var files = Array.from(input.files);
+    if (!files.length) return;
+    var readers = files.map(function(file) {
+        return new Promise(function(resolve) {
+            var reader = new FileReader();
+            reader.onload = function(e) { resolve(e.target.result); };
+            reader.readAsDataURL(file);
         });
     });
-
-    // Sort by deliveryDate ascending (soonest first); orders without a date go last
-    allOrders.sort((a, b) =>
-        (a.deliveryDate || '9999-99-99').localeCompare(b.deliveryDate || '9999-99-99')
-    );
-
-    const countEl = document.getElementById('pl-count');
-    if (countEl) countEl.textContent = allOrders.length + ' order' + (allOrders.length !== 1 ? 's' : '');
-
-    const content = document.getElementById('pl-content');
-    if (!content) return;
-
-    if (allOrders.length === 0) {
-        content.innerHTML = `<div class="empty-state" style="height:240px;">
-            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="8" y="8" width="32" height="32" rx="3"/><line x1="16" y1="18" x2="32" y2="18"/><line x1="16" y1="24" x2="32" y2="24"/><line x1="16" y1="30" x2="24" y2="30"/></svg>
-            <p>No orders yet. Orders will appear here once customers check out.</p>
-        </div>`;
-        return;
-    }
-
-    let rowsHtml = '';
-    allOrders.forEach(order => {
-        const isReady = order.packingStatus === 'Ready for Pickup';
-        const badgeClass = isReady ? 'pl-badge pl-badge-ready' : 'pl-badge pl-badge-prepare';
-        const badgeLabel = isReady ? 'Ready for Pickup' : 'Prepare for Pickup';
-        const fmtDate = order.deliveryDate
-            ? new Date(order.deliveryDate + 'T12:00:00').toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' })
-            : '—';
-        const markBtn = !isReady
-            ? `<button class="pl-mark-ready-btn" onclick="event.stopPropagation(); togglePackingStatus('${order.userId}','${order.orderId}')">Mark Ready</button>`
-            : `<span style="font-size:11px;color:var(--muted);">✓ Notified</span>`;
-
-        rowsHtml += `
-            <tr>
-                <td style="text-align:left;"><span class="part-num-badge" style="font-size:10px;">${order.orderId}</span></td>
-                <td style="font-weight:500;">${order.userDisplayName}</td>
-                <td style="color:var(--muted);">${order.folderName}<br><span style="font-size:10px;opacity:.6;">#${order.customerNumber || ''}</span></td>
-                <td style="font-size:12px;color:var(--accent);font-weight:500;">${fmtDate}</td>
-                <td style="font-weight:500;font-family:'Bebas Neue',sans-serif;font-size:16px;">$${Number(order.total).toFixed(2)}</td>
-                <td><span class="${badgeClass}">${badgeLabel}</span></td>
-                <td>${markBtn}</td>
-            </tr>`;
+    Promise.all(readers).then(function(results) {
+        giImages = giImages.concat(results);
+        giRenderImageWrap();
+        document.getElementById('gi-file-label').textContent =
+            giImages.length + ' image' + (giImages.length !== 1 ? 's' : '') + ' ready';
     });
-
-    content.innerHTML = `
-        <div class="data-table-wrap">
-            <table class="data-table" style="min-width:700px;">
-                <thead><tr>
-                    <th style="text-align:left;width:16%;">Order ID</th>
-                    <th style="width:14%;">Location</th>
-                    <th style="width:16%;">Folder / #</th>
-                    <th style="width:15%;">Pickup Date</th>
-                    <th style="width:10%;">Total</th>
-                    <th style="width:16%;">Status</th>
-                    <th style="width:13%;">Action</th>
-                </tr></thead>
-                <tbody>${rowsHtml}</tbody>
-            </table>
-        </div>`;
+    input.value = '';
 }
 
-function togglePackingStatus(userId, orderId) {
+function giAddUrl() {
+    var inp = document.getElementById('gi-imgurl-new');
+    var url = inp.value.trim();
+    if (!url) return;
+    giImages.push(url);
+    giRenderImageWrap();
+    inp.value = '';
+}
+
+function giRemoveImage(idx) {
+    giImages.splice(idx, 1);
+    giRenderImageWrap();
+    document.getElementById('gi-file-label').textContent =
+        giImages.length > 0 ? giImages.length + ' image' + (giImages.length !== 1 ? 's' : '') + ' ready' : 'Upload images';
+}
+
+function openGIModal() {
+    ['gi-num','gi-partname','gi-desc','gi-price','gi-year'].forEach(function(id) {
+        var el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.getElementById('gi-qty').value = '1';
+    document.getElementById('gi-make').value = '';
+    document.getElementById('gi-model').innerHTML = '<option value="">-- Model --</option>';
+    var urlNew = document.getElementById('gi-imgurl-new'); if (urlNew) urlNew.value = '';
+    document.getElementById('gi-err').style.display = 'none';
+    document.getElementById('gi-file-label').textContent = 'Upload images';
+    var fi = document.getElementById('gi-file'); if (fi) fi.value = '';
+    giImages = [];
+    giRenderImageWrap();
+    openModal('modal-gi');
+}
+
+function submitGIPart() {
+    var num   = document.getElementById('gi-num').value.trim();
+    var make  = document.getElementById('gi-make').value;
+    var model = document.getElementById('gi-model').value;
+    var year  = document.getElementById('gi-year').value.trim();
+    var pname = document.getElementById('gi-partname').value.trim();
+    var desc  = document.getElementById('gi-desc').value.trim();
+    var price = parseFloat(document.getElementById('gi-price').value) || 0;
+    var qty   = parseInt(document.getElementById('gi-qty').value) || 1;
+    var err   = document.getElementById('gi-err');
+    if (!num || !make || !model) { err.textContent = 'Part #, Make, and Model are required.'; err.style.display = 'block'; return; }
+    var res = Admin.addGlobalPart({
+        partNumber:  num,
+        make:        make,
+        model:       model,
+        year:        year || String(new Date().getFullYear()),
+        partName:    pname,
+        description: desc,
+        imageUrl:    giImages.length > 0 ? giImages[0] : '',
+        images:      giImages.slice(),
+        price:       price,
+        quantity:    qty
+    });
+    if (!res.ok) { err.textContent = res.error; err.style.display = 'block'; return; }
+    closeModal('modal-gi');
+    toast(res.upserted ? 'Stock updated.' : 'Part added to inventory.');
+    renderInventoryPanel();
+}
+
+// ─── Packing List ─────────────────────────────────────────────────────────────
+function renderPackingPanel() {
+    var content = document.getElementById('packing-content');
+    var users   = Admin.getUsers();
+    var orders  = [];
+    users.forEach(function(u) {
+        (u.orderHistory || []).forEach(function(o) {
+            orders.push({ orderId: o.orderId, folderName: o.folderName,
+                customerNumber: o.customerNumber, deliveryDate: o.deliveryDate,
+                total: o.total, packingStatus: o.packingStatus,
+                userId: u.id, displayName: u.displayName, email: u.email || '' });
+        });
+    });
+    orders.sort(function(a, b) {
+        return (a.deliveryDate || '9999').localeCompare(b.deliveryDate || '9999');
+    });
+    if (orders.length === 0) {
+        content.innerHTML = '<div class="empty"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="8" y="8" width="32" height="32" rx="3"/><line x1="16" y1="18" x2="32" y2="18"/><line x1="16" y1="24" x2="32" y2="24"/><line x1="16" y1="30" x2="24" y2="30"/></svg><p>No orders yet.</p></div>';
+        return;
+    }
+    var html = '<div class="table-wrap"><table class="data-tbl"><thead><tr>';
+    html += '<th>Order ID</th><th>Location</th><th>Folder / #</th><th>Pickup Date</th><th>Total</th><th>Status</th><th>Action</th>';
+    html += '</tr></thead><tbody>';
+    orders.forEach(function(o) {
+        var isReady  = o.packingStatus === 'Ready for Pickup';
+        var badge    = isReady ? '<span class="badge badge-ready">Ready for Pickup</span>' : '<span class="badge badge-prepare">Prepare for Pickup</span>';
+        var fmtDate  = o.deliveryDate ? new Date(o.deliveryDate + 'T12:00:00').toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' }) : '—';
+        var action   = isReady
+            ? '<span style="font-size:11px;color:var(--muted);">&#10003; Notified</span>'
+            : '<button class="btn-sm accent" onclick="markReady(\'' + o.userId + '\',\'' + esc(o.orderId) + '\')">Mark Ready</button>';
+        html += '<tr>';
+        html += '<td><span class="part-badge">' + esc(o.orderId) + '</span></td>';
+        html += '<td style="font-weight:500;">' + esc(o.displayName) + '</td>';
+        html += '<td style="color:var(--muted);">' + esc(o.folderName) + '<br><span style="font-size:10px;opacity:.6;">#' + esc(o.customerNumber || '') + '</span></td>';
+        html += '<td style="font-size:12px;color:var(--muted);">' + fmtDate + '</td>';
+        html += '<td class="price-cell">$' + Number(o.total).toFixed(2) + '</td>';
+        html += '<td>' + badge + '</td>';
+        html += '<td>' + action + '</td>';
+        html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+    content.innerHTML = html;
+}
+
+function markReady(userId, orderId) {
     Admin.updateOrderPackingStatus(userId, orderId, 'Ready for Pickup');
-    const user  = Admin.getUserById(userId);
-    const email = (user && user.email && user.email.trim()) ? user.email.trim() : 'the registered email address';
-    toast(`Notification email dispatched to ${email}: Order is ready for pickup.`);
-    renderPackingListPanel();
+    toast('Order marked ready for pickup.');
+    renderPackingPanel();
 }
 
-// ─── User email save ──────────────────────────────────────────────────────────
-function saveUserEmail(userId) {
-    const input = document.getElementById('user-email-input-' + userId);
-    if (!input) return;
-    const email = input.value.trim();
-    Admin.setUserEmail(userId, email);
-    toast(email ? `Email saved: ${email}` : 'Email cleared.');
-}
-
-// ─── Transactions Panel ───────────────────────────────────────────────────────
+// ─── Transactions ─────────────────────────────────────────────────────────────
 function renderTransactionsPanel() {
-    const txns = (DB.transactions || []);
-    document.getElementById('tx-count').textContent = txns.length + ' transaction' + (txns.length !== 1 ? 's' : '');
-
-    const totalRevenue = txns.reduce((n, t) => n + t.total, 0);
-    const uniqueUsers  = new Set(txns.map(t => t.userId)).size;
-    document.getElementById('tx-stats').innerHTML = `
-        <div class="stat-card"><span class="stat-num">$${totalRevenue.toFixed(2)}</span><span class="stat-label">Total revenue</span></div>
-        <div class="stat-card"><span class="stat-num">${txns.length}</span><span class="stat-label">Orders placed</span></div>
-        <div class="stat-card"><span class="stat-num">${uniqueUsers}</span><span class="stat-label">Customers</span></div>`;
-
-    const content = document.getElementById('tx-content');
+    var content = document.getElementById('tx-content');
+    var txns    = DB.transactions || [];
     if (txns.length === 0) {
-        content.innerHTML = '<div class="empty-state" style="height:200px;"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 10h34M7 20h20M7 30h14"/></svg><p>No transactions yet.</p></div>';
+        content.innerHTML = '<div class="empty"><p>No transactions yet.</p></div>';
         return;
     }
-
-    // Build rows with paired expand rows
-    let rowsHtml = '';
-    txns.forEach((t, i) => {
-        const safeId = t.orderId.replace(/[^a-zA-Z0-9]/g, '_');
-        rowsHtml += `
-            <tr class="tx-row-clickable" onclick="toggleTxExpand('${safeId}', this)">
-                <td style="text-align:left;color:var(--muted);font-size:11px;">${i + 1}</td>
-                <td style="text-align:left;">
-                    <span class="part-num-badge" style="font-size:10px;">${t.orderId}</span>
-                    <span class="tx-chevron" id="chev-${safeId}" style="margin-left:6px;color:var(--muted);font-size:10px;">▾</span>
-                </td>
-                <td style="font-weight:500;">${t.displayName}</td>
-                <td style="color:var(--muted);">${t.folderName}&nbsp;<span style="font-size:10px;opacity:.6;">#${t.customerNumber || ''}</span></td>
-                <td style="color:var(--muted);font-size:12px;">${t.date}</td>
-                <td style="color:var(--muted);font-size:12px;">${t.deliveryDate || '—'}</td>
-                <td>${t.itemCount || '—'}</td>
-                <td class="price-cell">$${Number(t.total).toFixed(2)}</td>
-                <td><span style="font-size:10px;font-weight:500;padding:2px 8px;border-radius:99px;background:rgba(71,255,178,.1);color:#47ffb2;border:1px solid rgba(71,255,178,.25);">${t.status}</span></td>
-            </tr>
-            <tr class="tx-expand-row" id="tx-expand-${safeId}" style="display:none;">
-                <td colspan="9">
-                    <div class="tx-expand-inner">
-                        ${(t.items && t.items.length > 0) ? `
-                        <table class="tx-expand-table" style="margin-bottom:12px;">
-                            <thead><tr><th>Part #</th><th>Part Name</th><th>Qty</th><th>Unit Price</th><th>Subtotal</th></tr></thead>
-                            <tbody>${t.items.map(it => `
-                                <tr>
-                                    <td><span class="part-num-badge" style="font-size:10px;">${it.partNumber}</span></td>
-                                    <td style="font-weight:500;">${it.partName || it.description || '—'}</td>
-                                    <td>${it.qty}</td>
-                                    <td>$${Number(it.price).toFixed(2)}</td>
-                                    <td>$${(it.price * it.qty).toFixed(2)}</td>
-                                </tr>`).join('')}
-                            </tbody>
-                        </table>` : '<p style="font-size:12px;color:var(--muted);margin-bottom:12px;">No line-item detail available for this transaction.</p>'}
-                        <button onclick="event.stopPropagation(); downloadSellerInvoice('${t.orderId}')"
-                            style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(232,255,71,.08);border:1px solid rgba(232,255,71,.25);border-radius:7px;color:var(--accent);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:background .15s;"
-                            onmouseover="this.style.background='rgba(232,255,71,.16)'"
-                            onmouseout="this.style.background='rgba(232,255,71,.08)'">
-                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 9v1a1 1 0 001 1h6a1 1 0 001-1V9M6 1v6M4 5l2 2 2-2"/></svg>
-                            ↓ Seller Invoice
-                        </button>
-                    </div>
-                </td>
-            </tr>`;
+    var totalRev = txns.reduce(function(n, t) { return n + t.total; }, 0);
+    var uniq     = new Set(txns.map(function(t) { return t.userId; })).size;
+    var stats = '<div class="stat-grid" style="margin-bottom:24px;">';
+    stats += statCard('$' + totalRev.toFixed(2), 'Total revenue', '');
+    stats += statCard(txns.length, 'Orders placed', '');
+    stats += statCard(uniq, 'Customers', '');
+    stats += '</div>';
+    var html = '<div class="table-wrap"><table class="data-tbl"><thead><tr>';
+    html += '<th>#</th><th>Order ID</th><th>Location</th><th>Folder / #</th><th>Date</th><th>Pickup</th><th>Items</th><th>Total</th><th>Status</th>';
+    html += '</tr></thead><tbody>';
+    txns.forEach(function(t, i) {
+        var sid = t.orderId.replace(/[^a-zA-Z0-9]/g, '_');
+        html += '<tr class="tx-row" onclick="txToggle(\'' + sid + '\')">';
+        html += '<td style="color:var(--muted);font-size:11px;">' + (i + 1) + '</td>';
+        html += '<td><span class="part-badge">' + esc(t.orderId) + '</span><span class="chevron" id="chev-' + sid + '">&#9662;</span></td>';
+        html += '<td style="font-weight:500;">' + esc(t.displayName) + '</td>';
+        html += '<td style="color:var(--muted);">' + esc(t.folderName) + ' <span style="font-size:10px;opacity:.6;">#' + esc(t.customerNumber || '') + '</span></td>';
+        html += '<td style="font-size:11px;color:var(--muted);">' + esc(t.date) + '</td>';
+        html += '<td style="font-size:11px;color:var(--muted);">' + esc(t.deliveryDate || '—') + '</td>';
+        html += '<td>' + (t.itemCount || '—') + '</td>';
+        html += '<td class="price-cell">$' + Number(t.total).toFixed(2) + '</td>';
+        html += '<td><span class="badge badge-status">' + esc(t.status) + '</span></td>';
+        html += '</tr>';
+        html += '<tr class="tx-expand" id="tx-' + sid + '"><td colspan="9"><div class="tx-inner">';
+        if (t.items && t.items.length > 0) {
+            html += '<table class="data-tbl" style="margin-bottom:12px;font-size:12px;"><thead><tr>';
+            html += '<th>Part #</th><th>Name</th><th>Qty</th><th>Unit</th><th>Subtotal</th>';
+            html += '</tr></thead><tbody>';
+            t.items.forEach(function(it) {
+                html += '<tr>';
+                html += '<td><span class="part-badge" style="font-size:10px;">' + esc(it.partNumber) + '</span></td>';
+                html += '<td>' + esc(it.partName || it.description || '—') + '</td>';
+                html += '<td>' + it.qty + '</td>';
+                html += '<td>$' + Number(it.price).toFixed(2) + '</td>';
+                html += '<td>$' + (it.price * it.qty).toFixed(2) + '</td>';
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+        } else {
+            html += '<p style="font-size:12px;color:var(--muted);margin-bottom:10px;">No line-item detail available.</p>';
+        }
+        html += '<button class="btn-sm muted" onclick="event.stopPropagation();downloadInvoice(\'' + esc(t.orderId) + '\')">&#8595; Seller Invoice</button>';
+        html += '</div></td></tr>';
     });
-
-    content.innerHTML = `
-        <div class="data-table-wrap">
-            <table class="data-table">
-                <thead><tr>
-                    <th style="text-align:left;width:4%;">#</th>
-                    <th style="text-align:left;width:18%;">Order ID</th>
-                    <th style="width:13%;">Customer</th>
-                    <th style="width:13%;">Folder / #</th>
-                    <th style="width:10%;">Date</th>
-                    <th style="width:10%;">Pickup</th>
-                    <th style="width:7%;">Items</th>
-                    <th style="width:10%;">Total</th>
-                    <th style="width:10%;">Status</th>
-                </tr></thead>
-                <tbody>${rowsHtml}</tbody>
-            </table>
-        </div>`;
+    html += '</tbody></table></div>';
+    content.innerHTML = stats + html;
 }
 
-function toggleTxExpand(safeId, row) {
-    const expandRow = document.getElementById('tx-expand-' + safeId);
-    const chevron   = document.getElementById('chev-' + safeId);
-    if (!expandRow) return;
-    const isOpen = expandRow.style.display !== 'none';
-    expandRow.style.display = isOpen ? 'none' : 'table-row';
-    if (chevron) chevron.classList.toggle('open', !isOpen);
+function txToggle(sid) {
+    var row   = document.getElementById('tx-' + sid);
+    var chev  = document.getElementById('chev-' + sid);
+    if (!row) return;
+    var open  = row.style.display === 'table-row';
+    row.style.display = open ? 'none' : 'table-row';
+    if (chev) chev.classList.toggle('open', !open);
 }
 
-function downloadSellerInvoice(orderId) {
-    const tx = (DB.transactions || []).find(t => t.orderId === orderId);
+function downloadInvoice(orderId) {
+    var tx = (DB.transactions || []).find(function(t) { return t.orderId === orderId; });
     if (!tx) { toast('Transaction not found.', 'error'); return; }
-
-    const fmtDate = d => d ? new Date(d + 'T12:00:00').toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }) : '—';
-    const itemRows = (tx.items || []).map(it =>
-        `<tr><td>${it.partNumber}</td><td>${it.partName || it.description || ''}</td><td style="text-align:center;">${it.qty}</td><td style="text-align:right;">$${Number(it.price).toFixed(2)}</td><td style="text-align:right;">$${(it.price * it.qty).toFixed(2)}</td></tr>`
-    ).join('');
-
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Seller Invoice — ${tx.orderId}</title>
-    <style>
-        body{font-family:Arial,sans-serif;max-width:680px;margin:40px auto;color:#111;font-size:14px;}
-        h1{font-size:24px;margin-bottom:4px;}
-        .meta{color:#555;font-size:13px;margin-bottom:28px;}
-        table{width:100%;border-collapse:collapse;margin-bottom:20px;}
-        th{background:#f4f4f4;padding:9px 12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;border-bottom:2px solid #ddd;}
-        td{padding:9px 12px;border-bottom:1px solid #eee;}
-        .total-row td{font-weight:700;font-size:15px;border-top:2px solid #ddd;border-bottom:none;}
-        .footer{margin-top:32px;font-size:12px;color:#888;}
-    </style>
-    </head><body>
-    <h1>Seller Invoice</h1>
-    <div class="meta">
-        <strong>Order ID:</strong> ${tx.orderId}<br>
-        <strong>Customer:</strong> ${tx.displayName}<br>
-        <strong>Folder:</strong> ${tx.folderName} &nbsp; | &nbsp; <strong>Customer #:</strong> ${tx.customerNumber || '—'}<br>
-        <strong>Order Date:</strong> ${fmtDate(tx.date)}<br>
-        <strong>Pickup Date:</strong> ${fmtDate(tx.deliveryDate)}
-    </div>
-    <table>
-        <thead><tr><th>Part #</th><th>Description</th><th style="text-align:center;">Qty</th><th style="text-align:right;">Unit Price</th><th style="text-align:right;">Subtotal</th></tr></thead>
-        <tbody>
-            ${itemRows || '<tr><td colspan="5" style="color:#888;">No line-item detail available.</td></tr>'}
-            <tr class="total-row"><td colspan="4" style="text-align:right;">Order Total</td><td style="text-align:right;">$${Number(tx.total).toFixed(2)}</td></tr>
-        </tbody>
-    </table>
-    <div class="footer">Generated by PartFind &mdash; ACBW &mdash; ${new Date().toLocaleDateString()}</div>
-    </body></html>`;
-
-    const blob = new Blob([html], { type: 'text/html;charset=utf-8;' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href = url;
-    a.download = `invoice_${tx.orderId}.html`;
-    document.body.appendChild(a);
-    a.click();
+    var fmt = function(d) { return d ? new Date(d + 'T12:00:00').toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }) : '—'; };
+    var rows = (tx.items || []).map(function(it) {
+        return '<tr><td>' + esc(it.partNumber) + '</td><td>' + esc(it.partName || it.description || '') + '</td>' +
+               '<td style="text-align:center;">' + it.qty + '</td>' +
+               '<td style="text-align:right;">$' + Number(it.price).toFixed(2) + '</td>' +
+               '<td style="text-align:right;">$' + (it.price * it.qty).toFixed(2) + '</td></tr>';
+    }).join('');
+    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Seller Invoice</title>' +
+        '<style>body{font-family:Arial,sans-serif;max-width:680px;margin:40px auto;color:#111;font-size:14px;}' +
+        'h1{font-size:24px;margin-bottom:4px;}.meta{color:#555;font-size:13px;margin-bottom:28px;}' +
+        'table{width:100%;border-collapse:collapse;}th{background:#f4f4f4;padding:9px 12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;border-bottom:2px solid #ddd;}' +
+        'td{padding:9px 12px;border-bottom:1px solid #eee;}.tot td{font-weight:700;border-top:2px solid #ddd;border-bottom:none;}' +
+        '.foot{margin-top:32px;font-size:12px;color:#888;}</style></head><body>' +
+        '<h1>Seller Invoice</h1><div class="meta"><strong>Order:</strong> ' + esc(tx.orderId) + '<br>' +
+        '<strong>Location:</strong> ' + esc(tx.displayName) + '<br>' +
+        '<strong>Folder:</strong> ' + esc(tx.folderName) + ' &nbsp;|&nbsp; <strong>Customer #:</strong> ' + esc(tx.customerNumber || '—') + '<br>' +
+        '<strong>Order Date:</strong> ' + fmt(tx.date) + '<br>' +
+        '<strong>Pickup Date:</strong> ' + fmt(tx.deliveryDate) + '</div>' +
+        '<table><thead><tr><th>Part #</th><th>Description</th><th style="text-align:center;">Qty</th><th style="text-align:right;">Unit</th><th style="text-align:right;">Subtotal</th></tr></thead>' +
+        '<tbody>' + (rows || '<tr><td colspan="5" style="color:#888;">No detail available.</td></tr>') +
+        '<tr class="tot"><td colspan="4" style="text-align:right;">Order Total</td><td style="text-align:right;">$' + Number(tx.total).toFixed(2) + '</td></tr>' +
+        '</tbody></table><div class="foot">Generated by PartFind &mdash; ACBW &mdash; ' + new Date().toLocaleDateString() + '</div>' +
+        '</body></html>';
+    var blob = new Blob([html], { type: 'text/html;charset=utf-8;' });
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href = url; a.download = 'invoice_' + orderId + '.html';
+    document.body.appendChild(a); a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     toast('Invoice downloaded.');
 }
 
-function downloadTransactionsCSV() {
-    const txns = DB.transactions || [];
-    if (txns.length === 0) { toast('No transactions to export.', 'error'); return; }
-
-    const escape = v => {
-        const s = String(v == null ? '' : v);
-        return s.includes(',') || s.includes('"') || s.includes('\n')
-            ? '"' + s.replace(/"/g, '""') + '"'
-            : s;
+function exportTxCSV() {
+    var txns = DB.transactions || [];
+    if (!txns.length) { toast('No transactions to export.', 'error'); return; }
+    var esc2 = function(v) {
+        var s = String(v == null ? '' : v);
+        return (s.includes(',') || s.includes('"') || s.includes('\n')) ? '"' + s.replace(/"/g,'""') + '"' : s;
     };
-
-    const headers = ['#', 'Order ID', 'Customer', 'User ID', 'Folder', 'Customer #', 'Date', 'Pickup Date', 'Items', 'Total', 'Status'];
-    const rows = txns.map((t, i) => [
-        i + 1, t.orderId, t.displayName, t.userId, t.folderName,
-        t.customerNumber || '', t.date, t.deliveryDate || '',
-        t.itemCount || 0, t.total.toFixed(2), t.status
-    ].map(escape).join(','));
-
-    const csv  = [headers.join(','), ...rows].join('\r\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href = url; a.download = 'transactions_export.csv';
+    var hdr = ['#','Order ID','Location','User ID','Folder','Customer #','Date','Pickup Date','Items','Total','Status'];
+    var rows = txns.map(function(t, i) {
+        return [i+1, t.orderId, t.displayName, t.userId, t.folderName,
+                t.customerNumber || '', t.date, t.deliveryDate || '',
+                t.itemCount || 0, t.total.toFixed(2), t.status].map(esc2).join(',');
+    });
+    var csv  = [hdr.join(',')].concat(rows).join('\r\n');
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href = url; a.download = 'transactions.csv';
     document.body.appendChild(a); a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     toast('CSV downloaded.');
 }
 
-// ─── Init ─────────────────────────────────────────────────────────────────────
-// ─── Return Requests Panel ───────────────────────────────────────────────────
-function updateBell() {
-    if (typeof Returns === 'undefined') return;
-    const count = Returns.pendingCount();
-    const dot   = document.getElementById('notif-dot');
-    if (dot) dot.classList.toggle('visible', count > 0);
+// ─── Returns ─────────────────────────────────────────────────────────────────
+function renderReturnsPanel() {
+    var content  = document.getElementById('returns-content');
+    var all      = Returns.getAll();
+    var pending  = all.filter(function(r) { return r.status === 'pending'; }).length;
+    var approved = all.filter(function(r) { return r.status === 'approved'; }).length;
+    var rejected = all.filter(function(r) { return r.status === 'rejected'; }).length;
+    var stats = '<div class="stat-grid" style="margin-bottom:24px;">';
+    stats += statCard(pending,  'Pending', '');
+    stats += statCard(approved, 'Approved', '');
+    stats += statCard(rejected, 'Rejected', '');
+    stats += '</div>';
+    if (all.length === 0) {
+        content.innerHTML = stats + '<div class="empty"><p>No return requests yet.</p></div>';
+        return;
+    }
+    var html = '<div class="table-wrap"><table class="data-tbl"><thead><tr>';
+    html += '<th>Req ID</th><th>Location</th><th>Order</th><th>Part</th><th>Reason</th><th>Qty</th><th>Date</th><th>Action</th>';
+    html += '</tr></thead><tbody>';
+    all.forEach(function(r) {
+        var action;
+        if (r.status === 'pending') {
+            action = '<button class="btn-sm accent" onclick="approveRet(\'' + esc(r.reqId) + '\')">Approve</button> ' +
+                     '<button class="btn-sm danger" onclick="rejectRet(\'' + esc(r.reqId) + '\')">Reject</button>';
+        } else {
+            action = '<span class="badge badge-' + r.status + '">' + r.status.charAt(0).toUpperCase() + r.status.slice(1) + '</span>';
+        }
+        html += '<tr>';
+        html += '<td><span class="part-badge" style="font-size:10px;">' + esc(r.reqId) + '</span></td>';
+        html += '<td>' + esc(r.displayName) + '</td>';
+        html += '<td style="font-size:11px;color:var(--muted);">' + esc(r.orderId.slice(0,14)) + '&hellip;</td>';
+        html += '<td><div style="font-size:12px;font-weight:500;">' + esc(r.partName) + '</div><div class="part-badge">' + esc(r.partNumber) + '</div></td>';
+        html += '<td style="font-size:11px;color:var(--muted);">' + esc(r.reason) + '</td>';
+        html += '<td>' + r.partQty + '</td>';
+        html += '<td style="font-size:11px;color:var(--muted);">' + esc(r.dateCreated) + '</td>';
+        html += '<td>' + action + '</td>';
+        html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+    content.innerHTML = stats + html;
 }
 
-function renderReturnsPanel() {
-    if (typeof Returns === 'undefined') return;
-    const filter  = document.getElementById('ret-filter')?.value || '';
-    const all     = Returns.getAll();
-
-    const filtered = all.filter(r => {
-        if (!filter) return true;
-        return r.status === filter;
-    });
-
-    let rows = '';
-    if (filtered.length === 0) {
-        rows = `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:40px 0;">No return requests found.</td></tr>`;
+function approveRet(reqId) {
+    var res = Returns.approve(reqId);
+    if (res.ok) {
+        toast(res.restocked ? 'Return approved — part restocked.' : 'Return approved.');
     } else {
-        filtered.forEach(r => {
-            let actionHtml = '';
-            if (r.status === 'pending') {
-                actionHtml = `
-                    <div style="display:flex;gap:6px;justify-content:center;">
-                        <button class="action-btn badge-user" style="padding:4px 8px;font-size:11px;" onclick="approveReturn('${r.reqId}')">Approve</button>
-                        <button class="action-btn" style="padding:4px 8px;font-size:11px;background:rgba(255,92,92,0.1);color:var(--danger);" onclick="rejectReturn('${r.reqId}')">Reject</button>
-                    </div>`;
-            } else {
-                const badgeClass = r.status === 'approved' ? 'badge-admin' : 'badge-danger';
-                actionHtml = `<span class="badge ${badgeClass}" style="text-transform:capitalize;">${r.status}</span>`;
-            }
-
-            rows += `<tr>
-                <td style="text-align:left;"><span class="part-num-badge" style="font-size:10px;">${r.reqId}</span></td>
-                <td>${r.displayName}</td>
-                <td style="font-size:11px;color:var(--muted);">${r.orderId.slice(0,14)}&hellip;</td>
-                <td>
-                    <div style="font-size:12px;font-weight:500;">${r.part.partName}</div>
-                    <div class="part-num-badge">${r.part.partNumber}</div>
-                </td>
-                <td style="font-size:12px;color:var(--muted);">${r.reason}</td>
-                <td>${r.part.partQty || 1}</td>
-                <td style="font-size:11px;color:var(--muted);">${r.dateCreated}</td>
-                <td>${actionHtml}</td>
-            </tr>`;
-        });
+        toast(res.error, 'error');
     }
-
-    const container = document.getElementById('returns-panel-content');
-    if (!container) return;
-
-    container.innerHTML = `
-        <div class="panel-header-row">
-            <div>
-                <h2 class="panel-title">Return Requests</h2>
-                <p class="panel-subtitle">Manage customer parts returns and global restocking updates</p>
-            </div>
-            <div style="display:flex;gap:10px;align-items:center;">
-                <select id="ret-filter" class="search-input" style="width:160px;margin:0;" onchange="renderReturnsPanel()">
-                    <option value="">All Statuses</option>
-                    <option value="pending" ${filter === 'pending' ? 'selected' : ''}>Pending</option>
-                    <option value="approved" ${filter === 'approved' ? 'selected' : ''}>Approved</option>
-                    <option value="rejected" ${filter === 'rejected' ? 'selected' : ''}>Rejected</option>
-                </select>
-            </div>
-        </div>
-        <div class="table-container">
-            <table class="inventory-table">
-                <thead><tr>
-                    <th style="width:8%;text-align:left;">Req ID</th>
-                    <th style="width:15%;">Location</th>
-                    <th style="width:15%;">Order ID</th>
-                    <th style="width:25%;">Part Details</th>
-                    <th style="width:15%;">Reason</th>
-                    <th style="width:5%;">Qty</th>
-                    <th style="width:10%;">Date Created</th>
-                    <th style="width:12%;text-align:center;">Actions</th>
-                </tr></thead>
-                <tbody>${rows}</tbody>
-            </table>
-        </div>`;
-
+    renderReturnsPanel();
     updateBell();
 }
 
-function approveReturn(reqId) {
-    const result = Returns.approve(reqId);
-    if (result.ok) {
-        renderReturnsPanel();
-        const msg = result.restocked
-            ? 'Return approved — part restocked in global inventory.'
-            : 'Return approved.';
-        toast(msg);
-    } else {
-        toast(result.error, 'error');
-    }
-}
-
-function rejectReturn(reqId) {
+function rejectRet(reqId) {
     Returns.reject(reqId);
-    renderReturnsPanel();
     toast('Return rejected.');
+    renderReturnsPanel();
+    updateBell();
 }
 
-// ─── Expose to Window Scope ──────────────────────────────────────────────────
-window.approveReturn = approveReturn;
-window.rejectReturn = rejectReturn;
-window.renderReturnsPanel = renderReturnsPanel;
+function updateBell() {
+    var dot = document.getElementById('notif-dot');
+    if (dot) dot.classList.toggle('visible', Returns.pendingCount() > 0);
+}
+
+// ─── Utility ──────────────────────────────────────────────────────────────────
+function esc(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
-initGlobalInventoryForm();
 renderUserList();
 updateBell();
 </script>

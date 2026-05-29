@@ -358,16 +358,29 @@ const Admin = {
     },
 
     // Parts
-    addPart(userId, folderName, part) {
+    addPart(userId, folderName, { partNumber, quantity }) {
         const user = this.getUserById(userId);
         if (!user) return { ok: false, error: 'User not found.' };
         const folder = user.serviceFolders.find(f => f.folderName === folderName);
         if (!folder) return { ok: false, error: 'Folder not found.' };
-        if (folder.parts.find(p => p.partNumber === part.partNumber)) return { ok: false, error: 'Part # already exists in this folder.' };
-        folder.parts.push(part);
-        if (part.make && part.model && part.year) {
-            Inventory.addPart(part.make, part.model, part.year, part);
+        if (folder.parts.find(p => p.partNumber === partNumber))
+            return { ok: false, error: 'Part already exists in this folder.' };
+
+        // Part must exist in global inventory — look it up there
+        const inv = DB.globalInventory || {};
+        let globalPart = null;
+        outer: for (const mk of Object.keys(inv)) {
+            for (const mo of Object.keys(inv[mk])) {
+                for (const yr of Object.keys(inv[mk][mo])) {
+                    const found = inv[mk][mo][yr].find(p => p.partNumber === partNumber);
+                    if (found) { globalPart = found; break outer; }
+                }
+            }
         }
+        if (!globalPart) return { ok: false, error: 'Part not found in global inventory.' };
+
+        const qty = Math.max(1, parseInt(quantity) || 1);
+        folder.parts.push({ ...globalPart, quantity: qty });
         saveDB();
         return { ok: true };
     },
@@ -445,13 +458,20 @@ const Admin = {
 
     // Add a part directly to the global inventory (not tied to a folder).
     // Smart upsert: if the partNumber already exists, increments stock instead.
-    addGlobalPart({ partNumber, make, model, year, partName, description, imageUrl, price, quantity }) {
+    // Accepts an optional `images` array (URLs/data-URLs). First entry = primary.
+    addGlobalPart({ partNumber, make, model, year, partName, description, imageUrl, images, price, quantity }) {
         if (!partNumber || !make || !model)
             return { ok: false, error: 'Part #, Make, and Model are required.' };
         const resolvedYear = year || String(new Date().getFullYear());
         const qty = Math.max(1, parseInt(quantity) || 1);
         if (!DB.globalInventory) DB.globalInventory = {};
         const inv = DB.globalInventory;
+
+        // Normalise the images array and keep imageUrl in sync with images[0]
+        const resolvedImages = (images && images.length > 0)
+            ? images.filter(Boolean)
+            : (imageUrl ? [imageUrl] : []);
+        const resolvedImageUrl = resolvedImages[0] || '';
 
         // Search all slots for an existing matching partNumber
         for (const mk of Object.keys(inv)) {
@@ -460,7 +480,12 @@ const Admin = {
                     const slot = inv[mk][mo][yr];
                     const idx  = slot.findIndex(p => p.partNumber === partNumber);
                     if (idx !== -1) {
+                        // Upsert: increment stock; update images only if new ones supplied
                         slot[idx].stock = (slot[idx].stock || 0) + qty;
+                        if (resolvedImages.length > 0) {
+                            slot[idx].images   = resolvedImages;
+                            slot[idx].imageUrl = resolvedImageUrl;
+                        }
                         saveDB();
                         return { ok: true, upserted: true };
                     }
@@ -471,9 +496,10 @@ const Admin = {
         // Not found — create a new entry
         const newPart = {
             partNumber,
-            partName:    partName || '',
+            partName:    partName    || '',
             description: description || '',
-            imageUrl:    imageUrl  || '',
+            imageUrl:    resolvedImageUrl,
+            images:      resolvedImages,
             price:       parseFloat(price) || 0,
             stock:       qty,
             make, model, year: resolvedYear
@@ -644,6 +670,26 @@ const Checkout = {
         });
 
         folder.cart = [];
+
+        // Post-order folder management: remove/decrement ordered parts from folder.parts
+        // (cart was captured at the top of this function before clearing)
+        const orderedMap = {};
+        for (const item of cart) { orderedMap[item.partNumber] = item.qty; }
+
+        folder.parts = (folder.parts || []).filter(p => {
+            const ordQty = orderedMap[p.partNumber];
+            if (ordQty === undefined) return true;       // not in this order — keep
+            const assignedQty = p.quantity || 1;
+            if (ordQty >= assignedQty) return false;     // fully consumed — remove
+            p.quantity = assignedQty - ordQty;           // partially consumed — decrement
+            return true;
+        });
+
+        // If every part in the folder was consumed, delete the folder entirely
+        if (folder.parts.length === 0) {
+            user.serviceFolders = user.serviceFolders.filter(f => f.folderName !== folderName);
+        }
+
         saveDB();
         return { ok: true, order };
     }

@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PartFind — Checkout</title>
+    <title>Autocraft OEM — Checkout</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg:      #0d0d0f;
-            --surface: #16161a;
-            --surf2:   #1e1e24;
-            --surf3:   #26262e;
+            --bg:      #111214;
+            --surface: #1A1B1F;
+            --surf2:   #22242A;
+            --surf3:   #2C2F38;
             --border:  rgba(255,255,255,0.07);
-            --border2: rgba(255,255,255,0.13);
-            --accent:  #e8ff47;
-            --accent2: #c8dc30;
-            --text:    #f0ede8;
-            --muted:   rgba(240,237,232,0.45);
+            --border2: rgba(255,255,255,0.14);
+            --accent:  #1B48D6;
+            --accent2: #1038BC;
+            --text:    #F5F5F7;
+            --muted:   rgba(245,245,247,0.45);
             --danger:  #ff5c5c;
             --success: #47ffb2;
         }
@@ -32,8 +32,7 @@
         /* ── Header ── */
         .checkout-header { width: 100%; max-width: 680px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 36px; position: relative; z-index: 1; }
         .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-        .logo-mark { width: 30px; height: 30px; background: var(--accent); color: #0d0d0f; font-family: 'Bebas Neue', sans-serif; font-size: 18px; display: flex; align-items: center; justify-content: center; border-radius: 6px; }
-        .logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: .05em; color: var(--text); }
+        .logo-img { width: 56px; height: 56px; object-fit: contain; filter: brightness(0) invert(1); flex-shrink: 0; }
         .back-link { font-size: 13px; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color .15s; }
         .back-link:hover { color: var(--text); }
         .back-link svg { width: 14px; height: 14px; }
@@ -42,7 +41,7 @@
         .steps { display: flex; align-items: center; gap: 0; margin-bottom: 40px; position: relative; z-index: 1; }
         .step { display: flex; align-items: center; gap: 8px; }
         .step-num { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: var(--muted); transition: all .2s; }
-        .step.active .step-num { background: var(--accent); border-color: var(--accent); color: #0d0d0f; }
+        .step.active .step-num { background: var(--accent); border-color: var(--accent); color: #ffffff; }
         .step.done .step-num { background: var(--surf2); border-color: var(--success); color: var(--success); }
         .step-label { font-size: 12px; color: var(--muted); transition: color .2s; }
         .step.active .step-label { color: var(--text); font-weight: 500; }
@@ -62,7 +61,7 @@
         .order-item-thumb { width: 44px; height: 44px; border-radius: 6px; object-fit: cover; background: var(--surf3); flex-shrink: 0; }
         .order-item-info { flex: 1; min-width: 0; }
         .order-item-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
-        .order-item-num  { font-size: 10px; color: var(--accent); letter-spacing: .08em; }
+        .order-item-num  { font-size: 10px; color: var(--muted); letter-spacing: .08em; }
         .order-item-right { text-align: right; flex-shrink: 0; }
         .order-item-price { font-family: 'Bebas Neue', sans-serif; font-size: 18px; }
         .order-item-qty   { font-size: 11px; color: var(--muted); }
@@ -84,24 +83,24 @@
         .cal-day.other-month { opacity: .2; }
         .cal-day.today { color: var(--text); font-weight: 500; }
         .cal-day.available {
-            background: rgba(232,255,71,.07);
-            border-color: rgba(232,255,71,.3);
-            color: var(--accent);
+            background: rgba(27,72,214,.1);
+            border-color: rgba(27,72,214,.4);
+            color: var(--text);
             font-weight: 500;
             cursor: pointer;
         }
-        .cal-day.available:hover { background: rgba(232,255,71,.15); border-color: rgba(232,255,71,.5); }
+        .cal-day.available:hover { background: rgba(27,72,214,.2); border-color: rgba(27,72,214,.65); }
         .cal-day.selected {
             background: var(--accent) !important;
             border-color: var(--accent) !important;
-            color: #0d0d0f !important;
+            color: #ffffff !important;
             font-weight: 700;
         }
         .cal-day.past { opacity: .3; }
         .cal-legend { display: flex; gap: 16px; margin-top: 12px; }
         .cal-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
         .cal-legend-dot { width: 10px; height: 10px; border-radius: 3px; }
-        .selected-date-display { margin-top: 16px; padding: 12px 16px; border-radius: 8px; font-size: 13px; background: rgba(232,255,71,.07); border: 1px solid rgba(232,255,71,.2); color: var(--accent); display: none; }
+        .selected-date-display { margin-top: 16px; padding: 12px 16px; border-radius: 8px; font-size: 13px; background: rgba(27,72,214,.1); border: 1px solid rgba(27,72,214,.35); color: var(--text); display: none; }
         .selected-date-display.visible { display: block; }
 
         /* ── Pickup notice ── */
@@ -122,7 +121,7 @@
         .btn-row { display: flex; gap: 10px; margin-top: 28px; }
         .btn-back { flex: 0; padding: 13px 20px; background: transparent; border: 1px solid var(--border2); border-radius: 10px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; transition: all .15s; white-space: nowrap; }
         .btn-back:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
-        .btn-next { flex: 1; padding: 14px; background: var(--accent); border: none; border-radius: 10px; color: #0d0d0f; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: background .15s, transform .1s; }
+        .btn-next { flex: 1; padding: 14px; background: var(--accent); border: none; border-radius: 10px; color: #ffffff; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: background .15s, transform .1s; }
         .btn-next:hover { background: var(--accent2); }
         .btn-next:active { transform: scale(.99); }
         .btn-next:disabled { opacity: .5; cursor: not-allowed; transform: none; }
@@ -143,7 +142,7 @@
         .success-actions { display: flex; gap: 10px; margin-top: 8px; width: 100%; }
         .btn-outline { flex: 1; padding: 12px; background: transparent; border: 1px solid var(--border2); border-radius: 10px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all .15s; text-decoration: none; text-align: center; }
         .btn-outline:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
-        .btn-solid { flex: 1; padding: 12px; background: var(--accent); border: none; border-radius: 10px; color: #0d0d0f; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: background .15s; text-decoration: none; text-align: center; }
+        .btn-solid { flex: 1; padding: 12px; background: var(--accent); border: none; border-radius: 10px; color: #ffffff; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: background .15s; text-decoration: none; text-align: center; }
         .btn-solid:hover { background: var(--accent2); }
 
         .error-banner { background: rgba(255,92,92,.08); border: 1px solid rgba(255,92,92,.25); border-radius: 8px; padding: 11px 16px; font-size: 13px; color: var(--danger); margin-bottom: 16px; display: none; }
@@ -159,8 +158,7 @@
 
 <div class="checkout-header">
     <a class="logo" href="recommended-parts.html">
-        <span class="logo-mark">P</span>
-        <span class="logo-text">PartFind</span>
+        <img src="autocraft-logo.png" class="logo-img" alt="Autocraft OEM">
     </a>
     <a class="back-link" href="recommended-parts.html" id="back-link">
         <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 2L4 7l5 5"/></svg>
@@ -227,7 +225,7 @@
             <div class="cal-grid" id="cal-grid"></div>
             <div class="cal-legend">
                 <div class="cal-legend-item">
-                    <div class="cal-legend-dot" style="background:rgba(232,255,71,.15);border:1px solid rgba(232,255,71,.35);"></div>
+                    <div class="cal-legend-dot" style="background:rgba(27,72,214,.15);border:1px solid rgba(27,72,214,.4);"></div>
                     Available
                 </div>
                 <div class="cal-legend-item">
@@ -296,7 +294,9 @@
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="db.js"></script>
+<script src="email.js"></script>
 <script>
 // ── Read URL params ───────────────────────────────────────────────────────────
 const params     = new URLSearchParams(location.search);
@@ -372,7 +372,7 @@ if (session && folderName) {
             const tr = document.createElement('tr');
             tr.innerHTML =
                 '<td>' + (item.partName || item.description) + '</td>' +
-                '<td style="text-align:right;font-size:10px;color:var(--accent);">' + item.partNumber + '</td>' +
+                '<td style="text-align:right;font-size:10px;color:var(--muted);">' + item.partNumber + '</td>' +
                 '<td style="text-align:right;">' + item.qty + '</td>' +
                 '<td style="text-align:right;">$' + item.price.toFixed(2) + '</td>' +
                 '<td style="text-align:right;font-weight:500;">$' + (item.price * item.qty).toFixed(2) + '</td>';
@@ -529,14 +529,31 @@ if (session && folderName) {
         const freshUser = Admin.getUserById(session.id);
         const userEmail = (freshUser && freshUser.email && freshUser.email.trim())
             ? freshUser.email.trim()
-            : 'the registered email address';
+            : null;
 
         document.getElementById('success-message').innerHTML =
             '<p>Order has been received and will be available for pickup at <strong>' + fmtPickup +
             '</strong> between the hours of <strong>8am and 6pm</strong>.</p>' +
-            '<p style="margin-top:8px;">A confirmation email has been sent to <strong>' + userEmail + '</strong>.</p>';
+            '<p style="margin-top:8px;">A confirmation email has been sent to <strong>' +
+            (userEmail || 'the registered email address') + '</strong>.</p>';
 
         document.getElementById('success-screen').style.display = 'flex';
+
+        // Send order confirmation email if EmailJS is configured and user has an email
+        if (userEmail && typeof Emailer !== 'undefined' && Emailer.isConfigured()) {
+            Emailer.sendOrderConfirmation({
+                toEmail:        userEmail,
+                toName:         session.displayName,
+                orderId:        result.order.orderId,
+                folderName:     folderName,
+                customerNumber: folder ? folder.customerNumber : '',
+                pickupDate:     selectedDate,
+                items:          cart,
+                total:          result.order.total
+            }).catch(function() {
+                console.warn('Order confirmation email failed.');
+            });
+        }
     }
 
     // ── Expose to global scope (called by inline onclick handlers) ────────────

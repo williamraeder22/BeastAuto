@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PartFind — My Parts</title>
+    <title>Autocraft OEM — My Parts</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg:       #0d0d0f;
-            --surface:  #16161a;
-            --surface2: #1e1e24;
-            --surface3: #26262e;
+            --bg:       #111214;
+            --surface:  #1A1B1F;
+            --surface2: #22242A;
+            --surface3: #2C2F38;
             --border:   rgba(255,255,255,0.07);
-            --border2:  rgba(255,255,255,0.13);
-            --accent:   #e8ff47;
-            --accent2:  #c8dc30;
-            --text:     #f0ede8;
-            --muted:    rgba(240,237,232,0.45);
+            --border2:  rgba(255,255,255,0.14);
+            --accent:   #1B48D6;
+            --accent2:  #1038BC;
+            --text:     #F5F5F7;
+            --muted:    rgba(245,245,247,0.45);
             --danger:   #ff5c5c;
         }
 
@@ -31,28 +31,30 @@
             background-size: 180px; }
 
         /* -- Sidebar -- */
-        .sidebar { width: 220px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 28px 20px; gap: 28px; position: sticky; top: 0; height: 100vh; z-index: 10; }
+        .sidebar { width: 220px; flex-shrink: 0; background: var(--bg); border-right: none; display: flex; flex-direction: column; padding: 28px 20px; gap: 28px; position: sticky; top: 0; height: 100vh; z-index: 10; position: relative; }
+        .sidebar::after { content: ''; position: absolute; right: -14px; top: 0; width: 14px; height: 100%;
+          background: linear-gradient(90deg, var(--accent) 0px 6px, var(--bg) 6px 8px, var(--accent) 8px 10px, var(--bg) 10px 12px, var(--accent) 12px 14px);
+          z-index: 11; pointer-events: none; }
         .logo { display: flex; align-items: center; gap: 10px; }
-        .logo-mark { width: 32px; height: 32px; background: var(--accent); color: #0d0d0f; font-family: 'Bebas Neue', sans-serif; font-size: 20px; display: flex; align-items: center; justify-content: center; border-radius: 7px; flex-shrink: 0; }
-        .logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: .05em; }
+        .logo-img { width: 40px; height: 40px; object-fit: contain; filter: brightness(0) invert(1); flex-shrink: 0; }
         .nav { display: flex; flex-direction: column; gap: 2px; }
-        .nav-label { font-size: 9px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding: 0 10px; margin-bottom: 4px; margin-top: 8px; }
-        .nav-item { font-size: 13px; color: var(--muted); text-decoration: none; padding: 9px 12px; border-radius: 8px; transition: background .15s, color .15s; display: flex; align-items: center; gap: 9px; cursor: pointer; border: none; background: none; width: 100%; text-align: left; }
+        .nav-label { font-size: 9px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: rgba(245,245,247,0.35); padding: 0 10px; margin-bottom: 4px; margin-top: 8px; }
+        .nav-item { font-size: 13px; color: rgba(245,245,247,0.5); text-decoration: none; padding: 9px 12px; border-radius: 8px; transition: background .15s, color .15s; display: flex; align-items: center; gap: 9px; cursor: pointer; border: none; background: none; width: 100%; text-align: left; }
         .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; }
-        .nav-item:hover { background: var(--surface2); color: var(--text); }
-        .nav-item.active { background: var(--surface2); color: var(--text); font-weight: 500; }
+        .nav-item:hover { background: rgba(27,72,214,.15); color: rgba(245,245,247,0.9); }
+        .nav-item.active { background: rgba(27,72,214,.25); color: rgba(245,245,247,0.95); font-weight: 500; }
 
         /* Global cart badge — total across all folders */
-        .global-cart-badge { margin-left: auto; background: var(--accent); color: #0d0d0f; font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 99px; display: flex; align-items: center; justify-content: center; padding: 0 4px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+        .global-cart-badge { margin-left: auto; background: var(--accent); color: #ffffff; font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 99px; display: flex; align-items: center; justify-content: center; padding: 0 4px; opacity: 0; transition: opacity .2s; pointer-events: none; }
         .global-cart-badge.visible { opacity: 1; }
 
-        .sidebar-footer { border-top: 1px solid var(--border); padding-top: 18px; margin-top: auto; }
-        .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; color: var(--accent); flex-shrink: 0; }
+        .sidebar-footer { border-top: 1px solid rgba(245,245,247,0.08); padding-top: 18px; margin-top: auto; }
+        .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); border: 1px solid rgba(27,72,214,.4); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; color: #ffffff; flex-shrink: 0; }
         .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
         .user-info-block { min-width: 0; }
-        .user-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .user-role-label { font-size: 11px; color: var(--muted); }
-        .logout-btn { font-size: 12px; color: var(--muted); background: none; border: none; cursor: pointer; padding: 0; transition: color .15s; }
+        .user-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: rgba(245,245,247,0.9); }
+        .user-role-label { font-size: 11px; color: rgba(245,245,247,0.4); }
+        .logout-btn { font-size: 12px; color: rgba(245,245,247,0.4); background: none; border: none; cursor: pointer; padding: 0; transition: color .15s; }
         .logout-btn:hover { color: var(--danger); }
 
         /* -- Main -- */
@@ -62,9 +64,9 @@
 
         /* -- Folder hero -- */
         .folder-hero { padding: 52px 56px 36px; border-bottom: 1px solid var(--border); }
-        .page-eyebrow { font-size: 10px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+        .page-eyebrow { font-size: 10px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
         .page-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(44px, 5.5vw, 72px); line-height: .93; margin-bottom: 10px; }
-        .page-title em { font-style: italic; font-family: 'DM Sans', sans-serif; font-weight: 300; font-size: .6em; color: var(--accent); vertical-align: middle; }
+        .page-title em { font-style: italic; font-family: 'DM Sans', sans-serif; font-weight: 300; font-size: .6em; color: var(--muted); vertical-align: middle; }
         .page-sub { font-size: 14px; font-weight: 300; color: var(--muted); max-width: 460px; line-height: 1.7; }
         .folder-section { padding: 36px 56px 60px; }
         .section-label { font-size: 11px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
@@ -76,7 +78,7 @@
         .folder-card:hover .folder-arrow { opacity: 1; transform: translate(0,0); }
         .folder-card-accent { height: 5px; background: var(--accent); width: 100%; }
         .folder-card-body { padding: 22px 22px 20px; }
-        .folder-icon { width: 42px; height: 42px; background: rgba(232,255,71,.08); border: 1px solid rgba(232,255,71,.18); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+        .folder-icon { width: 42px; height: 42px; background: rgba(27,72,214,.12); border: 1px solid rgba(27,72,214,.28); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
         .folder-icon svg { width: 20px; height: 20px; color: var(--accent); }
         .folder-card-name { font-size: 22px; font-weight: 500; letter-spacing: -.01em; margin-bottom: 4px; line-height: 1; }
         .folder-card-num { font-size: 11px; color: var(--muted); letter-spacing: .06em; font-weight: 400; margin-bottom: 16px; }
@@ -85,12 +87,12 @@
         .folder-parts-count strong { color: var(--text); font-weight: 500; }
 
         /* Per-folder cart pill — only shown when cart has items */
-        .folder-cart-pill { display: flex; align-items: center; gap: 5px; background: rgba(232,255,71,.1); border: 1px solid rgba(232,255,71,.25); border-radius: 99px; padding: 3px 10px 3px 6px; font-size: 11px; font-weight: 500; color: var(--accent); opacity: 0; transition: opacity .2s; pointer-events: none; }
+        .folder-cart-pill { display: flex; align-items: center; gap: 5px; background: rgba(27,72,214,.12); border: 1px solid rgba(27,72,214,.32); border-radius: 99px; padding: 3px 10px 3px 6px; font-size: 11px; font-weight: 500; color: var(--text); opacity: 0; transition: opacity .2s; pointer-events: none; }
         .folder-cart-pill.visible { opacity: 1; pointer-events: auto; cursor: pointer; }
         .folder-cart-pill svg { width: 11px; height: 11px; }
 
         .folder-arrow { width: 28px; height: 28px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transform: translate(-4px,4px); transition: opacity .2s, transform .2s; flex-shrink: 0; }
-        .folder-arrow svg { width: 12px; height: 12px; color: #0d0d0f; }
+        .folder-arrow svg { width: 12px; height: 12px; color: #ffffff; }
 
         /* -- Empty state -- */
         .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 40px; gap: 14px; color: var(--muted); text-align: center; }
@@ -109,9 +111,9 @@
         .parts-count-pill { font-size: 12px; color: var(--muted); background: var(--surface2); border: 1px solid var(--border2); padding: 4px 12px; border-radius: 99px; }
 
         /* Folder-specific cart button — hidden until this folder has items */
-        .folder-cart-btn { display: flex; align-items: center; gap: 7px; padding: 8px 14px; background: rgba(232,255,71,.08); border: 1px solid rgba(232,255,71,.25); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--accent); cursor: pointer; transition: background .15s; visibility: hidden; }
+        .folder-cart-btn { display: flex; align-items: center; gap: 7px; padding: 8px 14px; background: rgba(27,72,214,.1); border: 1px solid rgba(27,72,214,.3); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; transition: background .15s; visibility: hidden; }
         .folder-cart-btn.has-items { visibility: visible; }
-        .folder-cart-btn:hover { background: rgba(232,255,71,.15); }
+        .folder-cart-btn:hover { background: rgba(27,72,214,.2); }
         .folder-cart-btn svg { width: 14px; height: 14px; }
         .folder-cart-btn-count { font-family: 'Bebas Neue', sans-serif; font-size: 16px; line-height: 1; }
 
@@ -120,26 +122,26 @@
         .parts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .part-card { background: var(--surface); border: 1px solid var(--border2); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; animation: fadeUp .35s ease both; transition: border-color .2s, transform .2s; }
         .part-card:hover { border-color: rgba(255,255,255,.2); transform: translateY(-2px); }
-        .part-card.in-cart { border-color: rgba(232,255,71,.35); }
+        .part-card.in-cart { border-color: rgba(27,72,214,.5); }
         .part-img-wrap { position: relative; height: 180px; background: var(--surface2); overflow: hidden; }
         .part-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s ease; }
         .part-card:hover .part-img { transform: scale(1.03); }
         .part-img-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
         .part-img-placeholder svg { width: 36px; height: 36px; color: var(--muted); opacity: .4; }
-        .in-cart-ribbon { position: absolute; top: 12px; right: 12px; background: var(--accent); color: #0d0d0f; font-size: 10px; font-weight: 700; letter-spacing: .06em; padding: 3px 9px; border-radius: 99px; opacity: 0; transform: translateY(-4px); transition: opacity .2s, transform .2s; pointer-events: none; }
+        .in-cart-ribbon { position: absolute; top: 12px; right: 12px; background: var(--accent); color: #ffffff; font-size: 10px; font-weight: 700; letter-spacing: .06em; padding: 3px 9px; border-radius: 99px; opacity: 0; transform: translateY(-4px); transition: opacity .2s, transform .2s; pointer-events: none; }
         .part-card.in-cart .in-cart-ribbon { opacity: 1; transform: translateY(0); }
         .part-card-body { padding: 18px 20px 20px; display: flex; flex-direction: column; flex: 1; }
-        .part-number { font-size: 10px; letter-spacing: .12em; font-weight: 500; color: var(--accent); margin-bottom: 6px; text-transform: uppercase; }
+        .part-number { font-size: 10px; letter-spacing: .12em; font-weight: 500; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; }
         .part-name { font-size: 16px; font-weight: 500; margin-bottom: 4px; line-height: 1.3; }
         .part-desc { font-size: 13px; font-weight: 300; color: var(--muted); line-height: 1.5; flex: 1; margin-bottom: 16px; }
         .part-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
         .part-price { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: .02em; line-height: 1; }
         .add-btn { padding: 9px 16px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--text); cursor: pointer; transition: background .15s, border-color .15s, color .15s, transform .1s; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
         .add-btn svg { width: 13px; height: 13px; transition: transform .2s; }
-        .add-btn:hover { background: var(--accent); border-color: var(--accent); color: #0d0d0f; }
+        .add-btn:hover { background: var(--accent); border-color: var(--accent); color: #ffffff; }
         .add-btn:hover svg { transform: scale(1.15); }
         .add-btn:active { transform: scale(.97); }
-        .add-btn.added { background: rgba(232,255,71,.12); border-color: rgba(232,255,71,.35); color: var(--accent); cursor: default; }
+        .add-btn.added { background: rgba(27,72,214,.13); border-color: rgba(27,72,214,.4); color: var(--text); cursor: default; }
 
         /* -- Cart drawer -- */
         .cart-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 90; opacity: 0; pointer-events: none; transition: opacity .25s; }
@@ -148,7 +150,7 @@
         .cart-drawer.open { transform: translateX(0); }
         .cart-drawer-head { padding: 18px 24px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
         .cart-drawer-title { font-size: 15px; font-weight: 500; margin-bottom: 2px; }
-        .cart-drawer-folder { font-size: 11px; color: var(--accent); letter-spacing: .04em; }
+        .cart-drawer-folder { font-size: 11px; color: var(--muted); letter-spacing: .04em; }
         .cart-head-row { display: flex; align-items: flex-start; justify-content: space-between; }
         .cart-close { background: none; border: none; cursor: pointer; color: var(--muted); padding: 4px; border-radius: 6px; transition: color .15s, background .15s; }
         .cart-close:hover { color: var(--text); background: var(--surface2); }
@@ -161,7 +163,7 @@
         .cart-item-thumb-placeholder { width: 48px; height: 48px; border-radius: 6px; background: var(--surface3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .cart-item-info { flex: 1; min-width: 0; }
         .cart-item-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .cart-item-num { font-size: 10px; color: var(--accent); letter-spacing: .08em; margin-bottom: 6px; }
+        .cart-item-num { font-size: 10px; color: var(--muted); letter-spacing: .08em; margin-bottom: 6px; }
         .cart-item-bottom { display: flex; align-items: center; gap: 10px; }
         .cart-item-price { font-family: 'Bebas Neue', sans-serif; font-size: 17px; }
         .qty-control { display: flex; align-items: center; border: 1px solid var(--border2); border-radius: 6px; overflow: hidden; }
@@ -178,7 +180,7 @@
         .cart-totals { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
         .cart-total-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
         .cart-total-price { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: .02em; }
-        .checkout-btn { width: 100%; padding: 14px; background: var(--accent); color: #0d0d0f; border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: background .15s, transform .1s; }
+        .checkout-btn { width: 100%; padding: 14px; background: var(--accent); color: #ffffff; border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: background .15s, transform .1s; }
         .checkout-btn:hover { background: var(--accent2); }
         .checkout-btn:active { transform: scale(.99); }
 
@@ -201,7 +203,7 @@
         .ret-part-preview img { width:40px; height:40px; border-radius:6px; object-fit:cover; flex-shrink:0; }
         .ret-part-thumb { width:40px; height:40px; border-radius:6px; background:var(--surface3); flex-shrink:0; }
         .ret-part-name { font-size:13px; font-weight:500; }
-        .ret-part-num  { font-size:10px; color:var(--accent); letter-spacing:.06em; margin-top:2px; }
+        .ret-part-num  { font-size:10px; color:var(--muted); letter-spacing:.06em; margin-top:2px; }
         .ret-reason-group { display:flex; flex-direction:column; gap:8px; margin-bottom:20px; }
         .ret-reason-opt { display:flex; align-items:center; gap:10px; padding:10px 14px; border:1px solid var(--border2); border-radius:8px; cursor:pointer; transition:all .15s; }
         .ret-reason-opt:hover { border-color:rgba(255,255,255,.2); background:var(--surface2); }
@@ -226,10 +228,10 @@
         .history-body { padding: 36px 56px 60px; overflow-y: auto; flex: 1; }
         .order-card { background: var(--surface); border: 1px solid var(--border2); border-radius: 16px; margin-bottom: 16px; overflow: hidden; animation: fadeUp .3s ease both; }
         .order-card-head { padding: 18px 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--border); }
-        .order-id { font-size: 10px; font-weight: 500; letter-spacing: .1em; color: var(--accent); }
+        .order-id { font-size: 10px; font-weight: 500; letter-spacing: .1em; color: var(--muted); }
         .order-date { font-size: 11px; color: var(--muted); margin-top: 3px; }
         .order-status { font-size: 10px; font-weight: 500; padding: 3px 10px; border-radius: 99px; background: rgba(71,255,178,.1); color: #47ffb2; border: 1px solid rgba(71,255,178,.25); }
-        .order-status.test { background: rgba(232,255,71,.08); color: var(--accent); border-color: rgba(232,255,71,.25); }
+        .order-status.test { background: rgba(27,72,214,.08); color: var(--muted); border-color: rgba(27,72,214,.25); }
         .order-card-body { padding: 16px 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .order-meta-item { display: flex; flex-direction: column; gap: 3px; }
         .order-meta-label { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
@@ -240,14 +242,14 @@
         .order-item-row img { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; flex-shrink: 0; }
         .order-item-thumb-sm { width: 32px; height: 32px; border-radius: 4px; background: var(--surface3); flex-shrink: 0; }
         .order-item-name-sm { flex: 1; font-weight: 500; }
-        .order-item-num-sm { font-size: 10px; color: var(--accent); letter-spacing: .06em; }
+        .order-item-num-sm { font-size: 10px; color: var(--muted); letter-spacing: .06em; }
         .order-item-price-sm { font-family: 'Bebas Neue', sans-serif; font-size: 15px; flex-shrink: 0; }
         .order-card-footer { padding: 14px 22px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
         .email-confirm { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
         .email-confirm svg { width: 13px; height: 13px; color: #47ffb2; flex-shrink: 0; }
         .invoice-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--text); cursor: pointer; transition: all .15s; }
         .invoice-btn svg { width: 13px; height: 13px; }
-        .invoice-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .invoice-btn:hover { border-color: var(--accent); color: var(--text); }
         .history-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 40px; gap: 14px; color: var(--muted); text-align: center; }
         .history-empty svg { width: 48px; height: 48px; opacity: .2; }
 
@@ -265,6 +267,30 @@
             #print-invoice .inv-footer { margin-top: 40px; font-size: 11px; color: #999; border-top: 1px solid #ddd; padding-top: 12px; }
         }
 
+        /* -- Photo count badge on part card image -- */
+        .img-count-badge { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,.55); backdrop-filter: blur(4px); color: #ffffff; font-size: 10px; font-weight: 500; padding: 3px 8px 3px 6px; border-radius: 99px; display: flex; align-items: center; gap: 4px; pointer-events: none; letter-spacing: .02em; }
+        .img-count-badge svg { width: 11px; height: 11px; flex-shrink: 0; }
+        .part-img-wrap.has-gallery { cursor: zoom-in; }
+
+        /* -- Gallery lightbox -- */
+        .gallery-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.93); z-index: 500; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 0; }
+        .gallery-overlay.open { display: flex; }
+        .gallery-close { position: absolute; top: 18px; right: 22px; background: none; border: none; color: rgba(255,255,255,.6); font-size: 34px; cursor: pointer; line-height: 1; transition: color .15s; z-index: 10; padding: 4px; }
+        .gallery-close:hover { color: #ffffff; }
+        .gallery-main { display: flex; align-items: center; justify-content: center; gap: 16px; width: 100%; max-width: 920px; padding: 0 16px; }
+        .gallery-img-wrap { flex: 1; display: flex; align-items: center; justify-content: center; max-height: 62vh; overflow: hidden; }
+        .gallery-img { max-width: 100%; max-height: 62vh; object-fit: contain; border-radius: 8px; display: block; }
+        .gallery-arrow { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 50%; color: #fff; font-size: 26px; width: 46px; height: 46px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .15s; flex-shrink: 0; line-height: 1; }
+        .gallery-arrow:hover { background: rgba(255,255,255,.22); }
+        .gallery-footer { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 18px; width: 100%; max-width: 920px; padding: 0 20px; }
+        .gallery-counter { font-size: 11px; color: rgba(255,255,255,.45); letter-spacing: .1em; }
+        .gallery-thumbs { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 6px; max-width: 100%; }
+        .gallery-thumbs::-webkit-scrollbar { height: 3px; }
+        .gallery-thumbs::-webkit-scrollbar-thumb { background: rgba(255,255,255,.25); border-radius: 2px; }
+        .gallery-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; cursor: pointer; opacity: .45; transition: opacity .15s, border-color .15s; border: 2px solid transparent; flex-shrink: 0; }
+        .gallery-thumb.active { opacity: 1; border-color: #ffffff; }
+        .gallery-thumb:hover { opacity: .75; }
+
         @media (max-width: 860px) {
             .sidebar { display: none; }
             .folder-hero, .folder-section, .parts-body { padding-left: 24px; padding-right: 24px; }
@@ -278,14 +304,16 @@
 <!-- Sidebar -->
 <aside class="sidebar">
     <div class="logo">
-        <span class="logo-mark">P</span>
-        <span class="logo-text">PartFind</span>
+        <div style="display:flex;flex-direction:column;gap:0;line-height:1;">
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.14em;color:#F5F5F7;">AUTOCRAFT</span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.22em;color:#1B48D6;">OEM</span>
+        </div>
     </div>
     <nav class="nav">
         <span class="nav-label">Menu</span>
         <a href="recommended-parts.html" class="nav-item active">
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M2 4a2 2 0 012-2h2l2 2h4a2 2 0 012 2v5a2 2 0 01-2 2H4a2 2 0 01-2-2V4z"/></svg>
-            My Folders
+            My Tickets
         </a>
         <!-- Cart nav item — shows global total across all folders -->
         <button class="nav-item" id="nav-cart-btn" onclick="openCart()">
@@ -313,12 +341,12 @@
 <!-- Folder view -->
 <div id="view-folders" style="flex:1;display:flex;flex-direction:column;">
     <div class="folder-hero">
-        <div class="page-eyebrow">Service records</div>
-        <h1 class="page-title" id="hero-title">Your <em>folders</em></h1>
-        <p class="page-sub">Select a service folder to view recommended parts and manage your cart for that vehicle.</p>
+        <div class="page-eyebrow">Service Tickets</div>
+        <h1 class="page-title" id="hero-title">Your <em>Tickets</em></h1>
+        <p class="page-sub">Select a ticket to view recommended parts and manage your cart for that vehicle.</p>
     </div>
     <div class="folder-section">
-        <div class="section-label" id="folders-section-label">Your folders</div>
+        <div class="section-label" id="folders-section-label">Your tickets</div>
         <div class="folder-grid" id="folder-grid"></div>
     </div>
 </div>
@@ -328,7 +356,7 @@
     <div class="parts-topbar">
         <button class="back-btn" onclick="showFolders()">
             <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 2L4 7l5 5"/></svg>
-            All folders
+            All tickets
         </button>
         <div class="parts-topbar-info">
             <div class="parts-topbar-name" id="topbar-folder-name">—</div>
@@ -388,6 +416,22 @@
 
 <div class="toast" id="toast"><span class="toast-dot"></span><span id="toast-msg"></span></div>
 
+<!-- Image gallery lightbox -->
+<div class="gallery-overlay" id="gallery-overlay" onclick="if(event.target===this)closeGallery()">
+    <button class="gallery-close" onclick="closeGallery()" aria-label="Close gallery">×</button>
+    <div class="gallery-main">
+        <button class="gallery-arrow" id="gallery-prev" onclick="galleryNav(-1)" aria-label="Previous">&#8249;</button>
+        <div class="gallery-img-wrap">
+            <img class="gallery-img" id="gallery-img" src="" alt="">
+        </div>
+        <button class="gallery-arrow" id="gallery-next" onclick="galleryNav(1)" aria-label="Next">&#8250;</button>
+    </div>
+    <div class="gallery-footer">
+        <div class="gallery-counter" id="gallery-counter"></div>
+        <div class="gallery-thumbs" id="gallery-thumbs"></div>
+    </div>
+</div>
+
 <!-- Return Request Modal -->
 <div class="ret-backdrop" id="ret-backdrop">
     <div class="ret-modal">
@@ -422,6 +466,57 @@
 
 <script src="db.js"></script>
 <script>
+// ── Gallery lightbox (module-level — accessible from inline onclick) ──────────
+var _galleryImages = [];
+var _galleryIdx    = 0;
+var _partGalleries = {};  // partNumber → images[]
+
+function openGallery(partNumber) {
+    var images = _partGalleries[partNumber];
+    if (!images || images.length === 0) return;
+    _galleryImages = images;
+    _galleryIdx    = 0;
+    document.getElementById('gallery-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    _renderGalleryFrame();
+}
+
+function closeGallery() {
+    document.getElementById('gallery-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+function galleryNav(dir) {
+    _galleryIdx = (_galleryIdx + dir + _galleryImages.length) % _galleryImages.length;
+    _renderGalleryFrame();
+}
+
+function _renderGalleryFrame() {
+    document.getElementById('gallery-img').src = _galleryImages[_galleryIdx] || '';
+    document.getElementById('gallery-counter').textContent =
+        (_galleryIdx + 1) + ' / ' + _galleryImages.length;
+    var thumbWrap = document.getElementById('gallery-thumbs');
+    thumbWrap.innerHTML = '';
+    _galleryImages.forEach(function(url, i) {
+        var t = document.createElement('img');
+        t.src = url;
+        t.className = 'gallery-thumb' + (i === _galleryIdx ? ' active' : '');
+        (function(idx) { t.addEventListener('click', function() { _galleryIdx = idx; _renderGalleryFrame(); }); })(i);
+        thumbWrap.appendChild(t);
+    });
+    document.getElementById('gallery-prev').style.visibility = _galleryImages.length > 1 ? '' : 'hidden';
+    document.getElementById('gallery-next').style.visibility = _galleryImages.length > 1 ? '' : 'hidden';
+}
+
+// Keyboard navigation for gallery
+document.addEventListener('keydown', function(e) {
+    if (!document.getElementById('gallery-overlay').classList.contains('open')) return;
+    if (e.key === 'Escape')     closeGallery();
+    if (e.key === 'ArrowLeft')  galleryNav(-1);
+    if (e.key === 'ArrowRight') galleryNav(1);
+});
+
+// ── Auth guard ────────────────────────────────────────────────────────────────
 // -- Auth guard -----------------------------------------------------------------
 const session = Auth.requireAuth();
 if (session && session.role === 'admin') Auth.redirectByRole('admin');
@@ -431,7 +526,7 @@ if (session) {
     const initials  = session.displayName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
     document.getElementById('user-name').textContent   = session.displayName;
     document.getElementById('user-avatar').textContent = initials;
-    document.getElementById('hero-title').innerHTML    = `${firstName}'s <em>folders</em>`;
+    document.getElementById('hero-title').innerHTML    = `Your <em>Tickets</em>`;
     document.getElementById('logout-btn').addEventListener('click', () => Auth.logout());
 
     // -- State -----------------------------------------------------------------
@@ -483,12 +578,12 @@ if (session) {
         const grid    = document.getElementById('folder-grid');
         const label   = document.getElementById('folders-section-label');
         grid.innerHTML = '';
-        label.textContent = folders.length + ' folder' + (folders.length !== 1 ? 's' : '');
+        label.textContent = folders.length + ' ticket' + (folders.length !== 1 ? 's' : '');
 
         if (folders.length === 0) {
             grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
                 <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M8 14a4 4 0 014-4h7l4 4h13a4 4 0 014 4v14a4 4 0 01-4 4H12a4 4 0 01-4-4V14z"/></svg>
-                <p>No service folders have been assigned to your account yet.</p>
+                <p>No tickets have been assigned to your account yet.</p>
             </div>`;
             updateGlobalBadge();
             return;
@@ -578,16 +673,25 @@ if (session) {
         }
 
         folder.parts.forEach((part, i) => {
+            // Build images array — prefer part.images[], fall back to imageUrl
+            const images = (part.images && part.images.length > 0)
+                ? part.images.filter(Boolean)
+                : (part.imageUrl ? [part.imageUrl] : []);
+            _partGalleries[part.partNumber] = images;
+            const primaryImg   = images[0] || '';
+            const hasMultiple  = images.length > 1;
+
             const inCart = cart.some(c => c.partNumber === part.partNumber);
             const card   = document.createElement('div');
             card.className = 'part-card' + (inCart ? ' in-cart' : '');
             card.id        = 'part-card-' + part.partNumber;
             card.style.animationDelay = `${i * 55}ms`;
             card.innerHTML = `
-                <div class="part-img-wrap">
-                    ${part.imageUrl
-                        ? `<img class="part-img" src="${part.imageUrl}" alt="${part.partName || ''}" loading="lazy">`
+                <div class="part-img-wrap${hasMultiple ? ' has-gallery' : ''}"${hasMultiple ? ` onclick="openGallery('${part.partNumber}')"` : ''}>
+                    ${primaryImg
+                        ? `<img class="part-img" src="${primaryImg}" alt="${part.partName || ''}" loading="lazy">`
                         : `<div class="part-img-placeholder"><svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="4" y="4" width="28" height="28" rx="3"/><circle cx="13" cy="13" r="3"/><path d="M32 24l-9-7-6 6-3-3L4 28"/></svg></div>`}
+                    ${hasMultiple ? `<div class="img-count-badge"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="1" y="3" width="8" height="7" rx="1"/><path d="M3 3V2h6v1"/><circle cx="9.5" cy="8.5" r="2" fill="currentColor" stroke="none"/><path d="M9.5 7.5v2M8.5 8.5h2" stroke="#111" stroke-width="1" stroke-linecap="round"/></svg>${images.length} photos</div>` : ''}
                     <div class="in-cart-ribbon">In cart</div>
                 </div>
                 <div class="part-card-body">
@@ -871,7 +975,7 @@ if (session) {
             </tr>`).join('');
 
         document.getElementById('print-invoice').innerHTML = `
-            <h1>PartFind Invoice</h1>
+            <h1>Autocraft OEM Invoice</h1>
             <p style="color:#666;font-size:13px;margin-bottom:4px;">Tax invoice / receipt</p>
             ${order.testMode ? '<p style="color:#c8a800;font-size:12px;font-weight:700;margin-bottom:4px;">TEST ORDER — Not a real transaction</p>' : ''}
             <div class="inv-meta">
@@ -887,7 +991,7 @@ if (session) {
                 <tbody>${itemRows}</tbody>
             </table>
             <div class="inv-total">Order total: $${order.total.toFixed(2)}</div>
-            <div class="inv-footer">PartFind · ${email} · Order ${order.orderId} · Generated ${new Date().toLocaleDateString()}</div>`;
+            <div class="inv-footer">Autocraft OEM · ${email} · Order ${order.orderId} · Generated ${new Date().toLocaleDateString()}</div>`;
 
         window.print();
     }

@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git checkout *)"
+      "Bash(git checkout *)",
+      "Bash(node -e \"const fs=require\\('fs'\\); try { new Function\\(fs.readFileSync\\('admin-dashboard.html','utf8'\\).match\\(/<script[^>]*>\\([\\\\s\\\\S]*?\\)<\\\\/script>/g\\).pop\\(\\).replace\\(/<\\\\/?script[^>]*>/g,''\\)\\); console.log\\('OK'\\); } catch\\(e\\) { console.log\\(e.message\\); }\")",
+      "Bash(node --check db.js)",
+      "Bash(node -e ' *)",
+      "Bash(python -c ' *)",
+      "Bash(python -c \"print\\(len\\(open\\('admin-dashboard.html','rb'\\).read\\(\\)\\), 'bytes'\\)\")",
+      "Bash(dir \"C:\\\\Users\\\\William\\\\Developer\\\\Website\" /B)",
+      "Bash(ls \"C:\\\\Users\\\\William\\\\Developer\\\\Website\\\\\" 2>/dev/null || dir \"C:\\\\Users\\\\William\\\\Developer\\\\Website\\\\\")",
+      "Bash(del \"C:\\\\Users\\\\William\\\\Developer\\\\Website\\\\email.js\")"
     ]
   }
 }

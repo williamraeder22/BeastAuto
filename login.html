@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PartFind — Sign In</title>
+    <title>Autocraft OEM — Sign In</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0d0d0f; --surface: #16161a; --surface2: #1e1e24;
-            --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13);
-            --accent: #e8ff47; --text: #f0ede8; --muted: rgba(240,237,232,0.45);
+            --bg: #111214; --surface: #1A1B1F; --surface2: #22242A;
+            --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.14);
+            --accent: #1B48D6; --text: #F5F5F7; --muted: rgba(245,245,247,0.45);
             --error: #ff5c5c;
         }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,13 +39,8 @@
             animation: fadeUp 0.4s ease both;
         }
         @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-        .logo { display:flex; align-items:center; gap:10px; margin-bottom:36px; }
-        .logo-mark {
-            width:32px; height:32px; background:var(--accent); color:#0d0d0f;
-            font-family:'Bebas Neue',sans-serif; font-size:20px;
-            display:flex; align-items:center; justify-content:center; border-radius:6px;
-        }
-        .logo-text { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:.05em; }
+        .logo { display:flex; align-items:center; gap:12px; margin-bottom:36px; }
+        .logo-img { width:72px; height:72px; object-fit:contain; filter:brightness(0) invert(1); flex-shrink:0; }
         h1 { font-family:'Bebas Neue',sans-serif; font-size:36px; margin-bottom:6px; }
         .subtitle { font-size:14px; font-weight:300; color:var(--muted); margin-bottom:32px; }
         .field { margin-bottom:18px; display:flex; flex-direction:column; gap:6px; }
@@ -63,12 +58,12 @@
         select option { background: var(--surface2); color: var(--text); }
         .btn {
             width:100%; padding:14px; margin-top:8px;
-            background:var(--accent); color:#0d0d0f;
+            background:var(--accent); color:#ffffff;
             border:none; border-radius:10px;
             font-family:'DM Sans',sans-serif; font-size:15px; font-weight:500;
             cursor:pointer; transition:background .15s, transform .1s;
         }
-        .btn:hover { background:#c8dc30; }
+        .btn:hover { background:#1038BC; }
         .btn:active { transform:scale(.98); }
         .error-msg {
             font-size:13px; color:var(--error);
@@ -91,8 +86,10 @@
 <div class="noise"></div>
 <div class="card">
     <div class="logo">
-        <span class="logo-mark">P</span>
-        <span class="logo-text">PartFind</span>
+        <div style="display:flex;flex-direction:column;gap:2px;line-height:1;">
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:.14em;color:#F5F5F7;">AUTOCRAFT</span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.28em;color:#1B48D6;">OEM</span>
+        </div>
     </div>
 
     <h1>Welcome back.</h1>
